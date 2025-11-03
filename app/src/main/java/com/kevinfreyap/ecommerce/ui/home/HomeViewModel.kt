@@ -1,13 +1,34 @@
 package com.kevinfreyap.ecommerce.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.ecommerce.data.Resource
+import com.kevinfreyap.ecommerce.domain.model.Product
+import com.kevinfreyap.ecommerce.domain.usecase.ProductUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val productUseCase: ProductUseCase
+) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    private val _productList = MutableStateFlow<Resource<List<Product>>>(Resource.Loading())
+    val productList: StateFlow<Resource<List<Product>>> = _productList
+
+    init {
+        getProducts()
     }
-    val text: LiveData<String> = _text
+
+    fun getProducts() {
+        viewModelScope.launch {
+            productUseCase.getProducts()
+                .collect { products ->
+                    _productList.value = products
+                }
+        }
+    }
 }
