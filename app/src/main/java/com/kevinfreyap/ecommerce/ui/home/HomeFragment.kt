@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kevinfreyap.ecommerce.data.Resource
+import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.ecommerce.databinding.FragmentHomeBinding
 import com.kevinfreyap.ecommerce.ui.adapter.ProductAdapter
 import dagger.hilt.android.AndroidEntryPoint

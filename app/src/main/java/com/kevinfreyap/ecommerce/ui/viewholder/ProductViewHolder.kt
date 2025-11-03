@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kevinfreyap.ecommerce.R
 import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
-import com.kevinfreyap.ecommerce.domain.model.Product
+import com.kevinfreyap.core.domain.model.Product
 
 class ProductViewHolder(
     val binding: ItemProductBinding

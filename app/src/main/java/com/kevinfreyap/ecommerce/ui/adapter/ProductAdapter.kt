@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
-import com.kevinfreyap.ecommerce.domain.model.Product
+import com.kevinfreyap.core.domain.model.Product
 import com.kevinfreyap.ecommerce.ui.viewholder.ProductViewHolder
 
 class ProductAdapter: ListAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
