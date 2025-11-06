@@ -30,8 +30,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     buildFeatures {
@@ -42,31 +42,26 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-
-    api(libs.glide)
-    api(libs.material)
-    api(libs.androidx.navigation.fragment.ktx)
-    api(libs.androidx.navigation.ui.ktx)
-    api(libs.androidx.activity.ktx)
-    api(libs.androidx.fragment.ktx)
-
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
 
+    implementation(libs.kotlinx.coroutines.playServices)
+    implementation(libs.firebase.auth)
+    implementation(libs.googleid)
+    api(libs.androidx.credentials.play.services.auth)
+    api(libs.androidx.credentials)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preference)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

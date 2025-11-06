@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/til_custom_text_input_layout"
+    style="@style/Widget.Material3.TextInputLayout.FilledBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="5dp"
+    app:boxBackgroundColor="@android:color/white"
+    app:boxStrokeWidth="0dp"
+    app:boxStrokeWidthFocused="0dp"
+    app:boxCornerRadiusTopStart="28dp"
+    app:boxCornerRadiusTopEnd="28dp"
+    app:boxCornerRadiusBottomEnd="28dp"
+    app:boxCornerRadiusBottomStart="28dp"
+    tools:layout_height="wrap_content">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/et_custom_text_input_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</com.google.android.material.textfield.TextInputLayout>

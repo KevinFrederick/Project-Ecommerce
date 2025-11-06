@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hiltAndroid)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -30,8 +31,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     buildFeatures {
@@ -42,13 +43,16 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 
 dependencies {
-
     implementation(project(":core"))
+    implementation(project(":shared-ui"))
+    implementation(project(":auth"))
+    implementation(project(":account"))
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 }

@@ -2,8 +2,8 @@ package com.kevinfreyap.core.utils
 
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
-import com.kevinfreyap.core.domain.model.Product
-import com.kevinfreyap.core.domain.model.ProductCategory
+import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.core.domain.model.product.ProductCategory
 
 object DataMapper {
     fun mapProductCategoryToDomain(categoryResponse: CategoryResponse): ProductCategory {

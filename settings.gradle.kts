@@ -22,3 +22,6 @@ dependencyResolutionManagement {
 rootProject.name = "Ecommerce"
 include(":app")
 include(":core")
+include(":account")
+include(":shared-ui")
+include(":auth")

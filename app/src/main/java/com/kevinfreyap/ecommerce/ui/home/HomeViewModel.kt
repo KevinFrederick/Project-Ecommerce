@@ -3,8 +3,8 @@ package com.kevinfreyap.ecommerce.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.Product
-import com.kevinfreyap.core.domain.usecase.ProductUseCase
+import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

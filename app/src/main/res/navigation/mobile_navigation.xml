@@ -5,6 +5,10 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
 
+    <include
+        android:id="@+id/nav_auth"
+        app:graph="@navigation/nav_auth"/>
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"
@@ -18,8 +22,24 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.kevinfreyap.ecommerce.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_account_router"
+        android:name="com.kevinfreyap.ecommerce.ui.navigation.AccountRouterFragment" >
+        <deepLink
+            android:id="@+id/deep_link_account"
+            app:uri="app://ecommerce/account">
+        </deepLink>
+        <action
+            android:id="@+id/action_navigation_account_router_to_accountProfile"
+            app:destination="@id/navigation_account_profile" />
+        <action
+            android:id="@+id/action_navigation_account_router_to_loginFragment"
+            app:destination="@id/nav_auth" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_account_profile"
+        android:name="com.kevinfreyap.account.ui.AccountFragment"
+        android:label="@string/title_account"
+        tools:layout="@layout/fragment_account" />
+
 </navigation>

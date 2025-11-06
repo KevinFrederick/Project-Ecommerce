@@ -1,7 +1,7 @@
 package com.kevinfreyap.core.di
 
-import com.kevinfreyap.core.domain.usecase.ProductInteractor
-import com.kevinfreyap.core.domain.usecase.ProductUseCase
+import com.kevinfreyap.core.domain.usecase.product.ProductInteractor
+import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

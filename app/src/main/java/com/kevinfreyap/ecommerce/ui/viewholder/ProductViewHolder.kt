@@ -2,9 +2,9 @@ package com.kevinfreyap.ecommerce.ui.viewholder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.kevinfreyap.ecommerce.R
+import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
-import com.kevinfreyap.core.domain.model.Product
+import com.kevinfreyap.core.domain.model.product.Product
 
 class ProductViewHolder(
     val binding: ItemProductBinding
