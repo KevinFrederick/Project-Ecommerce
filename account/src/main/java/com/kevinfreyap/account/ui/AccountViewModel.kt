@@ -1,10 +1,9 @@
 package com.kevinfreyap.account.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kevinfreyap.core.domain.model.auth.UserProfile
+import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,17 +16,25 @@ class AccountViewModel @Inject constructor(
     private val authUseCase: AuthUseCase
 ) : ViewModel() {
 
-    private val _userProfile = MutableStateFlow<UserProfile?>(null)
-    val userProfile: StateFlow<UserProfile?> = _userProfile
+    private val _userProfile = MutableStateFlow<Resource<UserProfile?>>(Resource.Loading())
+    val userProfile: StateFlow<Resource<UserProfile?>> = _userProfile
 
     init {
-        _userProfile.value = authUseCase.getUserProfile()
+        loadUserProfile()
+    }
+
+    private fun  loadUserProfile() {
+        viewModelScope.launch {
+            authUseCase.getUserProfile().collect { resource ->
+                _userProfile.value = resource
+            }
+        }
     }
 
     fun logout() {
         viewModelScope.launch {
             authUseCase.logout()
-            _userProfile.value = null
+            _userProfile.value = Resource.Success(null)
         }
     }
 }

@@ -13,7 +13,7 @@
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
-    <string name="text_unknown_name">Username</string>
+    <string name="text_unknown_name">Your Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
 
     <!-- String Format -->

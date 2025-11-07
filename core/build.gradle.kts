@@ -53,6 +53,7 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.playServices)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore.ktx)
     implementation(libs.googleid)
     api(libs.androidx.credentials.play.services.auth)
     api(libs.androidx.credentials)
