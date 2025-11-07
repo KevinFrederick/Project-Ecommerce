@@ -16,5 +16,6 @@ class ProductViewHolder(
             .into(binding.ivProduct)
         binding.tvProduct.text = product.title
         binding.tvProductPrice.text = context.getString(R.string.currency_dollar, product.price)
+        binding.tvCategory.text = product.category.name
     }
 }

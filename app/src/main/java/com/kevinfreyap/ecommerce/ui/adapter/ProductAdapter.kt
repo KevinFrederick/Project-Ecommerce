@@ -2,13 +2,13 @@ package com.kevinfreyap.ecommerce.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.ecommerce.ui.viewholder.ProductViewHolder
 
-class ProductAdapter: ListAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
+class ProductAdapter: PagingDataAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

@@ -1,6 +1,8 @@
 package com.kevinfreyap.core.utils
 
 object Constants {
+    const val ROOM_TABLE_PRODUCT = "product"
+    const val ROOM_TABLE_REMOTE_KEYS = "remote_keys"
     const val USER_COLLECTION = "users"
     const val FIELD_ID = "uid"
     const val FIELD_EMAIL = "email"

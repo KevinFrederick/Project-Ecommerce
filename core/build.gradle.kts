@@ -64,6 +64,13 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preference)
 
+    api(libs.androidx.room.ktx)
+    api(libs.androidx.room.runtime)
+    api(libs.androidx.room.paging)
+    ksp(libs.androidx.room.compiler)
+
+    api(libs.paging.runtime)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

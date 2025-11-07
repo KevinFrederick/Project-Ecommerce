@@ -52,4 +52,5 @@ dependencies {
     api(libs.androidx.navigation.ui.ktx)
     api(libs.androidx.activity.ktx)
     api(libs.androidx.fragment.ktx)
+    api(libs.androidx.swiperefreshlayout)
 }

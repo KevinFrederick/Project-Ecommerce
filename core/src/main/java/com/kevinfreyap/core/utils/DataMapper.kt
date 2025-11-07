@@ -1,16 +1,61 @@
 package com.kevinfreyap.core.utils
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.product.ProductCategory
 
 object DataMapper {
+
+    private val gson = Gson()
+
     fun mapProductCategoryToDomain(categoryResponse: CategoryResponse): ProductCategory {
         return ProductCategory(
             id = categoryResponse.id,
             name = categoryResponse.name,
             image = categoryResponse.image
+        )
+    }
+
+    fun mapProductsResponseToEntity(input: List<ProductsResponseItem>): List<ProductEntity> {
+        val productList = ArrayList<ProductEntity>()
+        input.map {
+            val product = ProductEntity(
+                id = it.id,
+                title = it.title,
+                description = it.description,
+                price = it.price,
+                slug = it.slug,
+                creationAt = it.creationAt,
+                updatedAt = it.updatedAt,
+                category = gson.toJson(it.categoryResponse),
+                images = gson.toJson(it.images)
+            )
+            productList.add(product)
+        }
+        return productList
+    }
+
+    fun mapEntityToDomain(entity: ProductEntity): Product {
+        val categoryObject = gson.fromJson(entity.category, ProductCategory::class.java)
+        val imageList: List<String> = gson.fromJson(
+            entity.images,
+            object : TypeToken<List<String>>() {}.type
+        )
+
+        return Product(
+            id = entity.id,
+            title = entity.title,
+            category = categoryObject,
+            description = entity.description,
+            price = entity.price,
+            images = imageList,
+            slug = entity.slug,
+            creationAt = entity.creationAt,
+            updatedAt = entity.updatedAt
         )
     }
 
