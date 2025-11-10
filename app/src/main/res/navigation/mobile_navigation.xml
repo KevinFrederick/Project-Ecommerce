@@ -9,6 +9,10 @@
         android:id="@+id/nav_auth"
         app:graph="@navigation/nav_auth"/>
 
+    <include
+        android:id="@+id/nav_detail"
+        app:graph="@navigation/nav_detail"/>
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"

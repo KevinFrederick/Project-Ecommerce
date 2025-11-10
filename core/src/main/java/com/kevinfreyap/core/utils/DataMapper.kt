@@ -20,23 +20,22 @@ object DataMapper {
         )
     }
 
+    fun mapProductResponseToEntity(response: ProductsResponseItem): ProductEntity {
+        return ProductEntity(
+            id = response.id,
+            title = response.title,
+            description = response.description,
+            price = response.price,
+            slug = response.slug,
+            creationAt = response.creationAt,
+            updatedAt = response.updatedAt,
+            category = gson.toJson(response.categoryResponse),
+            images = gson.toJson(response.images)
+        )
+    }
+
     fun mapProductsResponseToEntity(input: List<ProductsResponseItem>): List<ProductEntity> {
-        val productList = ArrayList<ProductEntity>()
-        input.map {
-            val product = ProductEntity(
-                id = it.id,
-                title = it.title,
-                description = it.description,
-                price = it.price,
-                slug = it.slug,
-                creationAt = it.creationAt,
-                updatedAt = it.updatedAt,
-                category = gson.toJson(it.categoryResponse),
-                images = gson.toJson(it.images)
-            )
-            productList.add(product)
-        }
-        return productList
+        return input.map { mapProductResponseToEntity(it) }
     }
 
     fun mapEntityToDomain(entity: ProductEntity): Product {

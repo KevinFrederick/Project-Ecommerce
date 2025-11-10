@@ -8,7 +8,9 @@ import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.ecommerce.ui.viewholder.ProductViewHolder
 
-class ProductAdapter: PagingDataAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
+class ProductAdapter(
+    private val onItemClicked: (productId: Int) -> Unit
+): PagingDataAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -23,7 +25,7 @@ class ProductAdapter: PagingDataAdapter<Product, ProductViewHolder>(PRODUCT_DIFF
     ) {
         val product = getItem(position)
         if (product != null) {
-            holder.bind(product)
+            holder.bind(product, onItemClicked)
         }
     }
 

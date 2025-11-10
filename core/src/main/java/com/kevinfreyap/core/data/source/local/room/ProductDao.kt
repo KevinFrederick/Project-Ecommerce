@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.RemoteKeyEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {
@@ -18,6 +19,12 @@ interface ProductDao {
 
     @Query("SELECT * FROM product")
     fun getProducts(): PagingSource<Int, ProductEntity>
+
+    @Query("SELECT * FROM product WHERE id = :id")
+    fun getProductById(id: Int): Flow<ProductEntity?>
+
+    @Query("DELETE FROM product WHERE id = :id")
+    suspend fun deleteProductById(id: Int)
 
     @Query("SELECT * FROM remote_keys WHERE productId = :id")
     suspend fun getRemoteKeysById(id: Int): RemoteKeyEntity?

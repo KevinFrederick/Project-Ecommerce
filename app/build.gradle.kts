@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":shared-ui"))
     implementation(project(":auth"))
     implementation(project(":account"))
+    implementation(project(":detail"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

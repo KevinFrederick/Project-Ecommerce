@@ -47,8 +47,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":shared-ui"))
 
-    implementation(libs.circle.imageview)
-
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 

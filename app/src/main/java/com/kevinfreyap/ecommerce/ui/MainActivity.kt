@@ -1,6 +1,7 @@
 package com.kevinfreyap.ecommerce.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -72,6 +73,22 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when(destination.id) {
+                R.id.navigation_home,
+                R.id.navigation_dashboard,
+                R.id.navigation_account_router,
+                R.id.nav_auth,
+                R.id.navigation_account_profile -> {
+                    navView.visibility = View.VISIBLE
+                }
+
+                else -> {
+                    navView.visibility = View.GONE
+                }
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

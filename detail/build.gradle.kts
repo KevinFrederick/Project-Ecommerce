@@ -3,10 +3,12 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
-    namespace = "com.kevinfreyap.shared_ui"
+    namespace = "com.kevinfreyap.detail"
     compileSdk = 36
 
     defaultConfig {
@@ -41,18 +43,15 @@ kotlin {
 }
 
 dependencies {
-    api(libs.androidx.lifecycle.livedata.ktx)
-    api(libs.androidx.lifecycle.viewmodel.ktx)
-    api(libs.androidx.core.ktx)
-    api(libs.androidx.appcompat)
-    api(libs.androidx.constraintlayout)
-    api(libs.glide)
-    api(libs.material)
-    api(libs.androidx.navigation.fragment.ktx)
-    api(libs.androidx.navigation.ui.ktx)
-    api(libs.androidx.activity.ktx)
-    api(libs.androidx.fragment.ktx)
-    api(libs.androidx.swiperefreshlayout)
-    api(libs.shimmer)
-    api(libs.circle.imageview)
+    implementation(project(":core"))
+    implementation(project(":shared-ui"))
+
+    implementation(libs.androidx.viewpager2)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
