@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface IProductRepository {
     fun getProducts(): Flow<PagingData<Product>>
     fun getProductById(productId: Int): Flow<Resource<Product?>>
+    fun getProductByIdFromCache(productId: Int): Flow<Product?>
 }

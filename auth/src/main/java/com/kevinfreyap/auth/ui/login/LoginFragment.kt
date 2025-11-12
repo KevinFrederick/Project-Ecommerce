@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -118,13 +119,17 @@ class LoginFragment : Fragment() {
                                 binding.progressBar.isVisible = false
 
                                 val message = when(resource.message) {
-                                    "ERROR_USER_NOT_FOUND" -> {
+                                    "ERROR_EMAIL_NOT_REGISTERED" -> {
                                         getString(sharedR.string.error_user_not_found)
                                     }
                                     "ERROR_WRONG_PASSWORD" -> {
                                         getString(sharedR.string.error_wrong_password)
                                     }
+                                    "ERROR_NO_CONNECTION" -> {
+                                        getString(sharedR.string.error_no_connection)
+                                    }
                                     else -> {
+                                        Log.e("LoginFragment", resource.message.toString())
                                         getString(sharedR.string.error_unknown)
                                     }
                                 }

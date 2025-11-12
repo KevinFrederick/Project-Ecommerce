@@ -13,6 +13,10 @@
         android:id="@+id/nav_detail"
         app:graph="@navigation/nav_detail"/>
 
+    <include
+        android:id="@+id/nav_cart"
+        app:graph="@navigation/nav_cart" />
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"

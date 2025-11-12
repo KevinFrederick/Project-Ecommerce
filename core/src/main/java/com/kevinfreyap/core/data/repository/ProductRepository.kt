@@ -8,20 +8,16 @@ import androidx.paging.map
 import androidx.room.withTransaction
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
-import com.kevinfreyap.core.data.source.NetworkBoundResource
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
-import com.kevinfreyap.core.data.source.remote.network.ApiResponse
 import com.kevinfreyap.core.data.source.remote.network.ApiService
-import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.utils.DataMapper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.io.IOException
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,6 +66,10 @@ class ProductRepository @Inject constructor(
             }
 
             emitAll(dbFlow.map { Resource.Success(it) })
+        } catch (_: IOException) {
+            emitAll(dbFlow.map { staleData ->
+                Resource.Error("ERROR_NO_CONNECTION", staleData)
+            })
         } catch (e: HttpException) {
             if (e.code() == 404) {
                 productDao.deleteProductById(productId)
@@ -83,6 +83,12 @@ class ProductRepository @Inject constructor(
             emitAll(dbFlow.map { staleData ->
                 Resource.Error(e.message.toString(), staleData)
             })
+        }
+    }
+
+    override fun getProductByIdFromCache(productId: Int): Flow<Product?> {
+        return productDao.getProductById(productId).map { productEntity ->
+            productEntity?.let { DataMapper.mapEntityToDomain(it) }
         }
     }
 }

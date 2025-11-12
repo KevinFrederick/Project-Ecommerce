@@ -1,6 +1,7 @@
 package com.kevinfreyap.core.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,6 +18,7 @@ import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.io.IOException
 import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,10 +45,18 @@ class AuthenticationRepository @Inject constructor(
                 saveUserInfo(user.uid, user.email)
                 emit(Resource.Success(true))
             } else {
-                emit(Resource.Error("REGISTRATION FAILED"))
+                emit(Resource.Error("REGISTRATION_FAILED"))
             }
-        } catch (_: Exception) {
-            emit(Resource.Error("REGISTRATION FAILED"))
+        } catch (_: IOException) {
+            emit(Resource.Error("ERROR_NO_CONNECTION"))
+        } catch (e: FirebaseAuthException) {
+            emit(Resource.Error(e.message ?: "REGISTRATION_FAILED"))
+        } catch (e: Exception) {
+            if (e.message?.contains("network", ignoreCase = true) == true) {
+                emit(Resource.Error("ERROR_NO_CONNECTION"))
+            }else {
+                emit(Resource.Error(e.message ?: "REGISTRATION_FAILED"))
+            }
         }
     }
 
@@ -66,16 +76,29 @@ class AuthenticationRepository @Inject constructor(
             } else {
                 emit(Resource.Error("UNKNOWN_ERROR"))
             }
+        } catch (_: IOException) {
+            emit(Resource.Error("ERROR_NO_CONNECTION"))
         } catch (e: Exception) {
             when(e) {
                 is FirebaseAuthInvalidUserException -> {
-                    emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+                    emit(Resource.Error("ERROR_EMAIL_NOT_REGISTERED"))
                 }
                 is FirebaseAuthInvalidCredentialsException -> {
                     emit(Resource.Error("ERROR_WRONG_PASSWORD"))
                 }
+                is FirebaseAuthException -> {
+                    if (e.errorCode == "ERROR_NETWORK_REQUEST_FAILED") {
+                        emit(Resource.Error("ERROR_NO_CONNECTION"))
+                    } else {
+                        emit(Resource.Error(e.message ?: "Login Failed"))
+                    }
+                }
                 else -> {
-                    emit(Resource.Error("Login Failed"))
+                    if (e.message?.contains("network", ignoreCase = true) == true) {
+                        emit(Resource.Error("ERROR_NO_CONNECTION"))
+                    }else {
+                        emit(Resource.Error(e.message ?: "Login Failed"))
+                    }
                 }
             }
         }
@@ -114,8 +137,14 @@ class AuthenticationRepository @Inject constructor(
             } else {
                 emit(Resource.Error("ERROR_USER_NOT_FOUND"))
             }
-        } catch (_: Exception) {
-            emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+        } catch (_: IOException) {
+            emit(Resource.Error("ERROR_NO_CONNECTION"))
+        } catch (e: Exception) {
+            if (e.message?.contains("network", ignoreCase = true) == true) {
+                emit(Resource.Error("ERROR_NO_CONNECTION"))
+            }else {
+                emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+            }
         }
 
     }

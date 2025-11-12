@@ -117,10 +117,16 @@ class RegisterFragment : Fragment() {
                             }
                             is Resource.Error -> {
                                 binding.progressBar.isVisible = false
-                                val message = if (resource.message == "REGISTRATION FAILED") {
-                                    getString(R.string.error_registration)
-                                } else {
-                                    resource.message
+                                val message = when (resource.message) {
+                                    "REGISTRATION_FAILED" -> {
+                                        getString(R.string.error_registration)
+                                    }
+                                    "ERROR_NO_CONNECTION" -> {
+                                        getString(R.string.error_no_connection)
+                                    }
+                                    else -> {
+                                        resource.message
+                                    }
                                 }
                                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                             }

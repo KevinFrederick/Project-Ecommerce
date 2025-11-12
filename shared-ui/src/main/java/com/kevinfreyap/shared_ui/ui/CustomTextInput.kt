@@ -1,4 +1,4 @@
-package com.kevinfreyap.shared_ui
+package com.kevinfreyap.shared_ui.ui
 
 import android.content.Context
 import android.text.InputType
@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import androidx.core.content.withStyledAttributes
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.databinding.ViewCustomTextInputBinding
 
 class CustomTextInput @JvmOverloads constructor(

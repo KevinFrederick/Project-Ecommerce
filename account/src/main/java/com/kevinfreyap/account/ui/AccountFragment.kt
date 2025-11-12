@@ -76,6 +76,9 @@ class AccountFragment : Fragment() {
                                     "ERROR_USER_NOT_FOUND" -> {
                                         getString(sharedR.string.error_user_not_found)
                                     }
+                                    "ERROR_NO_CONNECTION" -> {
+                                        getString(sharedR.string.error_no_connection)
+                                    }
                                     else -> {
                                         getString(sharedR.string.error_unknown)
                                     }

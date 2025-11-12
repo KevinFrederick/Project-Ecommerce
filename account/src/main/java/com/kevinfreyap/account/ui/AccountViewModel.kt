@@ -1,5 +1,6 @@
 package com.kevinfreyap.account.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,8 +35,16 @@ class AccountViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            authUseCase.logout()
-            _userProfile.value = Resource.Success(null)
+            try {
+                authUseCase.logout()
+                _userProfile.value = Resource.Success(null)
+            } catch (e: IOException) {
+                Log.e("AccountViewModel", "Failed to clear auth token", e)
+                _userProfile.value = Resource.Success(null)
+            } catch (e: Exception) {
+                Log.e("AccountViewModel", "Logout Failed", e)
+                _userProfile.value = Resource.Success(null)
+            }
         }
     }
 }

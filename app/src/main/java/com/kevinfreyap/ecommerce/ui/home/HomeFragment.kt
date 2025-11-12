@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kevinfreyap.ecommerce.databinding.FragmentHomeBinding
 import com.kevinfreyap.ecommerce.ui.adapter.ProductAdapter
+import com.kevinfreyap.shared_ui.util.setupCartMenu
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,6 +48,12 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.rvHomeProducts
         setupRecyclerview()
+        setupCartMenu(
+            cartItemCount = viewModel.cartItemCount
+        ) {
+            val uri = "app://ecommerce/cart".toUri()
+            findNavController().navigate(uri)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

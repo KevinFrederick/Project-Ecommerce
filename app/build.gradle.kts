@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":auth"))
     implementation(project(":account"))
     implementation(project(":detail"))
+    implementation(project(":cart"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

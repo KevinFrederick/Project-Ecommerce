@@ -44,7 +44,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_login_title"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.kevinfreyap.shared_ui.CustomTextInput
+        <com.kevinfreyap.shared_ui.ui.CustomTextInput
             android:id="@+id/email_input_login"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_login_desc" />
 
-        <com.kevinfreyap.shared_ui.CustomTextInput
+        <com.kevinfreyap.shared_ui.ui.CustomTextInput
             android:id="@+id/password_input_login"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

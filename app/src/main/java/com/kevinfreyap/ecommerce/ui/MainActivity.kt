@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kevinfreyap.ecommerce.R
+import com.kevinfreyap.auth.R as authR
 import com.kevinfreyap.ecommerce.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -79,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home,
                 R.id.navigation_dashboard,
                 R.id.navigation_account_router,
-                R.id.nav_auth,
+                authR.id.loginFragment,
+                authR.id.registerFragment,
                 R.id.navigation_account_profile -> {
                     navView.visibility = View.VISIBLE
                 }

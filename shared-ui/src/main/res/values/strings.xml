@@ -7,9 +7,13 @@
     <string name="title_account">Account</string>
     <string name="title_login">Login</string>
     <string name="title_register">Register</string>
+    <string name="title_cart">Cart</string>
 
     <!-- Title -->
     <string name="title_shipping_address">Shipping Address</string>
+
+    <!-- Label -->
+    <string name="label_quantity">Quantity</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -42,6 +46,10 @@
     <string name="add_address">Add Address</string>
     <string name="favorite">Favorite</string>
     <string name="add_to_cart">Add to Cart</string>
+    <string name="close">Close</string>
+    <string name="decrease_qty">Decrease Quantity</string>
+    <string name="increase_qty">Increase Quantity</string>
+    <string name="delete">Delete</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -50,18 +58,23 @@
     <string name="label_description">Description</string>
 
     <!-- Error Message -->
+    <string name="error_user_not_found">Please Login first</string>
     <string name="error_email_is_required">Email is required</string>
     <string name="error_enter_valid_email">Please enter a valid email</string>
     <string name="error_password_is_required">Password is required</string>
     <string name="error_password_too_short">Password must be at least 8 characters</string>
     <string name="error_password_do_not_match">Password do not match</string>
-    <string name="error_user_not_found">This email is not registered.</string>
+    <string name="error_email_not_found">This email is not registered</string>
     <string name="error_wrong_password">Wrong password. Please try again</string>
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_registration">Registration Failed</string>
     <string name="error_unavailable_product">Product no longer available</string>
+    <string name="error_no_connection">No Internet Connection!</string>
+    <string name="error_failed_to_load">Failed to load</string>
+    <string name="error_failed_to_add_to_cart">Failed to add item to cart</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
     <string name="success_login">Login Successful!</string>
+    <string name="success_add_to_cart">Added to Cart!</string>
 </resources>

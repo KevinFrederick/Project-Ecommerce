@@ -56,31 +56,31 @@
                 app:tabMaxWidth="10dp"
                 app:tabRippleColor="@android:color/transparent" />
 
-            <TextView
-                android:id="@+id/tv_product_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintTop_toBottomOf="@id/tab_layout_image_carousel_dots"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_favorite"
-                tools:text="$79" />
-
             <ImageButton
                 android:id="@+id/btn_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
                 android:src="@drawable/ic_favorite_border_24"
                 android:contentDescription="@string/favorite"
                 android:background="@android:color/transparent"
-                app:layout_constraintTop_toTopOf="@id/tv_product_price"
-                app:layout_constraintBottom_toBottomOf="@id/tv_product_price"
-                app:layout_constraintStart_toEndOf="@id/tv_product_price"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintTop_toBottomOf="@id/tab_layout_image_carousel_dots"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_product_price" />
+
+            <TextView
+                android:id="@+id/tv_product_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+                app:layout_constraintTop_toTopOf="@id/btn_favorite"
+                app:layout_constraintBottom_toBottomOf="@id/btn_favorite"
+                app:layout_constraintStart_toEndOf="@id/btn_favorite"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="$79" />
 
             <TextView
                 android:id="@+id/tv_product_name"
@@ -89,7 +89,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginHorizontal="16dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
-                app:layout_constraintTop_toBottomOf="@id/tv_product_price"
+                app:layout_constraintTop_toBottomOf="@id/btn_favorite"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Classic Comfort Drawstring Joggers" />
@@ -147,7 +147,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="32dp"
                 android:layout_marginHorizontal="24dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 app:layout_constraintVertical_bias="0"
@@ -162,7 +161,7 @@
     </androidx.core.widget.NestedScrollView>
     
     <Button
-        android:id="@+id/btn_add_to_cart"
+        android:id="@+id/btn_add_to_cart_sheet"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"

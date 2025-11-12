@@ -16,6 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
 }
 
@@ -26,3 +29,4 @@ include(":account")
 include(":shared-ui")
 include(":auth")
 include(":detail")
+include(":cart")

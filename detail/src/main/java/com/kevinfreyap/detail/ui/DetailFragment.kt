@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,7 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.detail.ImageCarouselAdapter
 import com.kevinfreyap.detail.databinding.FragmentDetailBinding
 import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_ui.util.setupCartMenu
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -41,12 +43,22 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupCartMenu (
+            cartItemCount = viewModel.cartItemCount
+        )  {
+            val uri = "app://ecommerce/cart".toUri()
+            findNavController().navigate(uri)
+        }
 
         binding.viewPagerImageCarousel.adapter = carouselAdapter
         TabLayoutMediator(
             binding.tabLayoutImageCarouselDots,
             binding.viewPagerImageCarousel
         ) { tab, position -> }.attach()
+
+        binding.btnAddToCartSheet.setOnClickListener {
+            AddToCartBottomSheetFragment().show(childFragmentManager, AddToCartBottomSheetFragment.TAG)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -63,9 +75,20 @@ class DetailFragment : Fragment() {
                         }
 
                         if (resource is Resource.Error) {
+                            var shouldPopBack = false
                             val message = when(resource.message) {
+                                "ERROR_USER_NOT_FOUND" -> {
+                                    getString(R.string.error_user_not_found)
+                                }
                                 "ERROR_PRODUCT_UNAVAILABLE" -> {
+                                    shouldPopBack = (product == null)
                                     getString(R.string.error_unavailable_product)
+                                }
+                                "ERROR_NO_CONNECTION" -> {
+                                    getString(R.string.error_no_connection)
+                                }
+                                "ERROR_FAILED_TO_ADD_TO_CART" -> {
+                                    getString(R.string.error_failed_to_add_to_cart)
                                 }
                                 else -> {
                                     Log.e("DetailFragment", resource.message.toString())
@@ -74,7 +97,7 @@ class DetailFragment : Fragment() {
                             }
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 
-                            if (product == null) {
+                            if (shouldPopBack) {
                                 findNavController().popBackStack()
                             }
                         }
