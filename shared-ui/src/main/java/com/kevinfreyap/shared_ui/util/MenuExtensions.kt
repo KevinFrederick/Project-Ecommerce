@@ -44,6 +44,7 @@ fun Fragment.setupCartMenu(
                 // This delays execution until after the layout and animation pass.
                 cartView.post {
                     BadgeUtils.attachBadgeDrawable(badge, cartIconImage, cartView)
+                    badge.isVisible = badge.number > 0
                 }
 
                 cartIconImage.setOnClickListener {

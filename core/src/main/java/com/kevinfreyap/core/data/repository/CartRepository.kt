@@ -3,27 +3,36 @@ package com.kevinfreyap.core.data.repository
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.snapshots
 import com.google.firebase.firestore.toObjects
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.data.source.local.entity.CartEntity
+import com.kevinfreyap.core.data.source.local.room.CartDao
+import com.kevinfreyap.core.data.source.remote.network.ApiService
+import com.kevinfreyap.core.data.source.remote.network.AvailabilityStatus
 import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.cart.SimpleCartItem
+import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.repository.ICartRepository
-import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.utils.Constants.CART_SUB_COLLECTION
 import com.kevinfreyap.core.utils.Constants.FIELD_QUANTITY
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
-import kotlinx.coroutines.CoroutineScope
+import com.kevinfreyap.core.utils.DataMapper
+import com.kevinfreyap.core.utils.getAuthUidFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,66 +41,39 @@ import javax.inject.Singleton
 class CartRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val productRepository: IProductRepository
+    private val apiService: ApiService,
+    private val cartDao: CartDao,
 ): ICartRepository {
-
-    override fun getCartItems(): Flow<Resource<List<Cart>>> = flow {
-        emit(Resource.Loading())
-
+    override fun getCartItems(): Flow<Resource<List<Cart>>>  {
         val currentUserUid = firebaseAuth.currentUser?.uid
-        if (currentUserUid.isNullOrEmpty()){
-            emit(Resource.Error("ERROR_USER_NOT_FOUND"))
-            return@flow
+        if (currentUserUid.isNullOrEmpty()) {
+            return flowOf(Resource.Error("ERROR_USER_NOT_FOUND"))
         }
-
-        try {
-            val cartList = firestore.collection(USER_COLLECTION)
-                .document(currentUserUid)
-                .collection(CART_SUB_COLLECTION)
-                .get()
-                .await().toObjects<SimpleCartItem>()
-
-            val cartItems = mutableListOf<Cart>()
-            val itemsToDeleteFromCart = mutableListOf<String>()
-
-            for (item in cartList) {
-                val product = productRepository.getProductByIdFromCache(item.productId).first()
-
-                if (product != null) {
-                    cartItems.add(
-                        Cart(
-                            product = product,
-                            quantity = item.quantity
-                        )
-                    )
-                }
-                else {
-                    Log.w("CartRepository", "Product ${item.productId} not found in cache")
-                    itemsToDeleteFromCart.add(
-                        item.productId.toString()
-                    )
-                }
+        return cartDao.getAllCartItems().map { entities ->
+            val domainList = entities.map { entity ->
+                Cart(
+                    product = DataMapper.mapCartEntityToDomain(entity),
+                    quantity = entity.quantity,
+                    isAvailable = entity.isAvailable
+                )
             }
-
-            if (itemsToDeleteFromCart.isNotEmpty()){
-                CoroutineScope(Dispatchers.IO).launch {
-                    deleteCartItems(currentUserUid, itemsToDeleteFromCart)
-                }
-            }
-
-            emit(Resource.Success(cartItems))
-        } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
-
-        } catch (_: FirebaseFirestoreException) {
-            emit(Resource.Error("ERROR_FAILED_TO_LOAD"))
-
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "An unknown error occurred"))
+            Resource.Success(domainList)
         }
     }
 
-    override fun addToCart(productId: Int, quantity: Int): Flow<Resource<Boolean>> = flow {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getCartItemCount(): Flow<Int> {
+        return firebaseAuth.getAuthUidFlow()
+            .flatMapLatest { userid ->
+                if (userid.isNullOrEmpty()) {
+                    flowOf(0)
+                } else {
+                    cartDao.getCartItemCount()
+                }
+            }
+    }
+
+    override fun addToCart(product: Product, quantity: Int): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
 
         val currentUserUid = firebaseAuth.currentUser?.uid
@@ -100,21 +82,28 @@ class CartRepository @Inject constructor(
             return@flow
         }
 
-        try {
-            val cartItem = SimpleCartItem(productId, quantity)
+        val timestamp = System.currentTimeMillis()
 
-            firestore.collection(USER_COLLECTION)
-                .document(currentUserUid)
-                .collection(CART_SUB_COLLECTION)
-                .document(productId.toString())
-                .set(cartItem)
-                .await()
+        val cartEntity = CartEntity(
+            productId = product.id.toString(),
+            name = product.title,
+            price = product.price,
+            imageUrl = product.images.firstOrNull() ?: "",
+            quantity = quantity,
+            isAvailable = true,
+            dateAdded = timestamp
+        )
+
+        try {
+            cartDao.insert(cartEntity)
 
             emit(Resource.Success(true))
+
+            syncToFirestore(cartEntity, timestamp)
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "ERROR_FAILED_TO_ADD_TO_CART"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun updateItemQuantity(
         productId: Int,
@@ -128,24 +117,23 @@ class CartRepository @Inject constructor(
         }
 
         try {
-            val cartItemRef = firestore.collection(USER_COLLECTION)
+            cartDao.updateQuantity(productId.toString(), newQuantity)
+
+            emit(Resource.Success(true))
+
+            firestore.collection(USER_COLLECTION)
                 .document(currentUserUid)
                 .collection(CART_SUB_COLLECTION)
                 .document(productId.toString())
+                .update(FIELD_QUANTITY, newQuantity)
+                .addOnFailureListener {
+                    Log.e("CartRepo", "Failed to sync update: ${it.message}")
+                }
 
-            cartItemRef.update(FIELD_QUANTITY, newQuantity).await()
-
-            emit(Resource.Success(true))
-        } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
         } catch (e: Exception) {
-            if (e.message?.contains("network", ignoreCase = true) == true) {
-                emit(Resource.Error("ERROR_NO_CONNECTION"))
-            }else {
-                emit(Resource.Error(e.message ?: "Update Failed"))
-            }
+            emit(Resource.Error(e.message ?: "Update Failed"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun removeItemFromCart(productId: Int): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
@@ -156,56 +144,196 @@ class CartRepository @Inject constructor(
         }
 
         try {
-            val cartItemRef = firestore.collection(USER_COLLECTION)
+            cartDao.deleteItem(productId.toString())
+
+            emit(Resource.Success(true))
+
+            firestore.collection(USER_COLLECTION)
                 .document(currentUserUid)
                 .collection(CART_SUB_COLLECTION)
                 .document(productId.toString())
+                .delete()
+                .addOnFailureListener {
+                    Log.e("CartRepo", "Failed delete failed: ${it.message}")
+                }
 
-            cartItemRef.delete().await()
-
-            emit(Resource.Success(true))
-        } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
         } catch (e: Exception) {
-            if (e.message?.contains("network", ignoreCase = true) == true) {
-                emit(Resource.Error("ERROR_NO_CONNECTION"))
-            }else {
-                emit(Resource.Error(e.message ?: "Delete Failed"))
+            emit(Resource.Error(e.message ?: "Delete Failed"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun syncCartOnLogin() = withContext(Dispatchers.IO) {
+        val currentUserUid = firebaseAuth.currentUser?.uid
+        if (currentUserUid.isNullOrEmpty()) return@withContext
+
+        try {
+            val snapshot = firestore.collection(USER_COLLECTION)
+                .document(currentUserUid)
+                .collection(CART_SUB_COLLECTION)
+                .get()
+                .await()
+
+            val simpleItems = snapshot.toObjects<SimpleCartItem>()
+            if (simpleItems.isEmpty()) {
+                cartDao.clearCart()
+                return@withContext
             }
+
+            // Check ProductId against API
+            val productIds = simpleItems.map { it.productId }
+            val availabilityMap = verifyProductsAvailability(productIds)
+
+            val entitiesToInsert = simpleItems.map { simpleCartItem ->
+                val status = availabilityMap[simpleCartItem.productId]
+
+                // Set default values from Firestore (in case of offline/unknown)
+                var name = simpleCartItem.title ?: ""
+                var price = simpleCartItem.price ?: 0
+                var imageUrl = simpleCartItem.imageUrl ?: ""
+                val isAvailable: Boolean
+
+                when(status) {
+                    is AvailabilityStatus.Available -> {
+                        val product = status.product
+                        name = product.title
+                        price = product.price
+                        imageUrl = product.images.firstOrNull() ?: ""
+                        isAvailable = true
+                    }
+                    is AvailabilityStatus.Unavailable -> {
+                        isAvailable = false
+                    }
+                    is AvailabilityStatus.Unknown, null -> {
+                        isAvailable = true
+                    }
+                }
+                CartEntity(
+                    productId = simpleCartItem.productId.toString(),
+                    name = name,
+                    price = price,
+                    imageUrl = imageUrl,
+                    quantity = simpleCartItem.quantity,
+                    isAvailable = isAvailable,
+                    dateAdded = simpleCartItem.dateAdded ?: System.currentTimeMillis()
+                )
+            }
+
+            cartDao.clearCart()
+            cartDao.insertAll(entitiesToInsert)
+            Log.d("CartRepo", "Successfully synced cart from Firestore.")
+        } catch (e: Exception) {
+            Log.e("CartRepo", "Failed to sync cart on login: ${e.message}")
         }
     }
 
-    override fun getCartItemCount(): Flow<Int> {
-        val currentUserUid = firebaseAuth.currentUser?.uid
-        if (currentUserUid.isNullOrEmpty()) {
-            return flowOf(0) // Return a flow of 0 if logged out
+    override suspend fun clearCartOnLogout() = withContext(Dispatchers.IO) {
+        cartDao.clearCart()
+    }
+
+    override fun refreshCartAvailability(): Flow<Resource<Boolean>> = flow {
+        emit(Resource.Loading())
+
+        val localItems = cartDao.getAllCartItems().first()
+        if (localItems.isEmpty()) {
+            emit(Resource.Success(true))
+            return@flow
         }
 
-        // 1. Get a reference to the cart collection
-        val cartRef = firestore.collection(USER_COLLECTION)
+        val productIds = localItems.map { it.productId.toInt() }
+        val availabilityMap = verifyProductsAvailability(productIds)
+
+        var isCartStillValid = true
+        try {
+            for (item in localItems) {
+                val status = availabilityMap[item.productId.toInt()]
+
+                when(status) {
+                    is AvailabilityStatus.Available -> {
+                        val product = status.product
+                        val updatedEntity = item.copy(
+                            name = product.title,
+                            price = product.price,
+                            imageUrl = product.images.firstOrNull() ?: "",
+                            isAvailable = true
+                        )
+                        cartDao.update(updatedEntity)
+                    }
+                    is AvailabilityStatus.Unavailable -> {
+                        isCartStillValid = false
+                        if (item.isAvailable) {
+                            cartDao.markAsUnavailable(item.productId)
+                        }
+                    }
+                    is AvailabilityStatus.Unknown, null -> {
+                        if (!item.isAvailable) {
+                            isCartStillValid = false
+                        }
+                    }
+                }
+            }
+            emit(Resource.Success(isCartStillValid))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to validate cart"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun syncToFirestore(cartEntity: CartEntity, timestamp: Long) {
+        val currentUserUid = firebaseAuth.currentUser?.uid
+        if (currentUserUid.isNullOrEmpty()) return
+
+        val cartSimpleItem = SimpleCartItem(
+            productId = cartEntity.productId.toInt(),
+            quantity = cartEntity.quantity,
+            title = cartEntity.name,
+            price = cartEntity.price,
+            imageUrl = cartEntity.imageUrl,
+            dateAdded = timestamp
+        )
+
+        firestore.collection(USER_COLLECTION)
             .document(currentUserUid)
             .collection(CART_SUB_COLLECTION)
-
-        // 2. Use .snapshots() to get a Flow that "listens" for
-        //    any changes to the cart (add, remove, etc.)
-        return cartRef.snapshots().map { snapshot ->
-            // 3. Just return the number of documents (items)
-            snapshot.size()
-        }.catch {
-            // On error (e.g., no network), just emit 0
-            emit(0)
-        }
+            .document(cartEntity.productId)
+            .set(cartSimpleItem)
+            .addOnSuccessListener {
+                Log.d("CartRepo", "Successfully synced item ${cartEntity.productId}")
+            }
+            .addOnFailureListener {
+                Log.e("CartRepo", "Failed to sync item ${cartEntity.productId}: ${it.message}")
+            }
     }
 
-    private suspend fun deleteCartItems(uid: String, itemIds: List<String>) {
-        val cartRef = firestore.collection(USER_COLLECTION)
-            .document(uid)
-            .collection(CART_SUB_COLLECTION)
+    private suspend fun verifyProductsAvailability(productIds: List<Int>): Map<Int, AvailabilityStatus> = coroutineScope {
+        val checks = productIds.map { id ->
+            async(Dispatchers.IO) {
+                try {
+                    // Try to hit the network
+                    val product = apiService.getProductById(id)
 
-        firestore.runBatch { batch ->
-            for (id in itemIds){
-                batch.delete(cartRef.document(id))
+                    // If successful, it exists
+                    id to AvailabilityStatus.Available(DataMapper.mapProductResponseToDomain(product))
+
+                } catch (e: HttpException) {
+                    // Server responded (Online)
+                    if (e.code() == 404 || e.code() == 400) {
+                        // Server says "Deleted"
+                        id to AvailabilityStatus.Unavailable
+                    } else {
+                        // Server says "500 Error", etc. Assume available.
+                        id to AvailabilityStatus.Unknown
+                    }
+                } catch (_: IOException) {
+                    // *** THIS HANDLES OFFLINE ***
+                    // IOException means No Internet, Timeout, or Connection Reset.
+                    // We can't verify
+                    id to AvailabilityStatus.Unknown
+                } catch (_: Exception) {
+                    // Unknown error, stay safe
+                    id to AvailabilityStatus.Unknown
+                }
             }
-        }.await()
+        }
+
+        checks.awaitAll().toMap()
     }
 }

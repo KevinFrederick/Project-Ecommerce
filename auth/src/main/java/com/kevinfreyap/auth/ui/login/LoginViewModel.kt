@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
+import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase
+    private val authUseCase: AuthUseCase,
+    private val cartUseCase: CartUseCase
 ): ViewModel() {
     private val _loginState = MutableStateFlow<Resource<Boolean>?>(null)
     val loginState: StateFlow<Resource<Boolean>?> = _loginState
@@ -50,6 +52,9 @@ class LoginViewModel @Inject constructor(
             _loginState.value = Resource.Loading()
             val loginRequest = LoginRequest(email, pass)
             authUseCase.login(loginRequest).collect { value ->
+                if (value is Resource.Success) {
+                    cartUseCase.syncCartOnLogin()
+                }
                 _loginState.value = value
             }
         }

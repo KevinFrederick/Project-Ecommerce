@@ -20,6 +20,9 @@ interface ProductDao {
     @Query("SELECT * FROM product")
     fun getProducts(): PagingSource<Int, ProductEntity>
 
+    @Query("SELECT * FROM product WHERE id in (:ids)")
+    fun getProductByIds(ids: List<Int>): List<ProductEntity>
+
     @Query("SELECT * FROM product WHERE id = :id")
     fun getProductById(id: Int): Flow<ProductEntity?>
 

@@ -1,23 +1,28 @@
 package com.kevinfreyap.detail.ui
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.detail.databinding.BottomSheetFragmentAddToCartBinding
 import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_ui.util.showGenericDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -47,6 +52,29 @@ class AddToCartBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val product = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(PRODUCT_ARG, Product::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable(PRODUCT_ARG)
+        }
+
+        if (product != null) {
+            binding.tvProductNameBottomSheet.text = product.title
+            binding.tvProductPriceBottomSheet.text =
+                getString(R.string.currency_dollar, product.price)
+
+            val shimmerDrawable = ShimmerDrawable().apply {
+                setShimmer(shimmer)
+            }
+            Glide.with(this@AddToCartBottomSheetFragment)
+                .load(product.images.firstOrNull())
+                .placeholder(shimmerDrawable)
+                .error(R.drawable.ic_image_24)
+                .into(binding.ivProductImageBottomSheet)
+        } else {
+            dismiss()
+        }
 
         binding.btnCloseIcon.setOnClickListener {
             dismiss()
@@ -63,44 +91,6 @@ class AddToCartBottomSheetFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.productState.collect { resource ->
-                        if (resource is Resource.Success){
-                            val product = resource.data
-                            if (product != null) {
-                                binding.tvProductNameBottomSheet.text = product.title
-                                binding.tvProductPriceBottomSheet.text =
-                                    getString(R.string.currency_dollar, product.price)
-
-                                val shimmerDrawable = ShimmerDrawable().apply {
-                                    setShimmer(shimmer)
-                                }
-                                Glide.with(this@AddToCartBottomSheetFragment)
-                                    .load(product.images.firstOrNull())
-                                    .placeholder(shimmerDrawable)
-                                    .error(R.drawable.ic_image_24)
-                                    .into(binding.ivProductImageBottomSheet)
-                            } else {
-                                dismiss()
-                                val message = when (resource.message) {
-                                    "ERROR_PRODUCT_UNAVAILABLE" -> {
-                                        getString(R.string.error_unavailable_product)
-                                    }
-
-                                    else -> {
-                                        Log.e(TAG, resource.message.toString())
-                                        getString(R.string.error_unknown)
-                                    }
-                                }
-
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            }
-                        } else if (resource is Resource.Error) {
-                            Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
-                launch {
                     viewModel.quantity.collect { quantity ->
                         binding.tvProductQuantity.text = quantity.toString()
                     }
@@ -114,13 +104,38 @@ class AddToCartBottomSheetFragment : BottomSheetDialogFragment() {
                             }
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
-                                Toast.makeText(context, getString(R.string.success_add_to_cart), Toast.LENGTH_SHORT).show()
+                                val resultBundle = Bundle().apply {
+                                    putBoolean(IS_SUCCESS, true)
+                                }
+
+                                setFragmentResult(ADD_CART_REQ, resultBundle)
                                 viewModel.clearAddToCartState()
                                 dismiss()
                             }
                             is Resource.Error -> {
                                 binding.progressBar.isVisible = false
                                 viewModel.clearAddToCartState()
+                                if (resource.message == "ERROR_USER_NOT_FOUND"){
+                                    requireContext().showGenericDialog(
+                                        title = getString(R.string.error_login_required),
+                                        message = getString(R.string.error_login_required_desc),
+                                        positiveButtonText = getString(R.string.sign_in),
+                                        negativeButtonText = getString(R.string.cancel),
+                                        isCancelable = true,
+                                        onPositiveClick = {
+                                            val uri = "app://ecommerce/account".toUri()
+
+                                            val navOptions = navOptions {
+                                                popUpTo(findNavController().graph.startDestinationId){
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                            findNavController().navigate(uri, navOptions)
+                                        }
+                                    )
+                                }
                             }
                             null -> {
                                 binding.progressBar.isVisible = false
@@ -132,7 +147,9 @@ class AddToCartBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.btnAddToCart.setOnClickListener {
-            viewModel.onAddToCartClicked()
+            if (product != null){
+                viewModel.onAddToCartClicked(product)
+            }
         }
     }
 
@@ -142,6 +159,9 @@ class AddToCartBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "AddToCartBottomSheet"
+        const val BOTTOM_SHEET_TAG = "AddToCartBottomSheet"
+        const val PRODUCT_ARG = "product"
+        const val ADD_CART_REQ = "add_cart_request"
+        const val IS_SUCCESS = "is_success"
     }
 }

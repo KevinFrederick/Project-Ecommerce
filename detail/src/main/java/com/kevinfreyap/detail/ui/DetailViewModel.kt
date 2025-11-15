@@ -9,9 +9,7 @@ import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,13 +29,6 @@ class DetailViewModel @Inject constructor(
 
     private val _addToCartState = MutableStateFlow<Resource<Boolean>?>(null)
     val addToCartState: StateFlow<Resource<Boolean>?> = _addToCartState
-
-    val cartItemCount: StateFlow<Int> = cartUseCase.getCartItemCount()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0
-        )
 
     init {
         if (productId != null) {
@@ -65,13 +56,12 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun onAddToCartClicked() {
-        val currentProduct = (productState.value as? Resource.Success)?.data
+    fun onAddToCartClicked(product: Product) {
         val currentQuantity = quantity.value
 
-        if (currentProduct != null && currentQuantity > 0) {
+        if (currentQuantity > 0) {
             viewModelScope.launch{
-                cartUseCase.addToCart(currentProduct.id, currentQuantity).collect { resource ->
+                cartUseCase.addToCart(product, currentQuantity).collect { resource ->
                     _addToCartState.value = resource
                 }
             }

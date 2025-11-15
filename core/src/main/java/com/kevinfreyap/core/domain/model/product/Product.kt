@@ -1,5 +1,9 @@
 package com.kevinfreyap.core.domain.model.product
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Product(
     val id: Int,
     val title: String,
@@ -10,4 +14,4 @@ data class Product(
     val slug: String,
     val creationAt: String,
     val updatedAt: String
-)
+): Parcelable

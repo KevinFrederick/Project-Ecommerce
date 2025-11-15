@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -16,15 +17,18 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kevinfreyap.ecommerce.databinding.FragmentHomeBinding
+import com.kevinfreyap.ecommerce.ui.MainActivity
+import com.kevinfreyap.core.data.source.MainViewModel
 import com.kevinfreyap.ecommerce.ui.adapter.ProductAdapter
 import com.kevinfreyap.shared_ui.util.setupCartMenu
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
-
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: HomeViewModel by viewModels()
 
     private var _binding: FragmentHomeBinding? = null
@@ -49,7 +53,7 @@ class HomeFragment : Fragment() {
         recyclerView = binding.rvHomeProducts
         setupRecyclerview()
         setupCartMenu(
-            cartItemCount = viewModel.cartItemCount
+            cartItemCount = mainViewModel.cartItemCount
         ) {
             val uri = "app://ecommerce/cart".toUri()
             findNavController().navigate(uri)
@@ -57,6 +61,13 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    (requireActivity() as MainActivity).isNetworkAvailable
+                        .drop(1) // Skip initial value so it doesn't refresh on Launch
+                        .collect { isOnline ->
+                            productAdapter.refresh()
+                        }
+                }
                 launch {
                     viewModel.productList.collectLatest { pagingData ->
                         productAdapter.submitData(pagingData)

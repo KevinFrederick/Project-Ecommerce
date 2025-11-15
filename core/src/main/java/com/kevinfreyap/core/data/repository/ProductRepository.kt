@@ -13,11 +13,12 @@ import com.kevinfreyap.core.data.source.remote.network.ApiService
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.utils.DataMapper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import java.io.IOException
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,47 +49,45 @@ class ProductRepository @Inject constructor(
                     DataMapper.mapEntityToDomain(productEntity)
                 }
             }
+            .flowOn(Dispatchers.IO)
     }
 
     override fun getProductById(productId: Int): Flow<Resource<Product?>> = flow {
-        emit(Resource.Loading())
 
-        val dbFlow = productDao.getProductById(productId).map { productEntity ->
-            productEntity?.let { DataMapper.mapEntityToDomain(it) }
+        val dbFlow = productDao.getProductById(productId).map { entity ->
+            entity?.let { DataMapper.mapEntityToDomain(it) }
         }
+        emit(Resource.Loading(dbFlow.first()))
 
         try {
             val response = apiService.getProductById(productId)
-
             val productEntity = DataMapper.mapProductResponseToEntity(response)
+
             database.withTransaction {
                 productDao.insertAllProducts(listOf(productEntity))
             }
 
-            emitAll(dbFlow.map { Resource.Success(it) })
-        } catch (_: IOException) {
-            emitAll(dbFlow.map { staleData ->
-                Resource.Error("ERROR_NO_CONNECTION", staleData)
-            })
-        } catch (e: HttpException) {
-            if (e.code() == 404) {
+            dbFlow.collect { data ->
+                emit(Resource.Success(data))
+            }
+
+        }  catch (e: HttpException) {
+            if (e.code() == 404 || e.code() == 400) {
                 productDao.deleteProductById(productId)
                 emit(Resource.Error("ERROR_PRODUCT_UNAVAILABLE"))
             } else {
-                emitAll(dbFlow.map { staleData ->
-                    Resource.Error(e.message(), staleData)
-                })
+                val staleData = dbFlow.first()
+                emit(Resource.Error(e.message.toString(), staleData))
             }
         } catch (e: Exception) {
-            emitAll(dbFlow.map { staleData ->
-                Resource.Error(e.message.toString(), staleData)
-            })
+            val staleData = dbFlow.first()
+            emit(Resource.Error(e.message ?: "Unknown Error", staleData))
         }
     }
 
-    override fun getProductByIdFromCache(productId: Int): Flow<Product?> {
-        return productDao.getProductById(productId).map { productEntity ->
-            productEntity?.let { DataMapper.mapEntityToDomain(it) }
+    override suspend fun getProductByIdFromCache(productIds: List<Int>): List<Product> {
+        return productDao.getProductByIds(productIds).map { productEntity ->
+            DataMapper.mapEntityToDomain(productEntity)
         }
     }
 }

@@ -14,6 +14,10 @@
 
     <!-- Label -->
     <string name="label_quantity">Quantity</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="shipping_fee">Shipping Fee</string>
+    <string name="total">Total</string>
+    <string name="free">Free</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -50,12 +54,19 @@
     <string name="decrease_qty">Decrease Quantity</string>
     <string name="increase_qty">Increase Quantity</string>
     <string name="delete">Delete</string>
+    <string name="checkout">Checkout</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="go_shopping">Go Shopping</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
     <string name="register_description">Let\'s get started with a free account.</string>
     <string name="continue_with_other">or continue with</string>
     <string name="label_description">Description</string>
+    <string name="empty_cart">Your cart is empty</string>
+    <string name="error_no_product_desc">This product has been removed by the seller</string>
+    <string name="error_login_required_desc">You need to sign in to access this feature</string>
 
     <!-- Error Message -->
     <string name="error_user_not_found">Please Login first</string>
@@ -72,9 +83,12 @@
     <string name="error_no_connection">No Internet Connection!</string>
     <string name="error_failed_to_load">Failed to load</string>
     <string name="error_failed_to_add_to_cart">Failed to add item to cart</string>
+    <string name="error_login_required">Login Required</string>
+    <string name="error_remove_unavailable_item">Please remove unavailable items first</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
     <string name="success_login">Login Successful!</string>
     <string name="success_add_to_cart">Added to Cart!</string>
+    <string name="success_add_to_cart_offline">Saved to cart (Offline). Will sync later</string>
 </resources>

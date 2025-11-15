@@ -9,6 +9,7 @@ import com.kevinfreyap.cart.viewholder.CartViewHolder
 import com.kevinfreyap.core.domain.model.cart.Cart
 
 class CartAdapter(
+    private val onNavigation: (Cart) -> Unit,
     private val onIncrease: (Cart) -> Unit,
     private val onDecrease: (Cart) -> Unit,
 ): ListAdapter<Cart, CartViewHolder>(CART_DIFF_CALLBACK) {
@@ -19,6 +20,7 @@ class CartAdapter(
         val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CartViewHolder(
             binding = binding,
+            onNavigation = onNavigation,
             onIncrease = onIncrease,
             onDecrease = onDecrease,
         ) { position -> getItem(position)}
@@ -70,7 +72,9 @@ class CartAdapter(
 
             override fun getChangePayload(oldItem: Cart, newItem: Cart): Any? {
                 // If the items are the same, but the content is different...
-                if (oldItem.product == newItem.product && oldItem.quantity != newItem.quantity) {
+                if (oldItem.product == newItem.product &&
+                    oldItem.isAvailable == newItem.isAvailable &&
+                    oldItem.quantity != newItem.quantity) {
                     // ...and ONLY the quantity changed, return our payload
                     return PAYLOAD_QUANTITY
                 }

@@ -7,16 +7,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.cart.adapter.CartAdapter
 import com.kevinfreyap.cart.databinding.FragmentCartBinding
+import com.kevinfreyap.cart.utils.CheckoutActionState
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.shared_ui.R
 import com.yanzhenjie.recyclerview.SwipeMenuCreator
@@ -27,9 +31,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
-
-    // Get the CartViewModel using activityViewModels()
-    // This shares the ViewModel across all fragments.
     private val viewModel: CartViewModel by viewModels()
 
     private var _binding: FragmentCartBinding? = null
@@ -63,10 +64,16 @@ class CartFragment : Fragment() {
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
                                 cartAdapter.submitList(resource.data)
-                                Log.d("Cart", resource.data.size.toString())
                             }
                             is Resource.Error -> {
                                 binding.progressBar.isVisible = false
+                                if (resource.message == "ERROR_USER_NOT_FOUND") {
+                                    binding.cartLayout.isVisible = false
+                                    binding.noItemLayout.isVisible = true
+                                } else {
+                                    binding.cartLayout.isVisible = true
+                                    binding.noItemLayout.isVisible = false
+                                }
                                 val message = when(resource.message) {
                                     "ERROR_USER_NOT_FOUND" -> {
                                         getString(R.string.error_user_not_found)
@@ -82,8 +89,36 @@ class CartFragment : Fragment() {
                                         getString(R.string.error_unknown)
                                     }
                                 }
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
                             }
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.cartSummary.collect { summary ->
+                        binding.tvSubtotalPrice.text = getString(R.string.currency_dollar, summary.subtotal)
+
+                        if (summary.shippingFee == 0) {
+                            binding.tvShippingFee.text = getString(R.string.free)
+                        } else {
+                            binding.tvShippingFee.text = getString(R.string.currency_dollar, summary.shippingFee)
+                        }
+
+                        binding.tvTotalPrice.text = getString(R.string.currency_dollar, summary.total)
+
+                        binding.btnCheckout.isEnabled = summary.total > 0
+                    }
+                }
+
+                launch {
+                    viewModel.checkoutState.collect { state ->
+                        binding.btnCheckout.isEnabled = state !is CheckoutActionState.Loading
+                        binding.progressBar.isVisible = state is CheckoutActionState.Loading
+
+                        if (state is CheckoutActionState.Navigate) {
+                            // TODO (Navigate to Checkout Page)
+                            viewModel.resetCheckoutState()
                         }
                     }
                 }
@@ -98,18 +133,29 @@ class CartFragment : Fragment() {
                                 "ERROR_NO_CONNECTION" -> {
                                     getString(R.string.error_no_connection)
                                 }
+                                "ERROR_REMOVE_UNAVAILABLE_ITEM" -> {
+                                    getString(R.string.error_remove_unavailable_item)
+                                }
                                 else -> {
                                     Log.e("CartFragment", errorMessage)
                                     getString(R.string.error_unknown)
                                 }
                             }
-                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
 
                             viewModel.clearError()
                         }
                     }
                 }
             }
+        }
+
+        binding.btnReturn.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        binding.btnCheckout.setOnClickListener {
+            viewModel.onCheckoutClicked()
         }
     }
 
@@ -136,6 +182,18 @@ class CartFragment : Fragment() {
         }
 
         cartAdapter = CartAdapter(
+            onNavigation = {
+                val uri = "app://ecommerce/product/${it.product.id}".toUri()
+                val navOptions = navOptions {
+                    popUpTo(com.kevinfreyap.cart.R.id.cartFragment) {
+                        inclusive = true
+                    }
+                }
+
+                findNavController().navigate(
+                    uri, navOptions
+                )
+            },
             onIncrease = {
                 viewModel.increaseQuantity(it)
             },

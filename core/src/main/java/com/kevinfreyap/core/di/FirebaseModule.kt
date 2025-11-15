@@ -2,6 +2,8 @@ package com.kevinfreyap.core.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.PersistentCacheSettings
+import com.google.firebase.firestore.firestoreSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +19,13 @@ class FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provideFirestore(): FirebaseFirestore {
+        val settings = firestoreSettings {
+            setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
+        }
+
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.firestoreSettings = settings
+        return firestore
+    }
 }

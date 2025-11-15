@@ -1,5 +1,6 @@
 package com.kevinfreyap.cart.viewholder
 
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
@@ -10,6 +11,7 @@ import com.kevinfreyap.shared_ui.R
 
 class CartViewHolder(
     private val binding: ItemCartBinding,
+    private val onNavigation: (Cart) -> Unit,
     private val onIncrease: (Cart) -> Unit,
     private val onDecrease: (Cart) -> Unit,
     private val getItem: (Int) -> Cart?
@@ -54,12 +56,28 @@ class CartViewHolder(
         binding.tvProductNameBottomSheet.text = cart.product.title
         binding.tvProductPriceBottomSheet.text = context.getString(R.string.currency_dollar, cart.product.price)
         binding.tvProductQuantity.text = cart.quantity.toString()
+        binding.tvProductQuantity.setOnClickListener {}
+        binding.tvProductQuantity.isSoundEffectsEnabled = false
 
         Glide.with(context)
             .load(cart.product.images.firstOrNull())
             .placeholder(shimmerDrawable)
             .error(R.drawable.ic_image_24)
             .into(binding.ivProductImageBottomSheet)
+
+        if (cart.isAvailable) {
+            binding.itemCartLayout.alpha = 1.0f
+            binding.tvItemUnavailable.isVisible = false
+
+            binding.root.setOnClickListener {
+                onNavigation(cart)
+            }
+        } else {
+            binding.itemCartLayout.alpha = 0.3f
+            binding.tvItemUnavailable.isVisible = true
+            binding.btnIncreaseQty.isEnabled = false
+            binding.btnDecreaseQty.isEnabled = false
+        }
     }
 
     fun bindQuantity(cart: Cart) {

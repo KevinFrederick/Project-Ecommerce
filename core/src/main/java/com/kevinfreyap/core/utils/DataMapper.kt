@@ -2,6 +2,7 @@ package com.kevinfreyap.core.utils
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.kevinfreyap.core.data.source.local.entity.CartEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
@@ -69,6 +70,20 @@ object DataMapper {
             slug = response.slug,
             creationAt = response.creationAt,
             updatedAt = response.updatedAt
+        )
+    }
+
+    fun mapCartEntityToDomain(entity: CartEntity): Product {
+        return Product(
+            id = entity.productId.toInt(),
+            title = entity.name,
+            price = entity.price,
+            images = listOf(entity.imageUrl),
+            category = ProductCategory(0, "", ""),
+            description = "",
+            slug = "",
+            creationAt = "",
+            updatedAt = ""
         )
     }
 

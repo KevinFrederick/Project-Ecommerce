@@ -3,6 +3,7 @@ package com.kevinfreyap.core.di
 import android.content.Context
 import androidx.room.Room
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
+import com.kevinfreyap.core.data.source.local.room.CartDao
 import com.kevinfreyap.core.data.source.local.room.ProductDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.remote.network.ApiService
@@ -27,6 +28,9 @@ class DatabaseModule {
 
     @Provides
     fun provideProductDao(database: ProductDatabase): ProductDao = database.productDao()
+
+    @Provides
+    fun provideCartDao(database: ProductDatabase): CartDao = database.cartDao()
 
     @Provides
     @Singleton

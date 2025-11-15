@@ -25,7 +25,6 @@ class ProductRemoteMediator @Inject constructor(
         state: PagingState<Int, ProductEntity>
     ): MediatorResult {
         try {
-
             // Determine the offset (page) to load
             val loadKey = when(loadType) {
                 // REFRESH: User is swiping to refresh. Load from the beginning.
