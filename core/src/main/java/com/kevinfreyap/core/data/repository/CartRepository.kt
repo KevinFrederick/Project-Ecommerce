@@ -226,7 +226,7 @@ class CartRepository @Inject constructor(
         }
     }
 
-    override suspend fun clearCartOnLogout() = withContext(Dispatchers.IO) {
+    override suspend fun clearCart() = withContext(Dispatchers.IO) {
         cartDao.clearCart()
     }
 

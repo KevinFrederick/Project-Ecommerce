@@ -39,7 +39,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authUseCase.logout()
-                cartUseCase.clearCartOnLogout()
+                cartUseCase.clearCart()
                 _userProfile.value = Resource.Success(null)
             } catch (e: IOException) {
                 Log.e("AccountViewModel", "Failed to clear auth token", e)

@@ -1,13 +1,13 @@
-package com.kevinfreyap.cart.viewholder
+package com.kevinfreyap.shared_ui.viewholder
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.kevinfreyap.cart.databinding.ItemCartBinding
 import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_ui.databinding.ItemCartBinding
 
 class CartViewHolder(
     private val binding: ItemCartBinding,

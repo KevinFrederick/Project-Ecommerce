@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/auth" />
             <option value="$PROJECT_DIR$/cart" />
+            <option value="$PROJECT_DIR$/checkout" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/detail" />
             <option value="$PROJECT_DIR$/shared-ui" />

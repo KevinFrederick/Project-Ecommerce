@@ -1,39 +1,43 @@
-package com.kevinfreyap.cart.ui
+package com.kevinfreyap.checkout.ui
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.kevinfreyap.shared_ui.adapter.CartAdapter
-import com.kevinfreyap.cart.databinding.FragmentCartBinding
-import com.kevinfreyap.cart.utils.CheckoutActionState
+import com.kevinfreyap.checkout.databinding.FragmentCheckoutBinding
+import com.kevinfreyap.checkout.utils.OrderState
+import com.kevinfreyap.core.utils.PaymentMethod
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_ui.adapter.CartAdapter
 import com.yanzhenjie.recyclerview.SwipeMenuCreator
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import com.yanzhenjie.recyclerview.SwipeRecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CartFragment : Fragment() {
-    private val viewModel: CartViewModel by viewModels()
+class CheckoutFragment : Fragment() {
+    private val viewModel: CheckoutViewModel by viewModels()
 
-    private var _binding: FragmentCartBinding? = null
+    private var _binding: FragmentCheckoutBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var recyclerView: SwipeRecyclerView
@@ -44,7 +48,7 @@ class CartFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentCartBinding.inflate(inflater, container, false)
+        _binding = FragmentCheckoutBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -53,8 +57,32 @@ class CartFragment : Fragment() {
         recyclerView = binding.rvCart
         setupRecyclerView()
 
+        binding.codOption.setOnClickListener {
+            viewModel.selectMethod(PaymentMethod.CASH)
+        }
+
+        binding.cardOption.setOnClickListener {
+            // viewModel.selectMethod(PaymentMethod.CARD)
+        }
+
+        binding.tvApplyBtn.setOnClickListener {
+            val voucherCode = binding.etVoucherInput.text.toString()
+
+            if (voucherCode.isNotEmpty()) {
+                // TODO (Apply Voucher Functionality)
+            } else {
+                binding.etVoucherInput.error = getString(R.string.error_no_voucher)
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.selectedMethod.collect { method ->
+                        updateSelectionUI(method)
+                    }
+                }
+
                 launch {
                     viewModel.cartList.collect { resource ->
                         when(resource) {
@@ -63,34 +91,11 @@ class CartFragment : Fragment() {
                             }
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
-                                cartAdapter.submitList(resource.data)
 
-                                if (resource.data.isEmpty()) {
-                                    binding.cartLayout.isVisible = false
-                                    binding.noItemLayout.isVisible = true
-                                } else {
-                                    binding.cartLayout.isVisible = true
-                                    binding.noItemLayout.isVisible = false
-                                }
+                                cartAdapter.submitList(resource.data)
                             }
                             is Resource.Error -> {
                                 binding.progressBar.isVisible = false
-                                val message = when(resource.message) {
-                                    "ERROR_USER_NOT_FOUND" -> {
-                                        getString(R.string.error_user_not_found)
-                                    }
-                                    "ERROR_FAILED_TO_LOAD" -> {
-                                        getString(R.string.error_failed_to_load)
-                                    }
-                                    "ERROR_NO_CONNECTION" -> {
-                                        getString(R.string.error_no_connection)
-                                    }
-                                    else -> {
-                                        Log.e("CartFragment", resource.message.toString())
-                                        getString(R.string.error_unknown)
-                                    }
-                                }
-                                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
                             }
                         }
                     }
@@ -106,22 +111,22 @@ class CartFragment : Fragment() {
                             binding.tvShippingFee.text = getString(R.string.currency_dollar, summary.shippingFee)
                         }
 
+                        binding.tvVoucherDiscount.text = getString(R.string.minus_currency_dollar, summary.voucherDiscount)
+
                         binding.tvTotalPrice.text = getString(R.string.currency_dollar, summary.total)
 
-                        binding.btnCheckout.isEnabled = summary.total > 0
+                        binding.btnOrder.isEnabled = summary.total > 0
                     }
                 }
 
                 launch {
-                    viewModel.checkoutState.collect { state ->
-                        binding.btnCheckout.isEnabled = state !is CheckoutActionState.Loading
-                        binding.progressBar.isVisible = state is CheckoutActionState.Loading
+                    viewModel.orderState.collect { state ->
+                        binding.btnOrder.isEnabled = state !is OrderState.Loading
+                        binding.progressBar.isVisible = state is OrderState.Loading
 
-                        if (state is CheckoutActionState.Navigate) {
-                            val uri = "app://ecommerce/checkout".toUri()
-                            findNavController().navigate(uri)
-
-                            viewModel.resetCheckoutState()
+                        if (state is OrderState.OrderSuccess){
+                            showOrderSuccessDialog(state.receipt.orderId)
+                            viewModel.resetOrderState()
                         }
                     }
                 }
@@ -153,12 +158,8 @@ class CartFragment : Fragment() {
             }
         }
 
-        binding.btnReturn.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.btnCheckout.setOnClickListener {
-            viewModel.onCheckoutClicked()
+        binding.btnOrder.setOnClickListener {
+            viewModel.onOrderClicked()
         }
     }
 
@@ -185,18 +186,7 @@ class CartFragment : Fragment() {
         }
 
         cartAdapter = CartAdapter(
-            onNavigation = {
-                val uri = "app://ecommerce/product/${it.product.id}".toUri()
-                val navOptions = navOptions {
-                    popUpTo(com.kevinfreyap.cart.R.id.cartFragment) {
-                        inclusive = true
-                    }
-                }
-
-                findNavController().navigate(
-                    uri, navOptions
-                )
-            },
+            onNavigation = {},
             onIncrease = {
                 viewModel.increaseQuantity(it)
             },
@@ -208,6 +198,56 @@ class CartFragment : Fragment() {
             adapter = cartAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+    }
+
+    private fun updateSelectionUI(selectedMethod: PaymentMethod) {
+        when(selectedMethod) {
+            PaymentMethod.CASH -> {
+                binding.ivCodSelector.setImageResource(R.drawable.ic_radio_button_checked_24)
+                binding.ivCardSelector.setImageResource(R.drawable.ic_radio_button_unchecked_24)
+            }
+
+            PaymentMethod.CARD -> {
+                binding.ivCodSelector.setImageResource(R.drawable.ic_radio_button_unchecked_24)
+                binding.ivCardSelector.setImageResource(R.drawable.ic_radio_button_checked_24)
+            }
+        }
+    }
+
+    private fun showOrderSuccessDialog(orderId: String) {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Order Placed!")
+            .setMessage("Your order #$orderId has been successfully placed.")
+            .setCancelable(true) // Allow outside click and back press
+            .create()
+
+        val job = viewLifecycleOwner.lifecycleScope.launch {
+            delay(2000)
+
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
+        }
+
+        dialog.setOnDismissListener {
+            job.cancel()
+            navigateToHome()
+        }
+
+        dialog.show()
+    }
+
+    private fun navigateToHome() {
+        if (!isAdded) return
+        
+        val uri = "app://ecommerce/home".toUri()
+
+        val navOptions = navOptions {
+            popUpTo(findNavController().graph.findStartDestination().id){
+                inclusive = true
+            }
+        }
+        findNavController().navigate(uri, navOptions)
     }
 
     override fun onDestroyView() {

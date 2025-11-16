@@ -17,11 +17,21 @@
         android:id="@+id/nav_cart"
         app:graph="@navigation/nav_cart" />
 
+    <include
+        android:id="@+id/nav_checkout"
+        app:graph="@navigation/nav_checkout" />
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+
+        <deepLink
+            android:id="@+id/deep_link_home"
+            app:uri="app://ecommerce/home"/>
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"

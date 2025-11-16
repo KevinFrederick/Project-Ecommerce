@@ -2,9 +2,11 @@ package com.kevinfreyap.core.di
 
 import com.kevinfreyap.core.data.repository.AuthenticationRepository
 import com.kevinfreyap.core.data.repository.CartRepository
+import com.kevinfreyap.core.data.repository.OrderRepository
 import com.kevinfreyap.core.data.repository.ProductRepository
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.domain.repository.ICartRepository
+import com.kevinfreyap.core.domain.repository.IOrderRepository
 import com.kevinfreyap.core.domain.repository.IProductRepository
 import dagger.Binds
 import dagger.Module
@@ -27,4 +29,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideCartRepository(cartRepository: CartRepository): ICartRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideOrderRepository(orderRepository: OrderRepository): IOrderRepository
 }

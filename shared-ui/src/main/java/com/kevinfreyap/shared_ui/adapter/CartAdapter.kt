@@ -1,12 +1,12 @@
-package com.kevinfreyap.cart.adapter
+package com.kevinfreyap.shared_ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kevinfreyap.cart.databinding.ItemCartBinding
-import com.kevinfreyap.cart.viewholder.CartViewHolder
 import com.kevinfreyap.core.domain.model.cart.Cart
+import com.kevinfreyap.shared_ui.databinding.ItemCartBinding
+import com.kevinfreyap.shared_ui.viewholder.CartViewHolder
 
 class CartAdapter(
     private val onNavigation: (Cart) -> Unit,

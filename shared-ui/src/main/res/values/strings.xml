@@ -11,6 +11,9 @@
 
     <!-- Title -->
     <string name="title_shipping_address">Shipping Address</string>
+    <string name="title_payment_methods">Payment Methods</string>
+    <string name="title_voucher">Add Voucher</string>
+    <string name="title_order_summary">Order Summary</string>
 
     <!-- Label -->
     <string name="label_quantity">Quantity</string>
@@ -18,9 +21,14 @@
     <string name="shipping_fee">Shipping Fee</string>
     <string name="total">Total</string>
     <string name="free">Free</string>
+    <string name="voucher">Voucher</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
+    <string name="image_location">Address Location</string>
+    <string name="image_cod_payment">Cash On Delivery Payment</string>
+    <string name="image_card_payment">Card Payment</string>
+    <string name="image_voucher">Voucher</string>
     <string name="text_unknown_name">Your Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
@@ -28,6 +36,7 @@
 
     <!-- String Format -->
     <string name="currency_dollar">$%1$d</string>
+    <string name="minus_currency_dollar">- $%1$d</string>
     <string name="no_account_sign_up">Don\'t have an account ? %1$s</string>
     <string name="have_account_sign_in">Already have an account ? %1$s</string>
 
@@ -35,6 +44,7 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
+    <string name="enter_voucher">Enter your voucher</string>
 
     <!-- Button Name -->
     <string name="sign_in">Sign In</string>
@@ -58,6 +68,10 @@
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
     <string name="go_shopping">Go Shopping</string>
+    <string name="delivery_payment">Cash on Delivery</string>
+    <string name="card_payment">Debit / Credit Card</string>
+    <string name="apply">Apply</string>
+    <string name="order">Order</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -70,6 +84,7 @@
 
     <!-- Error Message -->
     <string name="error_user_not_found">Please Login first</string>
+    <string name="error_not_available">Not Available Yet</string>
     <string name="error_email_is_required">Email is required</string>
     <string name="error_enter_valid_email">Please enter a valid email</string>
     <string name="error_password_is_required">Password is required</string>
@@ -85,6 +100,7 @@
     <string name="error_failed_to_add_to_cart">Failed to add item to cart</string>
     <string name="error_login_required">Login Required</string>
     <string name="error_remove_unavailable_item">Please remove unavailable items first</string>
+    <string name="error_no_voucher">Please enter a code</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>

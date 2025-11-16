@@ -41,6 +41,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":core"))
+
     api(libs.androidx.lifecycle.livedata.ktx)
     api(libs.androidx.lifecycle.viewmodel.ktx)
     api(libs.androidx.core.ktx)

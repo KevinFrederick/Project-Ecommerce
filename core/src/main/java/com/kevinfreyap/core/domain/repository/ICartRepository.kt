@@ -13,5 +13,5 @@ interface ICartRepository {
     fun removeItemFromCart(productId: Int): Flow<Resource<Boolean>>
     fun refreshCartAvailability(): Flow<Resource<Boolean>>
     suspend fun syncCartOnLogin()
-    suspend fun clearCartOnLogout()
+    suspend fun clearCart()
 }

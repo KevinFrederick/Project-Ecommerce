@@ -29,17 +29,20 @@ class CartInteractor @Inject constructor (private val cartRepository: CartReposi
 
                 val subtotal = items.sumOf { it.product.price.toDouble() * it.quantity }
                 val shippingFee = if (0 < subtotal && subtotal < 100) 20.0 else 0.0
-                val total = subtotal + shippingFee
+                val voucherDisc = 0
+                val total = (subtotal + shippingFee - voucherDisc).coerceAtLeast(0.0)
 
                 CartSummary(
                     subtotal = subtotal.toInt(),
                     shippingFee = shippingFee.toInt(),
+                    voucherDiscount = voucherDisc,
                     total = total.toInt()
                 )
             } else {
                 CartSummary(
                     subtotal = 0,
                     shippingFee = 0,
+                    voucherDiscount = 0,
                     total = 0
                 )
             }
@@ -65,7 +68,7 @@ class CartInteractor @Inject constructor (private val cartRepository: CartReposi
         cartRepository.syncCartOnLogin()
     }
 
-    override suspend fun clearCartOnLogout() {
-        cartRepository.clearCartOnLogout()
+    override suspend fun clearCart() {
+        cartRepository.clearCart()
     }
 }
