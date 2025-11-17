@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.kevinfreyap.cart.ui.CartFragment"
-        android:label="fragment_cart"
+        android:label="@string/title_cart"
         tools:layout="@layout/fragment_cart" >
 
         <deepLink

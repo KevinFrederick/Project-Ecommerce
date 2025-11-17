@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/checkoutFragment"
         android:name="com.kevinfreyap.checkout.ui.CheckoutFragment"
-        android:label="fragment_checkout"
+        android:label="@string/title_checkout"
         tools:layout="@layout/fragment_checkout" >
 
         <deepLink

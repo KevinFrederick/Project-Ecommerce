@@ -9,9 +9,9 @@ import com.kevinfreyap.shared_ui.databinding.ItemCartBinding
 import com.kevinfreyap.shared_ui.viewholder.CartViewHolder
 
 class CartAdapter(
-    private val onNavigation: (Cart) -> Unit,
-    private val onIncrease: (Cart) -> Unit,
-    private val onDecrease: (Cart) -> Unit,
+    private val onNavigation: (Cart) -> Unit ,
+    private val onIncrease: (Cart) -> Unit ,
+    private val onDecrease: (Cart) -> Unit ,
 ): ListAdapter<Cart, CartViewHolder>(CART_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -23,7 +23,8 @@ class CartAdapter(
             onNavigation = onNavigation,
             onIncrease = onIncrease,
             onDecrease = onDecrease,
-        ) { position -> getItem(position)}
+            getItem = { position -> getItem(position)}
+        )
     }
 
     override fun onBindViewHolder(

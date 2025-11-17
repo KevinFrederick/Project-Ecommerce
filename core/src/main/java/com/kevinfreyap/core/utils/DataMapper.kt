@@ -4,10 +4,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.kevinfreyap.core.data.source.local.entity.CartEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
+import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
+import com.kevinfreyap.core.domain.model.order.OrderItem
+import com.kevinfreyap.core.domain.model.order.OrderReceipt
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.product.ProductCategory
+import com.kevinfreyap.core.domain.model.user.UserAddress
 
 object DataMapper {
 
@@ -87,7 +91,39 @@ object DataMapper {
         )
     }
 
-    fun mapProductsResponseToDomain(listResponse: List<ProductsResponseItem>): List<Product> {
-        return listResponse.map { mapProductResponseToDomain(it) }
+    fun mapOrderDomainToEntity(domain: OrderReceipt): TransactionEntity {
+        return TransactionEntity(
+            transactionId = domain.orderId,
+            datePlaced = domain.datePlaced,
+            totalPaid = domain.totalPaid,
+            subtotal = domain.subtotal,
+            shippingFee = domain.shippingFee,
+            discountAmount = domain.discountAmount,
+            orderStatus = domain.orderStatus,
+            shippingAddressJson = gson.toJson(domain.shippingAddress),
+            itemsPurchasedJson = gson.toJson(domain.itemsPurchased),
+            paymentMethod = domain.paymentMethod
+        )
+    }
+
+    fun mapTransactionEntityToDomain(entity: TransactionEntity): OrderReceipt {
+        val itemsPurchasedType = object : TypeToken<List<OrderItem>>() {}.type
+
+        return OrderReceipt(
+            orderId = entity.transactionId,
+            datePlaced = entity.datePlaced,
+            totalPaid = entity.totalPaid,
+            subtotal = entity.subtotal,
+            shippingFee = entity.shippingFee,
+            discountAmount = entity.discountAmount,
+            orderStatus = entity.orderStatus,
+            shippingAddress = gson.fromJson(entity.shippingAddressJson, UserAddress::class.java),
+            itemsPurchased = gson.fromJson(entity.itemsPurchasedJson, itemsPurchasedType),
+            paymentMethod = entity.paymentMethod
+        )
+    }
+
+    fun mapTransactionsEntityToDomain(entities: List<TransactionEntity>): List<OrderReceipt> {
+        return entities.map { mapTransactionEntityToDomain(it) }
     }
 }

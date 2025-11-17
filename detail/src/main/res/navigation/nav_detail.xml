@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.kevinfreyap.detail.ui.DetailFragment"
-        android:label="fragment_detail"
+        android:label="@string/title_product_detail"
         tools:layout="@layout/fragment_detail" >
 
         <argument

@@ -1,6 +1,7 @@
 package com.kevinfreyap.cart.ui
 
-import android.util.Log
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.cart.utils.CheckoutActionState
@@ -9,19 +10,17 @@ import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.cart.CartSummary
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartUseCase: CartUseCase
+    private val cartUseCase: CartUseCase,
+    private val connectivityManager: ConnectivityManager
 ) : ViewModel() {
     val cartList: StateFlow<Resource<List<Cart>>> = cartUseCase.getCartItems()
         .stateIn(
@@ -96,6 +95,11 @@ class CartViewModel @Inject constructor(
     fun onCheckoutClicked() {
         if (_checkoutState.value is CheckoutActionState.Loading) return
 
+        if (!isInternetAvailable()) {
+            _errorState.value = "ERROR_NO_CONNECTION"
+            return
+        }
+
         viewModelScope.launch {
             cartUseCase.refreshCartAvailability().collect { resource ->
                 when(resource) {
@@ -118,6 +122,12 @@ class CartViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun isInternetAvailable(): Boolean {
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     fun clearError() {

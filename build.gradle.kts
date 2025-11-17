@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.google.gms.google.services) apply false
     alias(libs.plugins.kotlin.parcelize) apply false
+    alias(libs.plugins.android.navigation.safeargs.kotlin) apply false
 }

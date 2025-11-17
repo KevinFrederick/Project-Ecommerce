@@ -33,6 +33,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
@@ -71,6 +72,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     api(libs.paging.runtime)
+
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

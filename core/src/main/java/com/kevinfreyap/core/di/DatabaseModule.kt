@@ -6,6 +6,7 @@ import com.kevinfreyap.core.data.paging.ProductRemoteMediator
 import com.kevinfreyap.core.data.source.local.room.CartDao
 import com.kevinfreyap.core.data.source.local.room.ProductDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
+import com.kevinfreyap.core.data.source.local.room.TransactionDao
 import com.kevinfreyap.core.data.source.remote.network.ApiService
 import dagger.Module
 import dagger.Provides
@@ -31,6 +32,9 @@ class DatabaseModule {
 
     @Provides
     fun provideCartDao(database: ProductDatabase): CartDao = database.cartDao()
+
+    @Provides
+    fun provideTransactionDao(database: ProductDatabase): TransactionDao = database.transactionDao()
 
     @Provides
     @Singleton

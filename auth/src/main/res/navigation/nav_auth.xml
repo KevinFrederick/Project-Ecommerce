@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.kevinfreyap.auth.ui.login.LoginFragment"
-        android:label="LoginFragment" >
+        android:label="" >
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
@@ -15,5 +15,5 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.kevinfreyap.auth.ui.register.RegisterFragment"
-        android:label="RegisterFragment" />
+        android:label="" />
 </navigation>

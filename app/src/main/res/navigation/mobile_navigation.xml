@@ -21,10 +21,14 @@
         android:id="@+id/nav_checkout"
         app:graph="@navigation/nav_checkout" />
 
+    <include
+        android:id="@+id/nav_transaction"
+        app:graph="@navigation/nav_transaction" />
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"
-        android:label="@string/title_home"
+        android:label=""
         tools:layout="@layout/fragment_home" >
 
         <deepLink
@@ -33,11 +37,6 @@
 
     </fragment>
 
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.kevinfreyap.ecommerce.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_account_router"
@@ -53,6 +52,12 @@
             android:id="@+id/action_navigation_account_router_to_loginFragment"
             app:destination="@id/nav_auth" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_transaction"
+        android:name="com.kevinfreyap.transaction.ui.TransactionFragment"
+        android:label="@string/title_transactions"
+        tools:layout="@layout/fragment_transaction" />
 
     <fragment
         android:id="@+id/navigation_account_profile"

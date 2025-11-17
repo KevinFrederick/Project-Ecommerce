@@ -230,6 +230,34 @@ class CartRepository @Inject constructor(
         cartDao.clearCart()
     }
 
+    override suspend fun clearFirestoreCart() = withContext(Dispatchers.IO) {
+        val currentUserUid = firebaseAuth.currentUser?.uid
+        if (currentUserUid.isNullOrEmpty()) return@withContext
+
+        try {
+            val collectionRef = firestore.collection(USER_COLLECTION)
+                .document(currentUserUid)
+                .collection(CART_SUB_COLLECTION)
+
+            val snapshot = collectionRef.get().await()
+
+            if (snapshot.isEmpty) {
+                Log.d("CartRepo", "Firestore cart is already empty.")
+                return@withContext // Nothing to delete
+            }
+
+            val batch = firestore.batch()
+            for (document in snapshot.documents){
+                batch.delete(document.reference)
+            }
+
+            batch.commit().await()
+            Log.d("CartRepo", "Successfully cleared Firestore cart sub-collection.")
+        } catch (e: Exception) {
+            Log.e("CartRepo", "Failed to clear Firestore cart: ${e.message}")
+        }
+    }
+
     override fun refreshCartAvailability(): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
 

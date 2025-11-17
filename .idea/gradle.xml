@@ -19,6 +19,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/detail" />
             <option value="$PROJECT_DIR$/shared-ui" />
+            <option value="$PROJECT_DIR$/transaction" />
           </set>
         </option>
       </GradleProjectSettings>

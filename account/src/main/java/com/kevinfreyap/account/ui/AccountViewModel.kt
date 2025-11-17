@@ -1,12 +1,15 @@
 package com.kevinfreyap.account.ui
 
 import android.util.Log
+import android.util.Printer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
+import com.kevinfreyap.core.domain.usecase.order.OrderUseCase
+import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val authUseCase: AuthUseCase,
-    private val cartUseCase: CartUseCase
+    private val cartUseCase: CartUseCase,
+    private val transactionUseCase: TransactionUseCase
 ) : ViewModel() {
 
     private val _userProfile = MutableStateFlow<Resource<UserProfile?>>(Resource.Loading())
@@ -40,6 +44,7 @@ class AccountViewModel @Inject constructor(
             try {
                 authUseCase.logout()
                 cartUseCase.clearCart()
+                transactionUseCase.clearOrderHistory()
                 _userProfile.value = Resource.Success(null)
             } catch (e: IOException) {
                 Log.e("AccountViewModel", "Failed to clear auth token", e)

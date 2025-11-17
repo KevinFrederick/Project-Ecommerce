@@ -1,11 +1,11 @@
-package com.kevinfreyap.core.data.source.local.room
+package com.kevinfreyap.core.data.source.local.converters
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.kevinfreyap.core.domain.model.product.ProductCategory
 
-class Converters {
+class ProductConverters {
     private val gson = Gson()
 
     @TypeConverter

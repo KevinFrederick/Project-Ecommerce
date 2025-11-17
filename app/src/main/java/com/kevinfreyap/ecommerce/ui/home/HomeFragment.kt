@@ -17,7 +17,6 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kevinfreyap.ecommerce.databinding.FragmentHomeBinding
-import com.kevinfreyap.ecommerce.ui.MainActivity
 import com.kevinfreyap.core.data.source.MainViewModel
 import com.kevinfreyap.ecommerce.ui.adapter.ProductAdapter
 import com.kevinfreyap.shared_ui.util.setupCartMenu
@@ -62,10 +61,12 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    (requireActivity() as MainActivity).isNetworkAvailable
-                        .drop(1) // Skip initial value so it doesn't refresh on Launch
-                        .collect { isOnline ->
-                            productAdapter.refresh()
+                    mainViewModel.isNetworkAvailable
+                        .drop(1)
+                        .collect { isAvailable ->
+                            if (isAvailable) {
+                                productAdapter.refresh()
+                            }
                         }
                 }
                 launch {

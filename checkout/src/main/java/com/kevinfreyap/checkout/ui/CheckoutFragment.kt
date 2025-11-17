@@ -141,8 +141,9 @@ class CheckoutFragment : Fragment() {
                                 "ERROR_NO_CONNECTION" -> {
                                     getString(R.string.error_no_connection)
                                 }
-                                "ERROR_REMOVE_UNAVAILABLE_ITEM" -> {
-                                    getString(R.string.error_remove_unavailable_item)
+                                "ERROR_EMPTY_CART" -> {
+                                    findNavController().navigateUp()
+                                    getString(R.string.error_empty_cart)
                                 }
                                 else -> {
                                     Log.e("CartFragment", errorMessage)

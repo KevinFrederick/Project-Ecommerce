@@ -53,8 +53,8 @@ class CartViewHolder(
             setShimmer(shimmer)
         }
 
-        binding.tvProductNameBottomSheet.text = cart.product.title
-        binding.tvProductPriceBottomSheet.text = context.getString(R.string.currency_dollar, cart.product.price)
+        binding.tvProductName.text = cart.product.title
+        binding.tvProductPrice.text = context.getString(R.string.currency_dollar, cart.product.price)
         binding.tvProductQuantity.text = cart.quantity.toString()
         binding.tvProductQuantity.setOnClickListener {}
         binding.tvProductQuantity.isSoundEffectsEnabled = false
@@ -63,7 +63,7 @@ class CartViewHolder(
             .load(cart.product.images.firstOrNull())
             .placeholder(shimmerDrawable)
             .error(R.drawable.ic_image_24)
-            .into(binding.ivProductImageBottomSheet)
+            .into(binding.ivProductImage)
 
         if (cart.isAvailable) {
             binding.itemCartLayout.alpha = 1.0f

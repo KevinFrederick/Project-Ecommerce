@@ -1,15 +1,17 @@
 package com.kevinfreyap.core.domain.usecase.cart
 
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.data.repository.CartRepository
 import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.cart.CartSummary
 import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.core.domain.repository.ICartRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class CartInteractor @Inject constructor (private val cartRepository: CartRepository): CartUseCase {
+class CartInteractor @Inject constructor (
+    private val cartRepository: ICartRepository
+): CartUseCase {
     override fun getCartItems(): Flow<Resource<List<Cart>>> = cartRepository.getCartItems()
     override fun addToCart(
         product: Product,

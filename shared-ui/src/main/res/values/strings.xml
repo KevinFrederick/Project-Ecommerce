@@ -3,11 +3,14 @@
 
     <!-- Top Level -->
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_transactions">Transactions</string>
     <string name="title_account">Account</string>
     <string name="title_login">Login</string>
     <string name="title_register">Register</string>
     <string name="title_cart">Cart</string>
+    <string name="title_product_detail">Product Detail</string>
+    <string name="title_checkout">Checkout</string>
+    <string name="title_transaction_detail">Transaction Detail</string>
 
     <!-- Title -->
     <string name="title_shipping_address">Shipping Address</string>
@@ -22,6 +25,9 @@
     <string name="total">Total</string>
     <string name="free">Free</string>
     <string name="voucher">Voucher</string>
+    <string name="transaction_id_label">Transaction ID</string>
+    <string name="order_date">Order Date</string>
+    <string name="ordered_items">Ordered Items</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -29,6 +35,7 @@
     <string name="image_cod_payment">Cash On Delivery Payment</string>
     <string name="image_card_payment">Card Payment</string>
     <string name="image_voucher">Voucher</string>
+    <string name="image_chevron_right">Go to detail</string>
     <string name="text_unknown_name">Your Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
@@ -39,6 +46,7 @@
     <string name="minus_currency_dollar">- $%1$d</string>
     <string name="no_account_sign_up">Don\'t have an account ? %1$s</string>
     <string name="have_account_sign_in">Already have an account ? %1$s</string>
+    <string name="transaction_id">#%1$s</string>
 
     <!-- Hint -->
     <string name="email_hint">Email</string>
@@ -81,6 +89,8 @@
     <string name="empty_cart">Your cart is empty</string>
     <string name="error_no_product_desc">This product has been removed by the seller</string>
     <string name="error_login_required_desc">You need to sign in to access this feature</string>
+    <string name="cash_on_delivery">Cash on Delivery</string>
+    <string name="debit_credit_card">Debit / Credit Cart</string>
 
     <!-- Error Message -->
     <string name="error_user_not_found">Please Login first</string>
@@ -101,6 +111,7 @@
     <string name="error_login_required">Login Required</string>
     <string name="error_remove_unavailable_item">Please remove unavailable items first</string>
     <string name="error_no_voucher">Please enter a code</string>
+    <string name="error_empty_cart">Cart empty</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>

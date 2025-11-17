@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="64dp"
+    android:clipToPadding="false"
+    tools:context=".ui.TransactionDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="0dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/transaction_detail_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:layout_constraintTop_toBottomOf="@id/progress_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tv_transaction_id_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/transaction_id_label"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_transaction_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium.Emphasized"
+                    app:layout_constraintTop_toBottomOf="@id/tv_transaction_id_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:text="#ORD-ef23fa" />
+
+                <TextView
+                    android:id="@+id/tv_order_date_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/order_date"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    app:layout_constraintTop_toBottomOf="@id/tv_transaction_id"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_order_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toTopOf="@id/tv_order_date_label"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_order_date_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="25 November 2025, 08:30 PM" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_address_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/title_shipping_address"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    app:layout_constraintTop_toBottomOf="@id/tv_order_date_label"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_location_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_location_on_24"
+                    android:contentDescription="@string/image_location"
+                    app:layout_constraintTop_toBottomOf="@id/tv_shipping_address_label"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_address"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toTopOf="@id/iv_location_icon"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_location_icon"
+                    app:layout_constraintStart_toEndOf="@id/iv_location_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="123 Main Street, Apt 4, Anytown, CA 91234, USA" />
+
+                <TextView
+                    android:id="@+id/tv_payment_methods_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/title_payment_methods"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    app:layout_constraintTop_toBottomOf="@id/tv_shipping_address"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_payment_icon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_cod_24"
+                    android:contentDescription="@string/image_cod_payment"
+                    app:layout_constraintTop_toBottomOf="@id/tv_payment_methods_label"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_payment_method"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toTopOf="@id/iv_payment_icon"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_payment_icon"
+                    app:layout_constraintStart_toEndOf="@id/iv_payment_icon"
+                    tools:text="Cash on Delivery" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_ordered_items_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ordered_items"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+            app:layout_constraintTop_toBottomOf="@id/transaction_detail_card"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_ordered_items"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/tv_ordered_items_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_cart"
+            tools:itemCount="2" />
+
+        <TextView
+            android:id="@+id/tv_order_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/title_order_summary"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+            app:layout_constraintTop_toBottomOf="@id/rv_ordered_items"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_order_summary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tv_subtotal_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subtotal"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_subtotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    app:layout_constraintTop_toTopOf="@id/tv_subtotal_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="$158"/>
+
+                <TextView
+                    android:id="@+id/tv_shipping_fee_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/shipping_fee"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toBottomOf="@id/tv_subtotal_label"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_shipping_fee"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    app:layout_constraintTop_toTopOf="@id/tv_shipping_fee_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="$20"/>
+
+                <TextView
+                    android:id="@+id/tv_voucher_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/voucher"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintTop_toBottomOf="@id/tv_shipping_fee_label"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_voucher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    app:layout_constraintTop_toTopOf="@id/tv_voucher_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="- $0"/>
+
+                <View
+                    android:id="@+id/total_divider"
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/grey_500"
+                    app:layout_constraintTop_toBottomOf="@id/tv_voucher_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_total_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/total"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                    app:layout_constraintTop_toBottomOf="@id/total_divider"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium.Emphasized"
+                    app:layout_constraintTop_toTopOf="@id/tv_total_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="$178"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

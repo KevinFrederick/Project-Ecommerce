@@ -13,7 +13,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OrderRepository @Inject constructor(): IOrderRepository{
+class OrderRepository @Inject constructor(): IOrderRepository{ // Mock Repository
     override suspend fun submitOrder(
         items: List<Cart>,
         address: UserAddress,
@@ -31,7 +31,8 @@ class OrderRepository @Inject constructor(): IOrderRepository{
                 productId = cart.product.id.toString(),
                 title = cart.product.title,
                 quantity = cart.quantity,
-                pricePerItem = cart.product.price
+                pricePerItem = cart.product.price,
+                imageUrl = cart.product.images.firstOrNull() ?: ""
             )
         }
 
@@ -44,11 +45,16 @@ class OrderRepository @Inject constructor(): IOrderRepository{
             orderId = "ORD-${UUID.randomUUID().toString().substring(0,6).uppercase()}",
             datePlaced = System.currentTimeMillis(),
             totalPaid = total.toInt(),
+            subtotal = subtotal.toInt(),
+            shippingFee = shippingFee.toInt(),
+            discountAmount = voucherDisc,
             orderStatus = "Processing",
             shippingAddress = address,
-            itemsPurchased = itemsPurchased
+            itemsPurchased = itemsPurchased,
+            paymentMethod = payment
         )
 
+        // Assume Success
         return Resource.Success(receipt)
     }
 }

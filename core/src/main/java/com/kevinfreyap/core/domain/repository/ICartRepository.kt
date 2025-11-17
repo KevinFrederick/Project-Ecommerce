@@ -14,4 +14,5 @@ interface ICartRepository {
     fun refreshCartAvailability(): Flow<Resource<Boolean>>
     suspend fun syncCartOnLogin()
     suspend fun clearCart()
+    suspend fun clearFirestoreCart()
 }
