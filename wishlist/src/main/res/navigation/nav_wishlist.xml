@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_wishlist"
+    app:startDestination="@id/wishlistFragment">
+
+    <fragment
+        android:id="@+id/wishlistFragment"
+        android:name="com.kevinfreyap.wishlist.ui.WishlistFragment"
+        android:label="@string/wishlist"
+        tools:layout="@layout/fragment_wishlist" >
+
+        <deepLink
+            android:id="@+id/deep_link_wishlist"
+            app:uri="app://ecommerce/wishlist" />
+
+    </fragment>
+</navigation>

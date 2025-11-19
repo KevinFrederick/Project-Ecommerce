@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import com.kevinfreyap.core.data.source.local.entity.CartEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
 import com.kevinfreyap.core.domain.model.order.OrderItem
@@ -12,11 +13,13 @@ import com.kevinfreyap.core.domain.model.order.OrderReceipt
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.product.ProductCategory
 import com.kevinfreyap.core.domain.model.user.UserAddress
+import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
 
 object DataMapper {
 
     private val gson = Gson()
 
+    // Product
     fun mapProductCategoryToDomain(categoryResponse: CategoryResponse): ProductCategory {
         return ProductCategory(
             id = categoryResponse.id,
@@ -27,7 +30,7 @@ object DataMapper {
 
     fun mapProductResponseToEntity(response: ProductsResponseItem): ProductEntity {
         return ProductEntity(
-            id = response.id,
+            id = response.id.toString(),
             title = response.title,
             description = response.description,
             price = response.price,
@@ -65,7 +68,7 @@ object DataMapper {
 
     fun mapProductResponseToDomain(response: ProductsResponseItem): Product {
         return Product(
-            id = response.id,
+            id = response.id.toString(),
             title = response.title,
             category = mapProductCategoryToDomain(response.categoryResponse),
             description = response.description,
@@ -77,9 +80,11 @@ object DataMapper {
         )
     }
 
+
+    // Cart
     fun mapCartEntityToDomain(entity: CartEntity): Product {
         return Product(
-            id = entity.productId.toInt(),
+            id = entity.productId,
             title = entity.name,
             price = entity.price,
             images = listOf(entity.imageUrl),
@@ -91,6 +96,7 @@ object DataMapper {
         )
     }
 
+    // Order / Transaction
     fun mapOrderDomainToEntity(domain: OrderReceipt): TransactionEntity {
         return TransactionEntity(
             transactionId = domain.orderId,
@@ -125,5 +131,31 @@ object DataMapper {
 
     fun mapTransactionsEntityToDomain(entities: List<TransactionEntity>): List<OrderReceipt> {
         return entities.map { mapTransactionEntityToDomain(it) }
+    }
+
+
+    // Wishlist
+    fun mapWishlistEntityToDomain(entity: WishlistEntity): WishlistItem {
+        return WishlistItem(
+            productId = entity.productId,
+            dateAdded = entity.dateAdded
+        )
+    }
+
+    fun mapWishlistsToDomain(entities: List<WishlistEntity>): List<WishlistItem> {
+        return entities.map {
+            mapWishlistEntityToDomain(it)
+        }
+    }
+
+    fun mapWishlistDomainToEntity(domain: WishlistItem): WishlistEntity {
+        return WishlistEntity(
+            productId = domain.productId,
+            dateAdded = domain.dateAdded
+        )
+    }
+
+    fun mapWishlistsDomainToEntity(domains: List<WishlistItem>): List<WishlistEntity> {
+        return domains.map { mapWishlistDomainToEntity(it) }
     }
 }

@@ -11,7 +11,7 @@ import com.kevinfreyap.core.domain.model.product.Product
 class ProductViewHolder(
     val binding: ItemProductBinding
 ): RecyclerView.ViewHolder(binding.root) {
-    fun bind(product: Product, onItemClick: (productId: Int) -> Unit) {
+    fun bind(product: Product, onItemClick: (productId: String) -> Unit) {
         val context = itemView.context
 
         val shimmer = Shimmer.AlphaHighlightBuilder()
@@ -24,7 +24,7 @@ class ProductViewHolder(
         val shimmerDrawable = ShimmerDrawable().apply {
             setShimmer(shimmer)
         }
-        Glide.with(binding.root)
+        Glide.with(context)
             .load(product.images[0])
             .placeholder(shimmerDrawable)
             .error(R.drawable.ic_image_24)
@@ -33,7 +33,7 @@ class ProductViewHolder(
         binding.tvProductPrice.text = context.getString(R.string.currency_dollar, product.price)
         binding.tvCategory.text = product.category.name
 
-        binding.root.setOnClickListener {
+        itemView.setOnClickListener {
             onItemClick(product.id)
         }
     }

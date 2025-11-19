@@ -7,9 +7,12 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
+import com.kevinfreyap.core.domain.usecase.wishlist.WishlistUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,9 +20,10 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     private val productUseCase: ProductUseCase,
     private val cartUseCase: CartUseCase,
+    private val wishlistUseCase: WishlistUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val productId = savedStateHandle.get<Int>("productId")
+    private val productId = savedStateHandle.get<String>("productId")
 
     private val _productState = MutableStateFlow<Resource<Product?>>(Resource.Loading())
     val productState : StateFlow<Resource<Product?>> = _productState
@@ -30,6 +34,13 @@ class DetailViewModel @Inject constructor(
     private val _addToCartState = MutableStateFlow<Resource<Boolean>?>(null)
     val addToCartState: StateFlow<Resource<Boolean>?> = _addToCartState
 
+    val isInWishlist: StateFlow<Boolean> = wishlistUseCase.observeIsProductInWishlist(productId ?: "")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
     init {
         if (productId != null) {
             loadProduct(productId)
@@ -38,7 +49,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadProduct(id: Int) {
+    private fun loadProduct(id: String) {
         viewModelScope.launch {
             productUseCase.getProductById(id).collect {
                 _productState.value = it
@@ -53,6 +64,30 @@ class DetailViewModel @Inject constructor(
     fun decreaseQuantity() {
         if (_quantity.value > 1) {
             _quantity.value--
+        }
+    }
+
+    fun onClickWishlist() {
+        if (isInWishlist.value) {
+            onRemoveWishlist()
+        } else {
+            addToWishlist()
+        }
+    }
+
+    fun addToWishlist() {
+        viewModelScope.launch {
+            if (productId != null){
+                wishlistUseCase.addToWishlist(productId)
+            }
+        }
+    }
+
+    fun onRemoveWishlist() {
+        viewModelScope.launch {
+            if (productId != null) {
+                wishlistUseCase.removeFromWishlist(productId)
+            }
         }
     }
 

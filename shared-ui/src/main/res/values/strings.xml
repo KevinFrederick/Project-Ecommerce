@@ -47,6 +47,9 @@
     <string name="no_account_sign_up">Don\'t have an account ? %1$s</string>
     <string name="have_account_sign_in">Already have an account ? %1$s</string>
     <string name="transaction_id">#%1$s</string>
+    <string name="pieces">%1$s pc(s)</string>
+    <string name="item">%1$s item</string>
+    <string name="items">(%1$s items)</string>
 
     <!-- Hint -->
     <string name="email_hint">Email</string>
@@ -87,6 +90,8 @@
     <string name="continue_with_other">or continue with</string>
     <string name="label_description">Description</string>
     <string name="empty_cart">Your cart is empty</string>
+    <string name="empty_transactions">No transactions yet</string>
+    <string name="empty_wishlist">No item in wishlist</string>
     <string name="error_no_product_desc">This product has been removed by the seller</string>
     <string name="error_login_required_desc">You need to sign in to access this feature</string>
     <string name="cash_on_delivery">Cash on Delivery</string>

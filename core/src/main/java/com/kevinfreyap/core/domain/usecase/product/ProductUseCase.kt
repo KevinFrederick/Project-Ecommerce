@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductUseCase {
     fun getProducts(): Flow<PagingData<Product>>
-    fun getProductById(productId: Int): Flow<Resource<Product?>>
+    fun getProductById(productId: String): Flow<Resource<Product?>>
 }

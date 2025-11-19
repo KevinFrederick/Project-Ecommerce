@@ -6,6 +6,7 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
+import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authUseCase: AuthUseCase,
-    private val cartUseCase: CartUseCase
+    private val cartUseCase: CartUseCase,
+    private val transactionUseCase: TransactionUseCase
 ): ViewModel() {
     private val _loginState = MutableStateFlow<Resource<Boolean>?>(null)
     val loginState: StateFlow<Resource<Boolean>?> = _loginState
@@ -54,6 +56,7 @@ class LoginViewModel @Inject constructor(
             authUseCase.login(loginRequest).collect { value ->
                 if (value is Resource.Success) {
                     cartUseCase.syncCartOnLogin()
+                    transactionUseCase.syncTransactionHistoryOnLogin()
                 }
                 _loginState.value = value
             }

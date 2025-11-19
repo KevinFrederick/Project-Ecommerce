@@ -8,6 +8,7 @@ import androidx.paging.map
 import androidx.room.withTransaction
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
+import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.remote.network.ApiService
 import com.kevinfreyap.core.domain.model.product.Product
@@ -15,6 +16,7 @@ import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.utils.DataMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -52,7 +54,7 @@ class ProductRepository @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    override fun getProductById(productId: Int): Flow<Resource<Product?>> = flow {
+    override fun getProductById(productId: String): Flow<Resource<Product?>> = flow {
 
         val dbFlow = productDao.getProductById(productId).map { entity ->
             entity?.let { DataMapper.mapEntityToDomain(it) }
@@ -60,7 +62,7 @@ class ProductRepository @Inject constructor(
         emit(Resource.Loading(dbFlow.first()))
 
         try {
-            val response = apiService.getProductById(productId)
+            val response = apiService.getProductById(productId.toInt())
             val productEntity = DataMapper.mapProductResponseToEntity(response)
 
             database.withTransaction {
@@ -70,7 +72,6 @@ class ProductRepository @Inject constructor(
             dbFlow.collect { data ->
                 emit(Resource.Success(data))
             }
-
         }  catch (e: HttpException) {
             if (e.code() == 404 || e.code() == 400) {
                 productDao.deleteProductById(productId)
@@ -85,9 +86,15 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    override suspend fun getProductByIdFromCache(productIds: List<Int>): List<Product> {
-        return productDao.getProductByIds(productIds).map { productEntity ->
-            DataMapper.mapEntityToDomain(productEntity)
-        }
+    override suspend fun getProductByIdFromCache(productIds: List<String>): Flow<Resource<List<Product>>> {
+        return productDao.getProductByIds(productIds)
+            .map <List<ProductEntity>, Resource<List<Product>>> { productEntity ->
+                val domainList = productEntity.map { DataMapper.mapEntityToDomain(it) }
+                Resource.Success(domainList)
+            }
+            .catch { e ->
+                emit(Resource.Error(e.message ?: "Failed to fetch products"))
+            }
+            .flowOn(Dispatchers.IO)
     }
 }

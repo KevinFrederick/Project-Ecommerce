@@ -13,7 +13,6 @@ import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import com.kevinfreyap.core.utils.DataMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -28,8 +27,8 @@ class TransactionRepository @Inject constructor(
     override suspend fun saveOrder(receipt: OrderReceipt) {
         val entity = DataMapper.mapOrderDomainToEntity(receipt)
 
-        transactionDao.insert(entity)
         try {
+            transactionDao.insert(entity)
             val currentUserUid = firebaseAuth.currentUser?.uid
             if (currentUserUid.isNullOrEmpty()) {
                 Log.w("TransactionRepository", "User is null, skipping Firestore sync")

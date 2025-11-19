@@ -2,12 +2,11 @@ package com.kevinfreyap.core.data.source.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.kevinfreyap.core.utils.Constants.ROOM_TABLE_PRODUCT
 
-@Entity(tableName = ROOM_TABLE_PRODUCT)
+@Entity(tableName = "product")
 data class ProductEntity(
     @PrimaryKey
-    val id: Int,
+    val id: String,
     val title: String,
     val description: String,
     val price: Int,

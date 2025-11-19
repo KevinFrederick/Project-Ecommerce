@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":cart"))
     implementation(project(":checkout"))
     implementation(project(":transaction"))
+    implementation(project(":wishlist"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

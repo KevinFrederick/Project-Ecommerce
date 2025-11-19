@@ -1,14 +1,12 @@
 package com.kevinfreyap.account.ui
 
 import android.util.Log
-import android.util.Printer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
-import com.kevinfreyap.core.domain.usecase.order.OrderUseCase
 import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

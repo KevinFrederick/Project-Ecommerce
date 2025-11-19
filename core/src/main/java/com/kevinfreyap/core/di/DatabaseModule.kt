@@ -7,6 +7,7 @@ import com.kevinfreyap.core.data.source.local.room.CartDao
 import com.kevinfreyap.core.data.source.local.room.ProductDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.local.room.TransactionDao
+import com.kevinfreyap.core.data.source.local.room.WishlistDao
 import com.kevinfreyap.core.data.source.remote.network.ApiService
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,9 @@ class DatabaseModule {
 
     @Provides
     fun provideTransactionDao(database: ProductDatabase): TransactionDao = database.transactionDao()
+
+    @Provides
+    fun provideWishlistDao(database: ProductDatabase): WishlistDao = database.wishlistDao()
 
     @Provides
     @Singleton

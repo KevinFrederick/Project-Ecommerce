@@ -28,7 +28,7 @@ class OrderItemViewHolder(
 
         binding.tvProductName.text = orderItem.title
         binding.tvProductPrice.text = context.getString(R.string.currency_dollar, orderItem.pricePerItem)
-        binding.tvProductQuantity.text = orderItem.quantity.toString()
+        binding.tvProductQuantity.text = context.getString(R.string.pieces, orderItem.quantity.toString())
         Glide.with(context)
             .load(orderItem.imageUrl)
             .placeholder(shimmerDrawable)

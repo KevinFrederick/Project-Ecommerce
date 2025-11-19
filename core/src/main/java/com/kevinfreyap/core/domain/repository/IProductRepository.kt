@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface IProductRepository {
     fun getProducts(): Flow<PagingData<Product>>
-    fun getProductById(productId: Int): Flow<Resource<Product?>>
-    suspend fun getProductByIdFromCache(productIds: List<Int>): List<Product>
+    fun getProductById(productId: String): Flow<Resource<Product?>>
+    suspend fun getProductByIdFromCache(productIds: List<String>): Flow<Resource<List<Product>>>
 }

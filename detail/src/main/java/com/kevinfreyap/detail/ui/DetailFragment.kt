@@ -112,7 +112,21 @@ class DetailFragment : Fragment() {
                         }
                     }
                 }
+
+                launch {
+                    viewModel.isInWishlist.collect { value ->
+                        if (value) {
+                            binding.btnFavorite.setImageResource(R.drawable.ic_favorite_24)
+                        } else {
+                            binding.btnFavorite.setImageResource(R.drawable.ic_favorite_border_24)
+                        }
+                    }
+                }
             }
+        }
+
+        binding.btnFavorite.setOnClickListener {
+            viewModel.onClickWishlist()
         }
 
         binding.btnAddToCartSheet.setOnClickListener {

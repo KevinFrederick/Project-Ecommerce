@@ -45,10 +45,6 @@ class CartRepository @Inject constructor(
     private val cartDao: CartDao,
 ): ICartRepository {
     override fun getCartItems(): Flow<Resource<List<Cart>>>  {
-        val currentUserUid = firebaseAuth.currentUser?.uid
-        if (currentUserUid.isNullOrEmpty()) {
-            return flowOf(Resource.Error("ERROR_USER_NOT_FOUND"))
-        }
         return cartDao.getAllCartItems().map { entities ->
             val domainList = entities.map { entity ->
                 Cart(
@@ -85,7 +81,7 @@ class CartRepository @Inject constructor(
         val timestamp = System.currentTimeMillis()
 
         val cartEntity = CartEntity(
-            productId = product.id.toString(),
+            productId = product.id,
             name = product.title,
             price = product.price,
             imageUrl = product.images.firstOrNull() ?: "",
@@ -106,7 +102,7 @@ class CartRepository @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     override fun updateItemQuantity(
-        productId: Int,
+        productId: String,
         newQuantity: Int
     ): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
@@ -117,14 +113,14 @@ class CartRepository @Inject constructor(
         }
 
         try {
-            cartDao.updateQuantity(productId.toString(), newQuantity)
+            cartDao.updateQuantity(productId, newQuantity)
 
             emit(Resource.Success(true))
 
             firestore.collection(USER_COLLECTION)
                 .document(currentUserUid)
                 .collection(CART_SUB_COLLECTION)
-                .document(productId.toString())
+                .document(productId)
                 .update(FIELD_QUANTITY, newQuantity)
                 .addOnFailureListener {
                     Log.e("CartRepo", "Failed to sync update: ${it.message}")
@@ -135,7 +131,7 @@ class CartRepository @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun removeItemFromCart(productId: Int): Flow<Resource<Boolean>> = flow {
+    override fun removeItemFromCart(productId: String): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
         val currentUserUid = firebaseAuth.currentUser?.uid
         if (currentUserUid.isNullOrEmpty()) {
@@ -144,14 +140,14 @@ class CartRepository @Inject constructor(
         }
 
         try {
-            cartDao.deleteItem(productId.toString())
+            cartDao.deleteItem(productId)
 
             emit(Resource.Success(true))
 
             firestore.collection(USER_COLLECTION)
                 .document(currentUserUid)
                 .collection(CART_SUB_COLLECTION)
-                .document(productId.toString())
+                .document(productId)
                 .delete()
                 .addOnFailureListener {
                     Log.e("CartRepo", "Failed delete failed: ${it.message}")

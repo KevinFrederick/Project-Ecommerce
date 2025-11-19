@@ -45,6 +45,11 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeUserProfile()
 
+        binding.btnWishlist.setOnClickListener {
+            val uri = "app://ecommerce/wishlist".toUri()
+            findNavController().navigate(uri)
+        }
+
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }

@@ -52,13 +52,13 @@ class CartInteractor @Inject constructor (
     }
 
     override fun updateItemQuantity(
-        productId: Int,
+        productId: String,
         newQuantity: Int
     ): Flow<Resource<Boolean>> {
         return cartRepository.updateItemQuantity(productId, newQuantity)
     }
 
-    override fun removeItemFromCart(productId: Int): Flow<Resource<Boolean>> {
+    override fun removeItemFromCart(productId: String): Flow<Resource<Boolean>> {
         return cartRepository.removeItemFromCart(productId)
     }
 

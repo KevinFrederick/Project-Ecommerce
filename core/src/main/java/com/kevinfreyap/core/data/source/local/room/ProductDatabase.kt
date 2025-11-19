@@ -10,13 +10,15 @@ import com.kevinfreyap.core.data.source.local.entity.CartEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.RemoteKeyEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 
 @Database(
     entities = [
         ProductEntity::class,
         CartEntity::class,
         RemoteKeyEntity::class,
-        TransactionEntity::class
+        TransactionEntity::class,
+        WishlistEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -30,4 +32,5 @@ abstract class ProductDatabase: RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun cartDao(): CartDao
     abstract fun transactionDao(): TransactionDao
+    abstract fun wishlistDao(): WishlistDao
 }

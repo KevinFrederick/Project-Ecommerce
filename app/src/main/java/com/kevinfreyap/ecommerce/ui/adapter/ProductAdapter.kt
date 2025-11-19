@@ -9,7 +9,7 @@ import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.ecommerce.ui.viewholder.ProductViewHolder
 
 class ProductAdapter(
-    private val onItemClicked: (productId: Int) -> Unit
+    private val onItemClicked: (productId: String) -> Unit
 ): PagingDataAdapter<Product, ProductViewHolder>(PRODUCT_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,

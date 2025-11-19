@@ -51,7 +51,12 @@ class TransactionFragment : Fragment() {
                         binding.progressBar.isVisible = resource is Resource.Loading
 
                         if (resource is Resource.Success){
-                            transactionAdapter.submitList(resource.data)
+                            if (resource.data.isEmpty()){
+                                binding.tvNoTransaction.isVisible = true
+                            }else {
+                                binding.tvNoTransaction.isVisible = false
+                                transactionAdapter.submitList(resource.data)
+                            }
                         }
                     }
                 }

@@ -5,11 +5,13 @@ import com.kevinfreyap.core.data.repository.CartRepository
 import com.kevinfreyap.core.data.repository.OrderRepository
 import com.kevinfreyap.core.data.repository.ProductRepository
 import com.kevinfreyap.core.data.repository.TransactionRepository
+import com.kevinfreyap.core.data.repository.WishlistRepository
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.domain.repository.ICartRepository
 import com.kevinfreyap.core.domain.repository.IOrderRepository
 import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.domain.repository.ITransactionRepository
+import com.kevinfreyap.core.domain.repository.IWishlistRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -39,4 +41,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideTransactionRepository(transactionRepository: TransactionRepository): ITransactionRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideWishlistRepository(wishlistRepository: WishlistRepository): IWishlistRepository
 }

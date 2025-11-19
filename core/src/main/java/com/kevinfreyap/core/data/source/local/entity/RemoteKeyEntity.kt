@@ -2,11 +2,10 @@ package com.kevinfreyap.core.data.source.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.kevinfreyap.core.utils.Constants.ROOM_TABLE_REMOTE_KEYS
 
-@Entity(tableName = ROOM_TABLE_REMOTE_KEYS)
+@Entity(tableName = "remote_keys")
 data class RemoteKeyEntity(
     @PrimaryKey
-    val productId: Int,
+    val productId: String,
     val nextOffset: Int?
 )

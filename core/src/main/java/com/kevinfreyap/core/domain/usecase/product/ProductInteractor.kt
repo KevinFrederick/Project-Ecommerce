@@ -11,5 +11,5 @@ class ProductInteractor @Inject constructor(
     private val productRepository: IProductRepository
 ): ProductUseCase {
     override fun getProducts(): Flow<PagingData<Product>> = productRepository.getProducts()
-    override fun getProductById(productId: Int): Flow<Resource<Product?>> = productRepository.getProductById(productId)
+    override fun getProductById(productId: String): Flow<Resource<Product?>> = productRepository.getProductById(productId)
 }

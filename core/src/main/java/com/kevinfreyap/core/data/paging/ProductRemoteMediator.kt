@@ -59,7 +59,7 @@ class ProductRemoteMediator @Inject constructor(
                 loadKey + response.size
             }
             val keyEntities = response.map {
-                RemoteKeyEntity(productId = it.id, nextOffset = newOffset)
+                RemoteKeyEntity(productId = it.id.toString(), nextOffset = newOffset)
             }
 
             // Save data to Room in a single transaction

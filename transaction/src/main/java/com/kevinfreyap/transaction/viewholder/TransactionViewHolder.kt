@@ -14,6 +14,11 @@ class TransactionViewHolder(
 
         binding.tvOrderStatus.text = receipt.orderStatus
         binding.tvOrderId.text = receipt.orderId
+        binding.tvTotalItems.text = if (receipt.itemsPurchased.size > 1) {
+            context.getString(R.string.items, receipt.itemsPurchased.size.toString())
+        } else {
+            context.getString(R.string.item, receipt.itemsPurchased.size.toString())
+        }
         binding.tvOrderPrice.text = context.getString(R.string.currency_dollar, receipt.totalPaid)
         binding.tvOrderDate.text = TimeUtils.formatTransactionTime(receipt.datePlaced)
         itemView.setOnClickListener {

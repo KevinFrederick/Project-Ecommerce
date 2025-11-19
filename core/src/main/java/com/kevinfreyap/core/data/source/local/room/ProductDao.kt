@@ -17,20 +17,20 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRemoteKeys(remoteKeys: List<RemoteKeyEntity>)
 
-    @Query("SELECT * FROM product")
+    @Query("SELECT * FROM product ORDER BY id ASC")
     fun getProducts(): PagingSource<Int, ProductEntity>
 
-    @Query("SELECT * FROM product WHERE id in (:ids)")
-    fun getProductByIds(ids: List<Int>): List<ProductEntity>
+    @Query("SELECT * FROM product WHERE id IN (:ids)")
+    fun getProductByIds(ids: List<String>): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM product WHERE id = :id")
-    fun getProductById(id: Int): Flow<ProductEntity?>
+    fun getProductById(id: String): Flow<ProductEntity?>
 
     @Query("DELETE FROM product WHERE id = :id")
-    suspend fun deleteProductById(id: Int)
+    suspend fun deleteProductById(id: String)
 
     @Query("SELECT * FROM remote_keys WHERE productId = :id")
-    suspend fun getRemoteKeysById(id: Int): RemoteKeyEntity?
+    suspend fun getRemoteKeysById(id: String): RemoteKeyEntity?
 
     @Query("SELECT * FROM remote_keys ORDER BY productId DESC LIMIT 1")
     suspend fun getLastRemoteKey(): RemoteKeyEntity?

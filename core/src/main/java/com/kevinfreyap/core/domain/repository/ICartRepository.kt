@@ -9,8 +9,8 @@ interface ICartRepository {
     fun getCartItems(): Flow<Resource<List<Cart>>>
     fun getCartItemCount(): Flow<Int>
     fun addToCart(product: Product, quantity: Int): Flow<Resource<Boolean>>
-    fun updateItemQuantity(productId: Int, newQuantity: Int): Flow<Resource<Boolean>>
-    fun removeItemFromCart(productId: Int): Flow<Resource<Boolean>>
+    fun updateItemQuantity(productId: String, newQuantity: Int): Flow<Resource<Boolean>>
+    fun removeItemFromCart(productId: String): Flow<Resource<Boolean>>
     fun refreshCartAvailability(): Flow<Resource<Boolean>>
     suspend fun syncCartOnLogin()
     suspend fun clearCart()
