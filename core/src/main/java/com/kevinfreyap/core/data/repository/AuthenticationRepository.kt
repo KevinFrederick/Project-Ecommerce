@@ -1,11 +1,12 @@
 package com.kevinfreyap.core.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
@@ -14,9 +15,13 @@ import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.utils.Constants.FIELD_EMAIL
 import com.kevinfreyap.core.utils.Constants.FIELD_ID
+import com.kevinfreyap.core.utils.Constants.FIELD_NAME
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import java.lang.Exception
@@ -29,8 +34,6 @@ class AuthenticationRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val userPreferences: UserPreferences
 ): IAuthenticationRepository {
-
-    private var cachedProfile: UserProfile? = null
 
     override fun register(registerRequest: RegisterRequest): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
@@ -72,6 +75,31 @@ class AuthenticationRepository @Inject constructor(
             if (user != null) {
                 val token = user.getIdToken(true).await().token ?: ""
                 userPreferences.saveAuthToken(token)
+
+                val profile = UserProfile(
+                    uid = user.uid,
+                    email = user.email,
+                    displayName = user.displayName,
+                    photoUrl = user.photoUrl.toString(),
+                    address = null
+                )
+                userPreferences.saveUserProfile(profile)
+
+                try {
+                    val snapshot = firebaseFirestore.collection(USER_COLLECTION)
+                        .document(user.uid)
+                        .get()
+                        .await()
+
+                    val fullProfile = snapshot.toObject(UserProfile::class.java)
+
+                    if (fullProfile != null) {
+                        userPreferences.saveUserProfile(fullProfile)
+                    }
+                } catch (e: Exception) {
+                    Log.e("AuthRepository", "Failed to sync full profile on login", e)
+                }
+
                 emit(Resource.Success(true))
             } else {
                 emit(Resource.Error("UNKNOWN_ERROR"))
@@ -102,52 +130,76 @@ class AuthenticationRepository @Inject constructor(
                 }
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun logout() {
         firebaseAuth.signOut()
-        userPreferences.clearAuthToken()
-
-        cachedProfile = null
+        userPreferences.clearSession()
     }
 
-    override fun getUserProfile(): Flow<Resource<UserProfile?>> = flow{
-        emit(Resource.Loading())
+    override fun getUserProfile(): Flow<Resource<UserProfile>> {
+        return userPreferences.getUserProfile()
+            .map { profile ->
+                if (profile.uid.isNotEmpty()) {
+                    Resource.Success(profile)
+                } else if (firebaseAuth.currentUser != null) {
+                    Resource.Success(
+                        UserProfile(
+                            uid = firebaseAuth.currentUser?.uid ?: "",
+                            email = firebaseAuth.currentUser?.email,
+                            displayName = firebaseAuth.currentUser?.displayName,
+                            photoUrl = firebaseAuth.currentUser?.photoUrl.toString(),
+                            address = null
+                        )
+                    )
+                } else {
+                    Resource.Success(UserProfile())
+                }
+            }
+    }
 
-        if (cachedProfile != null) {
-            emit(Resource.Success(cachedProfile))
-            return@flow
-        }
+    override suspend fun refreshUserProfile() {
+        val uid = firebaseAuth.currentUser?.uid ?: return
 
-        val currentUserId = firebaseAuth.currentUser?.uid
-        if (currentUserId == null) {
-            emit(Resource.Error("ERROR_USER_NOT_FOUND"))
-            return@flow
-        }
         try {
-            val documentSnapshot = firebaseFirestore.collection(USER_COLLECTION)
-                .document(currentUserId)
+            val snapshot = firebaseFirestore.collection(USER_COLLECTION)
+                .document(uid)
                 .get()
                 .await()
 
-            if (documentSnapshot.exists()) {
-                val userProfile = documentSnapshot.toObject<UserProfile>()
-                cachedProfile = userProfile
-                emit(Resource.Success(userProfile))
-            } else {
-                emit(Resource.Error("ERROR_USER_NOT_FOUND"))
-            }
-        } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
-        } catch (e: Exception) {
-            if (e.message?.contains("network", ignoreCase = true) == true) {
-                emit(Resource.Error("ERROR_NO_CONNECTION"))
-            }else {
-                emit(Resource.Error("ERROR_USER_NOT_FOUND"))
-            }
-        }
+            val remoteProfile = snapshot.toObject(UserProfile::class.java)
 
+            if (remoteProfile != null) {
+                userPreferences.saveUserProfile(remoteProfile)
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepo", "Background sync failed: ${e.message}")
+        }
     }
+
+    override fun updateUserName(newName: String): Flow<Resource<Unit>> = flow {
+        try {
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser == null) {
+                emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+                return@flow
+            }
+
+            val profileUpdates = userProfileChangeRequest {
+                displayName = newName
+            }
+            currentUser.updateProfile(profileUpdates).await()
+
+            firebaseFirestore.collection(USER_COLLECTION)
+                .document(currentUser.uid)
+                .update(FIELD_NAME, newName)
+                .await()
+
+            emit(Resource.Success(Unit))
+        } catch (e: kotlin.Exception) {
+            emit(Resource.Error(e.message ?: "Failed to update name"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     override fun isUserLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null

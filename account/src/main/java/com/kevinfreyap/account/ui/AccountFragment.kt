@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,9 +15,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.account.databinding.FragmentAccountBinding
 import com.kevinfreyap.shared_ui.R as sharedR
 import com.kevinfreyap.account.R
+import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.ACCOUNT_EMAIL
+import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.ACCOUNT_NAME
+import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.EDIT_PROFILE_BOTTOM_SHEET
+import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.EDIT_PROFILE_REQ
+import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.IS_UPDATE_SUCCESS
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +36,9 @@ class AccountFragment : Fragment() {
 
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
+
+    private var userEmail: String? = null
+    private var userName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +59,27 @@ class AccountFragment : Fragment() {
             findNavController().navigate(uri)
         }
 
+        binding.btnEditAccount.setOnClickListener {
+            userEmail?.let { email ->
+                val bottomSheetFragment = EditProfileBottomSheetFragment()
+                val bundle = bundleOf(
+                    ACCOUNT_EMAIL to email,
+                    ACCOUNT_NAME to userName
+                )
+
+                bottomSheetFragment.arguments = bundle
+                bottomSheetFragment.show(childFragmentManager, EDIT_PROFILE_BOTTOM_SHEET)
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(EDIT_PROFILE_REQ, viewLifecycleOwner) { requestKey, result ->
+            val isSuccess = result.getBoolean(IS_UPDATE_SUCCESS)
+            if (isSuccess) {
+                showSnackBar(getString(sharedR.string.success_update_name))
+                viewModel.refreshProfileData()
+            }
+        }
+
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }
@@ -67,9 +97,11 @@ class AccountFragment : Fragment() {
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
 
-                                val user = userProfile.data
-                                if (user != null) {
-                                    setProfile(user)
+                                val currentUser = userProfile.data
+                                if (currentUser.uid.isNotEmpty()) {
+                                    setProfile(currentUser)
+                                    userEmail = currentUser.email
+                                    userName = currentUser.displayName
                                 } else {
                                     setNavigateAuth()
                                 }
@@ -88,7 +120,7 @@ class AccountFragment : Fragment() {
                                         getString(sharedR.string.error_unknown)
                                     }
                                 }
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                showSnackBar(message)
                             }
                         }
 
@@ -123,6 +155,14 @@ class AccountFragment : Fragment() {
             uri,
             navOptions
         )
+    }
+
+    private fun showSnackBar(message: String) {
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {

@@ -10,6 +10,8 @@ interface AuthUseCase {
     fun register(request: RegisterRequest): Flow<Resource<Boolean>>
     fun login(request: LoginRequest): Flow<Resource<Boolean>>
     suspend fun logout()
-    fun getUserProfile(): Flow<Resource<UserProfile?>>
+    fun getUserProfile(): Flow<Resource<UserProfile>>
+    suspend fun refreshUserProfile()
+    fun updateUserName(newName: String): Flow<Resource<Unit>>
     fun isUserLoggedIn(): Boolean
 }

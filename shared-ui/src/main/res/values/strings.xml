@@ -40,6 +40,7 @@
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
     <string name="text_seller_username">\@SellerUsername</string>
+    <string name="text_default_email">Example@email.com</string>
 
     <!-- String Format -->
     <string name="currency_dollar">$%1$d</string>
@@ -50,12 +51,16 @@
     <string name="pieces">%1$s pc(s)</string>
     <string name="item">%1$s item</string>
     <string name="items">(%1$s items)</string>
+    <string name="order_success_desc">Your order #%1$s has been successfully placed</string>
 
     <!-- Hint -->
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="enter_voucher">Enter your voucher</string>
+    <string name="name">Name</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
 
     <!-- Button Name -->
     <string name="sign_in">Sign In</string>
@@ -83,6 +88,7 @@
     <string name="card_payment">Debit / Credit Card</string>
     <string name="apply">Apply</string>
     <string name="order">Order</string>
+    <string name="save">Save</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -123,4 +129,6 @@
     <string name="success_login">Login Successful!</string>
     <string name="success_add_to_cart">Added to Cart!</string>
     <string name="success_add_to_cart_offline">Saved to cart (Offline). Will sync later</string>
+    <string name="success_order_placed">Order Placed!</string>
+    <string name="success_update_name">Name updated successfully!</string>
 </resources>

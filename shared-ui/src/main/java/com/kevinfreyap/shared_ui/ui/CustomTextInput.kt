@@ -37,6 +37,9 @@ class CustomTextInput @JvmOverloads constructor(
             val hint = getString(R.styleable.CustomTextInput_custom_hint)
             setHint(hint)
 
+            val enabled = getBoolean(R.styleable.CustomTextInput_android_enabled, true)
+            binding.etCustomTextInputEditText.isEnabled = enabled
+
             val inputType = getInt(R.styleable.CustomTextInput_android_inputType, InputType.TYPE_CLASS_TEXT)
             setInputType(inputType)
 
@@ -53,10 +56,13 @@ class CustomTextInput @JvmOverloads constructor(
         binding.tilCustomTextInputLayout.hint = hint
     }
 
+    fun setText(text: String) {
+        binding.etCustomTextInputEditText.setText(text)
+    }
+
     fun setInputType(type: Int) {
         binding.etCustomTextInputEditText.inputType = type
     }
-
 
     fun setEndIconMode(mode: Int) {
         binding.tilCustomTextInputLayout.endIconMode = mode

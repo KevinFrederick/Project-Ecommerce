@@ -1,6 +1,5 @@
 package com.kevinfreyap.checkout.ui
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.checkout.databinding.FragmentCheckoutBinding
 import com.kevinfreyap.checkout.utils.OrderState
@@ -216,9 +216,9 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun showOrderSuccessDialog(orderId: String) {
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Order Placed!")
-            .setMessage("Your order #$orderId has been successfully placed.")
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.success_order_placed))
+            .setMessage(getString(R.string.order_success_desc, orderId))
             .setCancelable(true) // Allow outside click and back press
             .create()
 

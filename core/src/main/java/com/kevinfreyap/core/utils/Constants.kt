@@ -8,8 +8,8 @@ object Constants {
 
     const val FIELD_ID = "uid"
     const val FIELD_EMAIL = "email"
-    const val FIELD_NAME = "name"
-    const val FIELD_PHOTO_URL = "photo_url"
+    const val FIELD_NAME = "displayName"
+    const val FIELD_PHOTO_URL = "photoUrl"
     const val FIELD_ADDRESS = "address"
     const val FIELD_QUANTITY = "quantity"
 }

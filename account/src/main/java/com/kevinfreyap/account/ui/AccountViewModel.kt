@@ -10,7 +10,9 @@ import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -22,19 +24,36 @@ class AccountViewModel @Inject constructor(
     private val transactionUseCase: TransactionUseCase
 ) : ViewModel() {
 
-    private val _userProfile = MutableStateFlow<Resource<UserProfile?>>(Resource.Loading())
-    val userProfile: StateFlow<Resource<UserProfile?>> = _userProfile
+    val userProfile: StateFlow<Resource<UserProfile>> = authUseCase.getUserProfile()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Resource.Loading()
+        )
+
+    private val _updateNameState = MutableStateFlow<Resource<Unit>?>(null)
+    val updateNameState: StateFlow<Resource<Unit>?> = _updateNameState
 
     init {
-        loadUserProfile()
+        refreshProfileData()
     }
 
-    private fun  loadUserProfile() {
+    fun  refreshProfileData() {
         viewModelScope.launch {
-            authUseCase.getUserProfile().collect { resource ->
-                _userProfile.value = resource
+            authUseCase.refreshUserProfile()
+        }
+    }
+
+    fun updateName(name: String) {
+        viewModelScope.launch {
+            authUseCase.updateUserName(name).collect { result ->
+                _updateNameState.value = result
             }
         }
+    }
+
+    fun resetUpdateState() {
+        _updateNameState.value = null
     }
 
     fun logout() {
@@ -43,13 +62,10 @@ class AccountViewModel @Inject constructor(
                 authUseCase.logout()
                 cartUseCase.clearCart()
                 transactionUseCase.clearOrderHistory()
-                _userProfile.value = Resource.Success(null)
             } catch (e: IOException) {
                 Log.e("AccountViewModel", "Failed to clear auth token", e)
-                _userProfile.value = Resource.Success(null)
             } catch (e: Exception) {
                 Log.e("AccountViewModel", "Logout Failed", e)
-                _userProfile.value = Resource.Success(null)
             }
         }
     }
