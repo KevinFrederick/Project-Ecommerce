@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="CustomTextInput">
         <attr name="android:enabled" />
+        <attr name="android:imeOptions"/>
         <attr name="custom_hint" format="string" />
         <attr name="android:inputType" />
         <attr name="custom_endIconMode" >

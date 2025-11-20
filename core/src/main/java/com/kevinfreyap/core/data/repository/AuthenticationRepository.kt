@@ -11,14 +11,17 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.model.auth.RegisterRequest
+import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
+import com.kevinfreyap.core.utils.Constants.FIELD_ADDRESS
 import com.kevinfreyap.core.utils.Constants.FIELD_EMAIL
 import com.kevinfreyap.core.utils.Constants.FIELD_ID
 import com.kevinfreyap.core.utils.Constants.FIELD_NAME
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -195,9 +198,38 @@ class AuthenticationRepository @Inject constructor(
                 .update(FIELD_NAME, newName)
                 .await()
 
+            val currentCachedProfile = userPreferences.getUserProfile().first()
+            val updatedProfile = currentCachedProfile.copy(displayName = newName)
+
+            userPreferences.saveUserProfile(updatedProfile)
+
             emit(Resource.Success(Unit))
         } catch (e: kotlin.Exception) {
             emit(Resource.Error(e.message ?: "Failed to update name"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun updateAddress(newAddress: UserAddress): Flow<Resource<Unit>> = flow {
+        try {
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser == null) {
+                emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+                return@flow
+            }
+
+            firebaseFirestore.collection(USER_COLLECTION)
+                .document(currentUser.uid)
+                .update(FIELD_ADDRESS, newAddress)
+                .await()
+
+            val currentProfile = userPreferences.getUserProfile().first()
+            val updatedProfile = currentProfile.copy(address = newAddress)
+
+            userPreferences.saveUserProfile(updatedProfile)
+
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Failed to update address"))
         }
     }.flowOn(Dispatchers.IO)
 

@@ -8,31 +8,41 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.cart.CartSummary
 import com.kevinfreyap.core.domain.model.user.UserAddress
+import com.kevinfreyap.core.domain.model.user.UserProfile
+import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.usecase.order.OrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
+    private val authUseCase: AuthUseCase,
     private val cartUseCase: CartUseCase,
     private val orderUseCase: OrderUseCase
 ): ViewModel() {
     private val _orderState = MutableStateFlow<OrderState>(OrderState.Idle)
     val orderState: StateFlow<OrderState> = _orderState
 
-    private val _selectedAddress = MutableStateFlow(
-        UserAddress(
-            street = "123 Main Street, Apt 4",
-            city = "Anytown, CA",
-            zipCode = "91234"
+    val userAddress: StateFlow<UserAddress?> = authUseCase.getUserProfile()
+        .map { resource ->
+            if (resource is Resource.Success) {
+                resource.data.address
+            } else {
+                null
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
         )
-    )
 
     private val _selectedMethod = MutableStateFlow(PaymentMethod.CASH)
     val selectedMethod: StateFlow<PaymentMethod> = _selectedMethod
@@ -96,12 +106,17 @@ class CheckoutViewModel @Inject constructor(
 
     fun onOrderClicked() {
         if (_orderState.value is OrderState.Loading) return
+        val currentAddress = userAddress.value
+        if (currentAddress == null) {
+            _errorState.value = "ERROR_NO_ADDRESS"
+            return
+        }
 
         viewModelScope.launch {
             _orderState.value = OrderState.Loading
 
             val result = orderUseCase.placeOrder(
-                address = _selectedAddress.value,
+                address = currentAddress,
                 paymentMethod = _selectedMethod.value,
                 voucher = ""
             )

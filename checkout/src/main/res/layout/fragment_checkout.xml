@@ -75,8 +75,7 @@
                         app:layout_constraintTop_toTopOf="@id/iv_location_icon"
                         app:layout_constraintBottom_toBottomOf="@id/iv_location_icon"
                         app:layout_constraintStart_toEndOf="@id/iv_location_icon"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:text="123 Main Street, Apt 4, Anytown, CA 91234, USA" />
+                        app:layout_constraintEnd_toEndOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

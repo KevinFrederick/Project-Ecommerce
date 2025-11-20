@@ -3,6 +3,7 @@ package com.kevinfreyap.core.domain.usecase.auth
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.model.auth.RegisterRequest
+import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import kotlinx.coroutines.flow.Flow
 
@@ -13,5 +14,6 @@ interface AuthUseCase {
     fun getUserProfile(): Flow<Resource<UserProfile>>
     suspend fun refreshUserProfile()
     fun updateUserName(newName: String): Flow<Resource<Unit>>
+    fun updateAddress(newAddress: UserAddress): Flow<Resource<Unit>>
     fun isUserLoggedIn(): Boolean
 }

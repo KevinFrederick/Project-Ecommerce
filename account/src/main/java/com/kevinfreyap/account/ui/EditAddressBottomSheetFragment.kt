@@ -1,5 +1,6 @@
 package com.kevinfreyap.account.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,46 +14,67 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
-import com.kevinfreyap.account.databinding.BottomSheetFragmentEditProfileBinding
+import com.kevinfreyap.account.databinding.BottomSheetFragmentEditAddressBinding
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.shared_ui.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class EditProfileBottomSheetFragment : BottomSheetDialogFragment() {
+class EditAddressBottomSheetFragment : BottomSheetDialogFragment() {
     private val viewModel: AccountViewModel by viewModels()
 
-    private var _binding: BottomSheetFragmentEditProfileBinding? = null
+    private var _binding: BottomSheetFragmentEditAddressBinding? = null
     private val binding get() = _binding!!
 
-    private var name: String? = null
+    private var userAddress: UserAddress? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = BottomSheetFragmentEditProfileBinding.inflate(inflater, container, false)
+        _binding = BottomSheetFragmentEditAddressBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val email = arguments?.getString(ACCOUNT_EMAIL)
-        binding.etEmail.setText(email ?: getString(R.string.text_default_email))
+        userAddress = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(ACCOUNT_ADDRESS, UserAddress::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable(ACCOUNT_ADDRESS)
+        }
 
-        name = arguments?.getString(ACCOUNT_NAME)
-        binding.etChangeName.setText(name ?: "")
+        with(binding) {
+            etStreetAddress.setText(userAddress?.street ?: "")
+            etCityAddress.setText(userAddress?.city ?: "")
+            etStateAddress.setText(userAddress?.state ?: "")
+            etZipAddress.setText(userAddress?.zipCode ?: "")
+            etCountryAddress.setText(userAddress?.country ?: "")
+        }
 
-        binding.btnCancel.setOnClickListener {
+        binding.btnCancelAddress.setOnClickListener {
             dismiss()
         }
 
-        binding.btnSave.setOnClickListener {
-            val oldName = name ?: ""
-            val newName = binding.etChangeName.getText()
-            viewModel.updateName(currentName = oldName, newName =  newName)
+        binding.btnSaveAddress.setOnClickListener {
+            val street = binding.etStreetAddress.getText()
+            val city = binding.etCityAddress.getText()
+            val state = binding.etStateAddress.getText()
+            val zipCode = binding.etZipAddress.getText()
+            val country = binding.etCountryAddress.getText()
+
+            viewModel.updateAddress(
+                currentAddress = userAddress,
+                newStreet = street,
+                newCity = city,
+                newState = state,
+                newZip = zipCode,
+                newCountry = country,
+            )
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -63,9 +85,9 @@ class EditProfileBottomSheetFragment : BottomSheetDialogFragment() {
 
                         if (resource is Resource.Success) {
                             val resultBundle = bundleOf(
-                                IS_PROFILE_UPDATE_SUCCESS to true
+                                IS_ADDRESS_UPDATE_SUCCESS to true
                             )
-                            setFragmentResult(EDIT_PROFILE_REQ, resultBundle)
+                            setFragmentResult(EDIT_ADDRESS_REQ, resultBundle)
                             dismiss()
                             viewModel.resetUpdateState()
                         }
@@ -75,11 +97,17 @@ class EditProfileBottomSheetFragment : BottomSheetDialogFragment() {
                                 "ERROR_USER_NOT_FOUND" -> {
                                     getString(R.string.error_user_not_found)
                                 }
-                                "ERROR_NO_NAME" -> {
-                                    getString(R.string.error_name_blank)
+                                "ERROR_STREET_BLANK" -> {
+                                    getString(R.string.error_street_blank)
                                 }
-                                "ERROR_NAME_TOO_LONG" -> {
-                                    getString(R.string.error_name_too_long)
+                                "ERROR_CITY_BLANK" -> {
+                                    getString(R.string.error_city_blank)
+                                }
+                                "ERROR_COUNTRY_BLANK" -> {
+                                    getString(R.string.error_country_blank)
+                                }
+                                "ERROR_INVALID_ZIP" -> {
+                                    getString(R.string.error_invalid_zip)
                                 }
                                 else -> {
                                     getString(R.string.error_unknown)
@@ -103,11 +131,10 @@ class EditProfileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val EDIT_PROFILE_BOTTOM_SHEET = "EditProfileBottomSheet"
-        const val ACCOUNT_EMAIL = "account_email"
-        const val ACCOUNT_NAME = "account_name"
+        const val EDIT_ADDRESS_BOTTOM_SHEET = "edit_address_bottom_sheet"
+        const val ACCOUNT_ADDRESS = "account_address"
 
-        const val EDIT_PROFILE_REQ = "edit_profile_request"
-        const val IS_PROFILE_UPDATE_SUCCESS = "is_profile_update_success"
+        const val EDIT_ADDRESS_REQ = "edit_address_request"
+        const val IS_ADDRESS_UPDATE_SUCCESS = "is_address_update_success"
     }
 }

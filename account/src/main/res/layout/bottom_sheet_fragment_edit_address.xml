@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:clipToPadding="false"
+    tools:context=".ui.EditAddressBottomSheetFragment">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="0dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.kevinfreyap.shared_ui.ui.CustomTextInput
+        android:id="@+id/et_street_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPostalAddress"
+        android:imeOptions="actionNext"
+        app:custom_hint="@string/input_street"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.kevinfreyap.shared_ui.ui.CustomTextInput
+        android:id="@+id/et_city_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="textCapWords"
+        android:imeOptions="actionNext"
+        app:custom_hint="@string/input_city"
+        app:layout_constraintTop_toBottomOf="@id/et_street_address"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_state_address" />
+
+    <com.kevinfreyap.shared_ui.ui.CustomTextInput
+        android:id="@+id/et_state_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:inputType="textCapWords"
+        android:imeOptions="actionNext"
+        app:custom_hint="@string/input_state"
+        app:layout_constraintTop_toBottomOf="@id/et_street_address"
+        app:layout_constraintStart_toEndOf="@id/et_city_address"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.kevinfreyap.shared_ui.ui.CustomTextInput
+        android:id="@+id/et_zip_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="textCapCharacters"
+        android:imeOptions="actionNext"
+        app:custom_hint="@string/input_zip_code"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintTop_toBottomOf="@id/et_city_address"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_country_address"/>
+
+    <com.kevinfreyap.shared_ui.ui.CustomTextInput
+        android:id="@+id/et_country_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        app:custom_hint="@string/input_country"
+        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintTop_toBottomOf="@id/et_city_address"
+        app:layout_constraintStart_toEndOf="@id/et_zip_address"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btn_cancel_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/cancel"
+        app:layout_constraintTop_toBottomOf="@id/et_country_address"
+        app:layout_constraintEnd_toStartOf="@id/btn_save_address"/>
+
+    <Button
+        android:id="@+id/btn_save_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/save"
+        app:layout_constraintTop_toBottomOf="@id/et_country_address"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

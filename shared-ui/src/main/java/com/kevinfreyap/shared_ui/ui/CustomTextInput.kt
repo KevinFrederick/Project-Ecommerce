@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.content.withStyledAttributes
 import com.google.android.material.textfield.TextInputEditText
@@ -39,6 +40,11 @@ class CustomTextInput @JvmOverloads constructor(
 
             val enabled = getBoolean(R.styleable.CustomTextInput_android_enabled, true)
             binding.etCustomTextInputEditText.isEnabled = enabled
+
+            val imeOptions = getInt(R.styleable.CustomTextInput_android_imeOptions, EditorInfo.IME_NULL)
+            if (imeOptions != EditorInfo.IME_NULL) {
+                binding.etCustomTextInputEditText.imeOptions = imeOptions
+            }
 
             val inputType = getInt(R.styleable.CustomTextInput_android_inputType, InputType.TYPE_CLASS_TEXT)
             setInputType(inputType)

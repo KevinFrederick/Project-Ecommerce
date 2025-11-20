@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
@@ -31,8 +32,8 @@ class AccountViewModel @Inject constructor(
             initialValue = Resource.Loading()
         )
 
-    private val _updateNameState = MutableStateFlow<Resource<Unit>?>(null)
-    val updateNameState: StateFlow<Resource<Unit>?> = _updateNameState
+    private val _updateState = MutableStateFlow<Resource<Unit>?>(null)
+    val updateState: StateFlow<Resource<Unit>?> = _updateState
 
     init {
         refreshProfileData()
@@ -44,16 +45,51 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateName(name: String) {
+    fun updateName(currentName: String, newName: String) {
+        if (currentName == newName) {
+            _updateState.value = Resource.Success(Unit)
+            return
+        }
+
         viewModelScope.launch {
-            authUseCase.updateUserName(name).collect { result ->
-                _updateNameState.value = result
+            authUseCase.updateUserName(newName).collect { result ->
+                _updateState.value = result
+            }
+        }
+    }
+
+    fun updateAddress(
+        currentAddress: UserAddress?,
+        newStreet: String,
+        newCity: String,
+        newState: String,
+        newZip: String,
+        newCountry: String
+    ) {
+        val newAddress = UserAddress(
+            street = newStreet,
+            city = newCity,
+            state = newState,
+            country = newCountry,
+            zipCode = newZip
+        )
+
+        val current = currentAddress ?: UserAddress()
+
+        if (current == newAddress) {
+            _updateState.value = Resource.Success(Unit)
+            return
+        }
+
+        viewModelScope.launch {
+            authUseCase.updateAddress(newAddress).collect { result ->
+                _updateState.value = result
             }
         }
     }
 
     fun resetUpdateState() {
-        _updateNameState.value = null
+        _updateState.value = null
     }
 
     fun logout() {

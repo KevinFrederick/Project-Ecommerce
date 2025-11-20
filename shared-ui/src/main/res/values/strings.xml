@@ -61,6 +61,11 @@
     <string name="name">Name</string>
     <string name="current_password">Current Password</string>
     <string name="new_password">New Password</string>
+    <string name="input_street">Street Address</string>
+    <string name="input_city">City</string>
+    <string name="input_state">State</string>
+    <string name="input_zip_code">Zip Code</string>
+    <string name="input_country">Country</string>
 
     <!-- Button Name -->
     <string name="sign_in">Sign In</string>
@@ -123,6 +128,13 @@
     <string name="error_remove_unavailable_item">Please remove unavailable items first</string>
     <string name="error_no_voucher">Please enter a code</string>
     <string name="error_empty_cart">Cart empty</string>
+    <string name="error_name_blank">Please enter your name</string>
+    <string name="error_name_too_long">Name cannot exceed 30 characters</string>
+    <string name="error_street_blank">Street address is required</string>
+    <string name="error_city_blank">City is required</string>
+    <string name="error_country_blank">Country is required</string>
+    <string name="error_invalid_zip">Invalid Zip Code</string>
+    <string name="error_no_address">Please add a shipping address</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
@@ -131,4 +143,5 @@
     <string name="success_add_to_cart_offline">Saved to cart (Offline). Will sync later</string>
     <string name="success_order_placed">Order Placed!</string>
     <string name="success_update_name">Name updated successfully!</string>
+    <string name="success_update_address">Address updated successfully!</string>
 </resources>

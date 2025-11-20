@@ -3,6 +3,7 @@ package com.kevinfreyap.core.domain.usecase.auth
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.model.auth.RegisterRequest
+import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import kotlinx.coroutines.flow.Flow
@@ -29,12 +30,50 @@ class AuthInteractor @Inject constructor (
             return@flow
         }
 
-        if (newName.length > 20) {
+        if (newName.length > 30) {
             emit(Resource.Error("ERROR_NAME_TOO_LONG"))
             return@flow
         }
 
         emitAll(authenticationRepository.updateUserName(newName))
+    }
+
+    override fun updateAddress(newAddress: UserAddress): Flow<Resource<Unit>> = flow {
+        val street = newAddress.street.trim()
+        val city = newAddress.city.trim()
+        val zip = newAddress.zipCode.trim()
+        val country = newAddress.country.trim()
+        val state = newAddress.state.trim()
+
+        if (street.isBlank()) {
+            emit(Resource.Error("ERROR_STREET_BLANK"))
+            return@flow
+        }
+
+        if (city.isBlank()) {
+            emit(Resource.Error("ERROR_CITY_BLANK"))
+            return@flow
+        }
+
+        if (country.isBlank()) {
+            emit(Resource.Error("ERROR_COUNTRY_BLANK"))
+            return@flow
+        }
+
+        if (zip.length < 3 || zip.length > 12) {
+            emit(Resource.Error("ERROR_INVALID_ZIP"))
+            return@flow
+        }
+
+        val cleanAddress = newAddress.copy(
+            street = street,
+            city = city,
+            state = state,
+            country = country,
+            zipCode = zip
+        )
+
+        emitAll(authenticationRepository.updateAddress(cleanAddress))
     }
 
     override fun isUserLoggedIn(): Boolean = authenticationRepository.isUserLoggedIn()

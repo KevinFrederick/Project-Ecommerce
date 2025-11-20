@@ -78,6 +78,16 @@ class CheckoutFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
+                    viewModel.userAddress.collect { address ->
+                        if (address != null) {
+                            binding.tvShippingAddress.text = address.toString()
+                        } else {
+                            binding.tvShippingAddress.text = getString(R.string.text_no_address)
+                        }
+                    }
+                }
+
+                launch {
                     viewModel.selectedMethod.collect { method ->
                         updateSelectionUI(method)
                     }
@@ -144,6 +154,9 @@ class CheckoutFragment : Fragment() {
                                 "ERROR_EMPTY_CART" -> {
                                     findNavController().navigateUp()
                                     getString(R.string.error_empty_cart)
+                                }
+                                "ERROR_NO_ADDRESS" -> {
+                                    getString(R.string.error_no_address)
                                 }
                                 else -> {
                                     Log.e("CartFragment", errorMessage)
