@@ -1,11 +1,13 @@
 package com.kevinfreyap.core.data.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
+import com.kevinfreyap.core.ProductQuery
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
@@ -29,13 +31,16 @@ import javax.inject.Singleton
 class ProductRepository @Inject constructor(
     private val database: ProductDatabase,
     private val apiService: ApiService,
+    private val productQuery: ProductQuery,
     private val remoteMediator: ProductRemoteMediator
 ): IProductRepository {
 
     private val productDao = database.productDao()
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getProducts(): Flow<PagingData<Product>> {
+    override fun getProducts(query: String): Flow<PagingData<Product>> {
+        val sqLiteQuery = productQuery.searchFilterQuery(query)
+
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -43,7 +48,7 @@ class ProductRepository @Inject constructor(
             ),
             remoteMediator = remoteMediator,
             pagingSourceFactory = {
-                productDao.getProducts()
+                productDao.getProducts(sqLiteQuery)
             }
         ).flow
             .map { pagingData ->

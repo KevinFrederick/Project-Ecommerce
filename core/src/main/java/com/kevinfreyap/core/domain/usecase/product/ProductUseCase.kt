@@ -6,6 +6,6 @@ import com.kevinfreyap.core.domain.model.product.Product
 import kotlinx.coroutines.flow.Flow
 
 interface ProductUseCase {
-    fun getProducts(): Flow<PagingData<Product>>
+    fun getProducts(query: String): Flow<PagingData<Product>>
     fun getProductById(productId: String): Flow<Resource<Product?>>
 }

@@ -1,7 +1,11 @@
 package com.kevinfreyap.ecommerce.ui
 
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -116,6 +120,26 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || return super.onSupportNavigateUp()
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+
+                // Check if touch is outside the EditText bounds
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                    v.clearFocus()
+
+                    // Hide the keyboard
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+            }
+        }
+
+        return super.dispatchTouchEvent(ev)
+    }
     private fun showOfflineBanner() {
         if (!binding.tvNetworkStatus.isVisible) {
             binding.tvNetworkStatus.isVisible = true

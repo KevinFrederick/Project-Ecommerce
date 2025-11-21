@@ -1,12 +1,12 @@
-package com.kevinfreyap.ecommerce.ui.adapter
+package com.kevinfreyap.shared_ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
 import com.kevinfreyap.core.domain.model.product.Product
-import com.kevinfreyap.ecommerce.ui.viewholder.ProductViewHolder
+import com.kevinfreyap.shared_ui.databinding.ItemProductBinding
+import com.kevinfreyap.shared_ui.viewholder.ProductViewHolder
 
 class ProductAdapter(
     private val onItemClicked: (productId: String) -> Unit

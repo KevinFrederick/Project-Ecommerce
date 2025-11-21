@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.RemoteKeyEntity
 import kotlinx.coroutines.flow.Flow
@@ -17,8 +19,8 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRemoteKeys(remoteKeys: List<RemoteKeyEntity>)
 
-    @Query("SELECT * FROM product ORDER BY id ASC")
-    fun getProducts(): PagingSource<Int, ProductEntity>
+    @RawQuery(observedEntities = [ProductEntity::class])
+    fun getProducts(query: SupportSQLiteQuery): PagingSource<Int, ProductEntity>
 
     @Query("SELECT * FROM product WHERE id IN (:ids)")
     fun getProductByIds(ids: List<String>): Flow<List<ProductEntity>>

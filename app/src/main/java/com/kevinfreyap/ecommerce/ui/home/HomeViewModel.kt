@@ -15,6 +15,8 @@ class HomeViewModel @Inject constructor(
     productUseCase: ProductUseCase
 ) : ViewModel() {
 
-    val productList: Flow<PagingData<Product>> = productUseCase.getProducts()
+    val productList: Flow<PagingData<Product>> = productUseCase.getProducts(
+        query = ""
+    )
         .cachedIn(viewModelScope)
 }

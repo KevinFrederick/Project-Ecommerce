@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kevinfreyap.ecommerce.databinding.FragmentHomeBinding
 import com.kevinfreyap.core.data.source.MainViewModel
-import com.kevinfreyap.ecommerce.ui.adapter.ProductAdapter
+import com.kevinfreyap.shared_ui.adapter.ProductAdapter
 import com.kevinfreyap.shared_ui.util.setupCartMenu
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -55,6 +55,11 @@ class HomeFragment : Fragment() {
             cartItemCount = mainViewModel.cartItemCount
         ) {
             val uri = "app://ecommerce/cart".toUri()
+            findNavController().navigate(uri)
+        }
+
+        binding.btnSearchFake.setOnClickListener{
+            val uri = "app://ecommerce/search".toUri()
             findNavController().navigate(uri)
         }
 

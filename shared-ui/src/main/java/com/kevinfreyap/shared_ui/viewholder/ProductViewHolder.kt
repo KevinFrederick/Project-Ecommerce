@@ -1,12 +1,12 @@
-package com.kevinfreyap.ecommerce.ui.viewholder
+package com.kevinfreyap.shared_ui.viewholder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.kevinfreyap.shared_ui.R
-import com.kevinfreyap.ecommerce.databinding.ItemProductBinding
 import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_ui.databinding.ItemProductBinding
 
 class ProductViewHolder(
     val binding: ItemProductBinding

@@ -10,6 +10,9 @@ import javax.inject.Inject
 class ProductInteractor @Inject constructor(
     private val productRepository: IProductRepository
 ): ProductUseCase {
-    override fun getProducts(): Flow<PagingData<Product>> = productRepository.getProducts()
+    override fun getProducts(query: String): Flow<PagingData<Product>> {
+        val cleanedQuery = query.trim()
+        return productRepository.getProducts(cleanedQuery)
+    }
     override fun getProductById(productId: String): Flow<Resource<Product?>> = productRepository.getProductById(productId)
 }

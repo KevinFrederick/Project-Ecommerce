@@ -3,7 +3,9 @@
     <declare-styleable name="CustomTextInput">
         <attr name="android:enabled" />
         <attr name="android:imeOptions"/>
+        <attr name="custom_start_icon" format="reference" />
         <attr name="custom_hint" format="string" />
+        <attr name="custom_placeholder" format="string" />
         <attr name="android:inputType" />
         <attr name="custom_endIconMode" >
             <enum name="none" value="0"/>

@@ -29,10 +29,14 @@
         android:id="@+id/nav_wishlist"
         app:graph="@navigation/nav_wishlist" />
 
+    <include
+        android:id="@+id/nav_search"
+        app:graph="@navigation/nav_search" />
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"
-        android:label=""
+        android:label="@string/app_name"
         tools:layout="@layout/fragment_home" >
 
         <deepLink
