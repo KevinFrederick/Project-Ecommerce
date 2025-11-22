@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.kevinfreyap.core.domain.model.filter.SearchFilter
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val productList: Flow<PagingData<Product>> = productUseCase.getProducts(
-        query = ""
+        query = "",
+        filter = SearchFilter()
     )
         .cachedIn(viewModelScope)
 }

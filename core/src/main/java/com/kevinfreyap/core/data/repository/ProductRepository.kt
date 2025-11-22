@@ -7,13 +7,16 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
-import com.kevinfreyap.core.ProductQuery
+import com.kevinfreyap.core.utils.ProductQuery
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
+import com.kevinfreyap.core.data.source.local.room.CategoryDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.remote.network.ApiService
+import com.kevinfreyap.core.domain.model.filter.SearchFilter
 import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.core.domain.model.product.ProductCategory
 import com.kevinfreyap.core.domain.repository.IProductRepository
 import com.kevinfreyap.core.utils.DataMapper
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,7 @@ import javax.inject.Singleton
 @Singleton
 class ProductRepository @Inject constructor(
     private val database: ProductDatabase,
+    private val categoryDao: CategoryDao,
     private val apiService: ApiService,
     private val productQuery: ProductQuery,
     private val remoteMediator: ProductRemoteMediator
@@ -38,12 +42,13 @@ class ProductRepository @Inject constructor(
     private val productDao = database.productDao()
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getProducts(query: String): Flow<PagingData<Product>> {
-        val sqLiteQuery = productQuery.searchFilterQuery(query)
+    override fun getProducts(query: String, filter: SearchFilter): Flow<PagingData<Product>> {
+        val sqLiteQuery = productQuery.searchFilterQuery(query, filter)
 
         return Pager(
             config = PagingConfig(
-                pageSize = 20,
+                pageSize = 60,
+                initialLoadSize = 60,
                 enablePlaceholders = false
             ),
             remoteMediator = remoteMediator,
@@ -101,5 +106,26 @@ class ProductRepository @Inject constructor(
                 emit(Resource.Error(e.message ?: "Failed to fetch products"))
             }
             .flowOn(Dispatchers.IO)
+    }
+
+    override fun getCategories(): Flow<Resource<List<ProductCategory>>> = flow {
+        emit(Resource.Loading())
+
+        categoryDao.getAllCategories().collect { entities ->
+            val categoryDomain = entities.map { DataMapper.mapCategoryEntityToDomain(it) }
+            emit(Resource.Success(categoryDomain))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun refreshCategories() {
+        try {
+            val remoteCategory = apiService.getCategories()
+            val entities = remoteCategory.map {
+                DataMapper.mapCategoryResponseToEntity(it)
+            }
+            categoryDao.replaceAll(entities)
+        } catch (e: Exception) {
+            Log.e("ProductRepository", "Failed to refresh categories: ${e.message}")
+        }
     }
 }

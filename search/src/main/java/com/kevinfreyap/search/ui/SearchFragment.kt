@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,6 +21,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kevinfreyap.search.databinding.FragmentSearchBinding
+import com.kevinfreyap.search.ui.SearchFilterBottomSheetFragment.Companion.SEARCH_FILTER_BOTTOM_SHEET
 import com.kevinfreyap.shared_ui.adapter.ProductAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -28,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by activityViewModels()
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -37,6 +38,7 @@ class SearchFragment : Fragment() {
     private lateinit var productAdapter: ProductAdapter
     private lateinit var imm: InputMethodManager
     private var currentLoadState: CombinedLoadStates? = null
+    private var hasFilter: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +51,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.syncCategory()
         recyclerView = binding.rvSearchResult
         setupRecyclerView()
 
@@ -74,12 +77,33 @@ class SearchFragment : Fragment() {
                         productAdapter.submitData(data)
                     }
                 }
+
+                launch {
+                    viewModel.filterState.collect { filter ->
+                        val isFilterActive = filter.category != null ||
+                            filter.minPrice != null ||
+                            filter.maxPrice != null
+
+                        binding.filterBadge.isVisible = isFilterActive
+                        hasFilter = isFilterActive
+
+                        if (!isFilterActive) {
+                            updateSearchUi()
+                        }
+                    }
+                }
             }
         }
 
         binding.btnSearch.setOnClickListener {
             val query = binding.etSearch.getText()
             handleQuery(query)
+        }
+
+        binding.btnFilterList.setOnClickListener {
+            val bottomSheetFragment = SearchFilterBottomSheetFragment()
+
+            bottomSheetFragment.show(childFragmentManager, SEARCH_FILTER_BOTTOM_SHEET)
         }
 
         productAdapter.addLoadStateListener { loadStates ->
@@ -136,15 +160,27 @@ class SearchFragment : Fragment() {
 
         val hasItems = productAdapter.itemCount > 0
 
-        binding.tvStartSearching.isVisible = isQueryEmpty
+        val isIdle = isQueryEmpty && !hasFilter
 
-        binding.tvNoItemFound.isVisible = !isQueryEmpty && !isTrulyLoading && !hasItems
+        binding.tvStartSearching.isVisible = isIdle
 
-        recyclerView.isVisible = !isQueryEmpty && hasItems
+        binding.tvNoItemFound.isVisible = !isIdle && !isTrulyLoading && !hasItems
+
+        recyclerView.isVisible = !isIdle && hasItems
+
+        binding.progressBar.isVisible = !isIdle && isTrulyLoading
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        if (!requireActivity().isChangingConfigurations) {
+            try {
+                viewModel.onQueryChange("")
+                viewModel.onResetFilter()
+            } catch (_: Exception){}
+        }
+
         _binding = null
     }
 }

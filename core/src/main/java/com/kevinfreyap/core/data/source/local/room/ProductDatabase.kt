@@ -7,6 +7,7 @@ import com.kevinfreyap.core.data.source.local.converters.PaymentMethodConverters
 import com.kevinfreyap.core.data.source.local.converters.ProductConverters
 import com.kevinfreyap.core.data.source.local.converters.TransactionTypeConverters
 import com.kevinfreyap.core.data.source.local.entity.CartEntity
+import com.kevinfreyap.core.data.source.local.entity.CategoryEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.RemoteKeyEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
@@ -18,7 +19,8 @@ import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
         CartEntity::class,
         RemoteKeyEntity::class,
         TransactionEntity::class,
-        WishlistEntity::class
+        WishlistEntity::class,
+        CategoryEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -33,4 +35,5 @@ abstract class ProductDatabase: RoomDatabase() {
     abstract fun cartDao(): CartDao
     abstract fun transactionDao(): TransactionDao
     abstract fun wishlistDao(): WishlistDao
+    abstract fun categoryDao(): CategoryDao
 }

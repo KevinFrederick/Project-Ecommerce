@@ -12,6 +12,6 @@ data class Product(
     val price: Int,
     val images: List<String>,
     val slug: String,
-    val creationAt: String,
-    val updatedAt: String
+    val creationAt: Long,
+    val updatedAt: Long
 ): Parcelable

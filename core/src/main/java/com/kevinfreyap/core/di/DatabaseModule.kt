@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.kevinfreyap.core.data.paging.ProductRemoteMediator
 import com.kevinfreyap.core.data.source.local.room.CartDao
+import com.kevinfreyap.core.data.source.local.room.CategoryDao
 import com.kevinfreyap.core.data.source.local.room.ProductDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.local.room.TransactionDao
@@ -39,6 +40,9 @@ class DatabaseModule {
 
     @Provides
     fun provideWishlistDao(database: ProductDatabase): WishlistDao = database.wishlistDao()
+
+    @Provides
+    fun provideCategoryDao(database: ProductDatabase): CategoryDao = database.categoryDao()
 
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
 package com.kevinfreyap.core.data.source.remote.network
 
+import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -16,4 +17,7 @@ interface ApiService {
     suspend fun getProductById(
         @Path("id") productId: Int
     ): ProductsResponseItem
+
+    @GET("categories")
+    suspend fun getCategories(): List<CategoryResponse>
 }

@@ -11,9 +11,10 @@ data class ProductEntity(
     val description: String,
     val price: Int,
     val slug: String,
-    val creationAt: String,
-    val updatedAt: String,
+    val creationAt: Long,
+    val updatedAt: Long,
     // We will store these complex types as a String (JSON)
     val category: String,
+    val categoryName: String,
     val images: String
 )

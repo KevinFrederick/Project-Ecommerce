@@ -32,12 +32,25 @@ class ProductRemoteMediator @Inject constructor(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 // APPEND: User is scrolling down. Load the next page.
                 LoadType.APPEND -> {
-                    // Get last item loaded
-                    val lastKey = productDao.getLastRemoteKey()
-                        ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    // 1. Check if we can find the last item
+                    val lastItem = state.lastItemOrNull()
+                    if (lastItem == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
 
-                    // Get next offset
-                    lastKey.nextOffset ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    // 2. Check if we can find the key for that item
+                    val remoteKey = productDao.getRemoteKeysById(lastItem.id)
+                    if (remoteKey == null) {
+                        return MediatorResult.Success(endOfPaginationReached = false)
+                    }
+
+                    // 3. Check the next offset
+                    val nextKey = remoteKey.nextOffset
+                    if (nextKey == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
+
+                    nextKey
                 }
             }
 
@@ -47,7 +60,7 @@ class ProductRemoteMediator @Inject constructor(
                 offset = loadKey
             )
 
-            val endOfPaginationReached = response.isEmpty()
+            val endOfPaginationReached = response.isEmpty() || response.size < state.config.pageSize
 
             // Map API response to Room Entity
             val productEntities = DataMapper.mapProductsResponseToEntity(response)

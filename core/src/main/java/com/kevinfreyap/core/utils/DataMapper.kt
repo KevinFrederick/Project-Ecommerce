@@ -3,6 +3,7 @@ package com.kevinfreyap.core.utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.kevinfreyap.core.data.source.local.entity.CartEntity
+import com.kevinfreyap.core.data.source.local.entity.CategoryEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
@@ -22,7 +23,7 @@ object DataMapper {
     // Product
     fun mapProductCategoryToDomain(categoryResponse: CategoryResponse): ProductCategory {
         return ProductCategory(
-            id = categoryResponse.id,
+            id = categoryResponse.id.toString(),
             name = categoryResponse.name,
             image = categoryResponse.image
         )
@@ -35,9 +36,10 @@ object DataMapper {
             description = response.description,
             price = response.price,
             slug = response.slug,
-            creationAt = response.creationAt,
-            updatedAt = response.updatedAt,
+            creationAt = DateHelper.parseIsoStringToLong(response.creationAt),
+            updatedAt = DateHelper.parseIsoStringToLong(response.updatedAt),
             category = gson.toJson(response.categoryResponse),
+            categoryName = response.categoryResponse.name,
             images = gson.toJson(response.images)
         )
     }
@@ -75,8 +77,8 @@ object DataMapper {
             price = response.price,
             images = response.images,
             slug = response.slug,
-            creationAt = response.creationAt,
-            updatedAt = response.updatedAt
+            creationAt = DateHelper.parseIsoStringToLong(response.creationAt),
+            updatedAt = DateHelper.parseIsoStringToLong(response.updatedAt)
         )
     }
 
@@ -88,11 +90,11 @@ object DataMapper {
             title = entity.name,
             price = entity.price,
             images = listOf(entity.imageUrl),
-            category = ProductCategory(0, "", ""),
+            category = ProductCategory("", "", ""),
             description = "",
             slug = "",
-            creationAt = "",
-            updatedAt = ""
+            creationAt = 0L,
+            updatedAt = 0L
         )
     }
 
@@ -157,5 +159,26 @@ object DataMapper {
 
     fun mapWishlistsDomainToEntity(domains: List<WishlistItem>): List<WishlistEntity> {
         return domains.map { mapWishlistDomainToEntity(it) }
+    }
+
+
+    // Category
+    fun mapCategoryEntityToDomain(entity: CategoryEntity): ProductCategory {
+        return ProductCategory(
+            id = entity.id,
+            name = entity.name,
+            image = entity.image
+        )
+    }
+
+    fun mapCategoryResponseToEntity(response: CategoryResponse): CategoryEntity {
+        return CategoryEntity(
+            id = response.id.toString(),
+            name = response.name,
+            slug = response.slug,
+            image = response.image,
+            creationAt = DateHelper.parseIsoStringToLong(response.creationAt),
+            updateAt = DateHelper.parseIsoStringToLong(response.updatedAt)
+        )
     }
 }

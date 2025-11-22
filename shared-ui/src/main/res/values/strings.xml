@@ -29,6 +29,10 @@
     <string name="transaction_id_label">Transaction ID</string>
     <string name="order_date">Order Date</string>
     <string name="ordered_items">Ordered Items</string>
+    <string name="filter">Filter</string>
+    <string name="sort_by">Sort By</string>
+    <string name="categories">Categories</string>
+    <string name="price_range">Price Range</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -53,6 +57,7 @@
     <string name="item">%1$s item</string>
     <string name="items">(%1$s items)</string>
     <string name="order_success_desc">Your order #%1$s has been successfully placed</string>
+    <string name="price_range_value">($%1$d to $%2$d)</string>
 
     <!-- Hint -->
     <string name="email_hint">Email</string>
@@ -97,6 +102,11 @@
     <string name="order">Order</string>
     <string name="save">Save</string>
     <string name="search">Search</string>
+    <string name="filter_list">Filter List</string>
+    <string name="newest">Newest</string>
+    <string name="price_low_high">Price (Low to High)</string>
+    <string name="price_high_low">Price (High to Low)</string>
+    <string name="clear">Clear</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
