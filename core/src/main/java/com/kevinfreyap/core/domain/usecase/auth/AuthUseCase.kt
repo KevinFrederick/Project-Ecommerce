@@ -8,6 +8,7 @@ import com.kevinfreyap.core.domain.model.user.UserProfile
 import kotlinx.coroutines.flow.Flow
 
 interface AuthUseCase {
+    fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>>
     fun register(request: RegisterRequest): Flow<Resource<Boolean>>
     fun login(request: LoginRequest): Flow<Resource<Boolean>>
     suspend fun logout()

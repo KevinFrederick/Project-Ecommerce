@@ -15,6 +15,8 @@ import javax.inject.Inject
 class AuthInteractor @Inject constructor (
     private val authenticationRepository: IAuthenticationRepository
 ): AuthUseCase {
+    override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = authenticationRepository.loginWithGoogle(idToken)
+
     override fun register(request: RegisterRequest): Flow<Resource<Boolean>> = authenticationRepository.register(request)
 
     override fun login(request: LoginRequest): Flow<Resource<Boolean>> = authenticationRepository.login(request)

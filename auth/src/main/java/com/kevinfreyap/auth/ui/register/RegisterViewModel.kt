@@ -2,6 +2,7 @@ package com.kevinfreyap.auth.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.auth.ui.nav.AuthNav
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.RegisterRequest
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
@@ -9,8 +10,10 @@ import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,6 +23,9 @@ class RegisterViewModel @Inject constructor(
 ): ViewModel() {
     private val _registerState = MutableStateFlow<Resource<Boolean>?>(null)
     val registerState: StateFlow<Resource<Boolean>?> = _registerState
+
+    private val _navEvent = Channel<AuthNav>()
+    val navEvent= _navEvent.receiveAsFlow()
 
     private val _emailError = MutableStateFlow<AuthErrorType?>(null)
     val emailError: StateFlow<AuthErrorType?> = _emailError
@@ -60,6 +66,21 @@ class RegisterViewModel @Inject constructor(
             val request = RegisterRequest(email, pass)
             authUseCase.register(request).collect { value ->
                 _registerState.value = value
+                if (value is Resource.Success){
+                    _navEvent.send(AuthNav.ToLogin)
+                }
+            }
+        }
+    }
+
+    fun onGoogleIdTokenReceived(idToken: String) {
+        viewModelScope.launch {
+            authUseCase.loginWithGoogle(idToken).collect { resource ->
+                _registerState.value = resource
+
+                if (resource is Resource.Success) {
+                    _navEvent.send(AuthNav.ToAccount)
+                }
             }
         }
     }

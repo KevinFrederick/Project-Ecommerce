@@ -42,7 +42,7 @@
     <string name="image_card_payment">Card Payment</string>
     <string name="image_voucher">Voucher</string>
     <string name="image_chevron_right">Go to detail</string>
-    <string name="text_unknown_name">Set Your Name</string>
+    <string name="text_unknown_name">Add Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
     <string name="text_seller_username">\@SellerUsername</string>
@@ -154,6 +154,8 @@
     <string name="error_invalid_zip">Invalid Zip Code</string>
     <string name="error_no_address">Please add a shipping address</string>
     <string name="error_failed_reset_password">Failed to reset password</string>
+    <string name="error_google_login">Google sign in cancelled or failed</string>
+    <string name="error_google_register">Google sign up cancelled or failed</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>

@@ -7,22 +7,29 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.auth.databinding.FragmentRegisterBinding
+import com.kevinfreyap.auth.ui.nav.AuthNav
 import com.kevinfreyap.auth.ui.util.getErrorMessage
+import com.kevinfreyap.core.BuildConfig
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.utils.GoogleAuthHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -33,6 +40,8 @@ class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var googleAuthHelper: GoogleAuthHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,8 +54,11 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        googleAuthHelper = GoogleAuthHelper(requireActivity())
+
         observeValidationErrors()
         observeRegistrationResult()
+        observeNavEvent()
         setupLoginLink()
 
         binding.btnRegister.setOnClickListener {
@@ -113,13 +125,15 @@ class RegisterFragment : Fragment() {
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
                                 Toast.makeText(context, getString(R.string.success_register), Toast.LENGTH_SHORT).show()
-                                findNavController().popBackStack()
                             }
                             is Resource.Error -> {
                                 binding.progressBar.isVisible = false
                                 val message = when (resource.message) {
                                     "REGISTRATION_FAILED" -> {
                                         getString(R.string.error_registration)
+                                    }
+                                    "ERROR_GOOGLE_SIGN_IN_FAILED" -> {
+                                        getString(R.string.error_google_register)
                                     }
                                     "ERROR_NO_CONNECTION" -> {
                                         getString(R.string.error_no_connection)
@@ -139,8 +153,38 @@ class RegisterFragment : Fragment() {
                 }
             }
         }
+
+        binding.btnRegisterGoogle.setOnClickListener {
+            launchGoogleSignUp()
+        }
     }
 
+    private fun observeNavEvent() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                launch {
+                    viewModel.navEvent.collect { destination ->
+                        when(destination) {
+                            AuthNav.ToAccount -> {
+                                val uri = "app://ecommerce/account".toUri()
+                                val navOptions = NavOptions.Builder()
+                                    .setPopUpTo(com.kevinfreyap.auth.R.id.loginFragment, true)
+                                    .build()
+
+                                findNavController().navigate(
+                                    uri,
+                                    navOptions
+                                )
+                            }
+                            AuthNav.ToLogin -> {
+                                findNavController().popBackStack()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun setupLoginLink() {
         val loginText = getString(R.string.sign_in)
         val fullText = getString(R.string.have_account_sign_in, loginText)
@@ -166,6 +210,20 @@ class RegisterFragment : Fragment() {
         binding.btnToLogin.highlightColor = Color.TRANSPARENT
         binding.btnToLogin.text = spannableString
         binding.btnToLogin.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun launchGoogleSignUp() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val clientId = BuildConfig.WEB_CLIENT_ID
+            val idToken = googleAuthHelper.signIn(clientId)
+
+            Log.e("RegisterFragment", idToken.toString())
+            if (idToken != null) {
+                viewModel.onGoogleIdTokenReceived(idToken)
+            } else {
+                Snackbar.make(binding.root, getString(R.string.error_google_register), Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {

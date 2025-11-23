@@ -66,6 +66,14 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun onGoogleIdTokenReceived(idToken: String) {
+        viewModelScope.launch {
+            authUseCase.loginWithGoogle(idToken).collect { resource ->
+                _loginState.value = resource
+            }
+        }
+    }
+
     fun onForgotPasswordClicked(email: String) {
         viewModelScope.launch {
             authUseCase.sendPasswordResetEmail(email).collect { resource ->

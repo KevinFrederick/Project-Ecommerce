@@ -33,6 +33,8 @@ import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog
 import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.EMAIL_INPUT
 import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_DIALOG
 import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_REQ
+import com.kevinfreyap.core.BuildConfig
+import com.kevinfreyap.core.utils.GoogleAuthHelper
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -41,6 +43,8 @@ class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var googleAuthHelper: GoogleAuthHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,6 +57,8 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        googleAuthHelper = GoogleAuthHelper(requireActivity())
+
         observeValidationErrors()
         observeLoginState()
         observeResetPasswordState()
@@ -86,6 +92,10 @@ class LoginFragment : Fragment() {
         binding.btnForgetPassword.setOnClickListener {
             val dialog = ResetPasswordDialog()
             dialog.show(childFragmentManager, RESET_PASSWORD_DIALOG)
+        }
+
+        binding.btnLoginGoogle.setOnClickListener {
+            launchGoogleSignIn()
         }
     }
 
@@ -138,6 +148,9 @@ class LoginFragment : Fragment() {
                                 val message = when(resource.message) {
                                     "ERROR_EMAIL_NOT_REGISTERED" -> {
                                         getString(sharedR.string.error_user_not_found)
+                                    }
+                                    "ERROR_GOOGLE_SIGN_IN_FAILED" -> {
+                                        getString(sharedR.string.error_google_login)
                                     }
                                     "ERROR_WRONG_PASSWORD" -> {
                                         getString(sharedR.string.error_wrong_password)
@@ -220,6 +233,19 @@ class LoginFragment : Fragment() {
         binding.btnToRegister.highlightColor = Color.TRANSPARENT
         binding.btnToRegister.text = spannableString
         binding.btnToRegister.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun launchGoogleSignIn() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val clientId = BuildConfig.WEB_CLIENT_ID
+            val idToken = googleAuthHelper.signIn(clientId)
+
+            if (idToken != null) {
+                viewModel.onGoogleIdTokenReceived(idToken)
+            } else {
+                Snackbar.make(binding.root, getString(sharedR.string.error_google_login), Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {

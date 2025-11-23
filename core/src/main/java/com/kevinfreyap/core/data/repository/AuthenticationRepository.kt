@@ -5,8 +5,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
@@ -37,6 +39,49 @@ class AuthenticationRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val userPreferences: UserPreferences
 ): IAuthenticationRepository {
+    override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
+        emit(Resource.Loading())
+        try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+            val authResult = firebaseAuth.signInWithCredential(credential).await()
+            val user = authResult.user
+
+            if (user != null){
+                val token = user.getIdToken(true).await().token ?: ""
+                userPreferences.saveAuthToken(token)
+
+                val profile = UserProfile(
+                    uid = user.uid,
+                    email = user.email,
+                    displayName = user.displayName,
+                    photoUrl = user.photoUrl?.toString(),
+                    address = null
+                )
+                userPreferences.saveUserProfile(profile)
+
+                try {
+                    val snapshot = firebaseFirestore.collection(USER_COLLECTION)
+                        .document(user.uid)
+                        .get()
+                        .await()
+
+                    val fullProfile = snapshot.toObject(UserProfile::class.java)
+                    if (fullProfile != null) {
+                        userPreferences.saveUserProfile(fullProfile)
+                    }
+                } catch (e: Exception) {
+                    Log.e("AuthRepository", "Firestore sync failed", e)
+                }
+
+                emit(Resource.Success(true))
+            } else {
+                emit(Resource.Error("ERROR_GOOGLE_SIGN_IN_FAILED"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Login Failed"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     override fun register(registerRequest: RegisterRequest): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
