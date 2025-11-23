@@ -14,6 +14,7 @@ import com.kevinfreyap.core.utils.DataMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -43,7 +44,13 @@ class WishlistRepository @Inject constructor(
         return wishlistDao.isProductInWatchlist(productId)
     }
 
-    override suspend fun addToWishlist(productId: String) = withContext(Dispatchers.IO) {
+    override fun addToWishlist(productId: String): Flow<Resource<Unit>> = flow {
+        val currentUserUid = firebaseAuth.currentUser?.uid
+        if (currentUserUid.isNullOrEmpty()) {
+            emit(Resource.Error("ERROR_USER_NOT_FOUND"))
+            return@flow
+        }
+
         try {
             val currentTime = System.currentTimeMillis()
 
@@ -53,12 +60,6 @@ class WishlistRepository @Inject constructor(
             )
 
             wishlistDao.insertWatchlist(wishlistEntity)
-
-            val currentUserUid = firebaseAuth.currentUser?.uid
-            if (currentUserUid.isNullOrEmpty()) {
-                Log.w("WishlistRepository", "User null, skipping firestore sync")
-                return@withContext
-            }
 
             val wishListItem = WishlistItem(
                 productId = productId,
@@ -73,10 +74,12 @@ class WishlistRepository @Inject constructor(
                 .addOnFailureListener {
                     Log.e("WishlistRepository", "Failed to sync wishlist $productId", it)
                 }
+
+            emit(Resource.Success(Unit))
         } catch (e: Exception) {
             Log.e("WishlistRepository", "Failed to add wishlist : ${e.message}")
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun removeFromWishlist(productId: String) {
         try {

@@ -34,6 +34,8 @@ class DetailViewModel @Inject constructor(
     private val _addToCartState = MutableStateFlow<Resource<Boolean>?>(null)
     val addToCartState: StateFlow<Resource<Boolean>?> = _addToCartState
 
+    private val _wishlistState = MutableStateFlow<Resource<Unit>>(Resource.Loading())
+    val wishlistState: StateFlow<Resource<Unit>> = _wishlistState
     val isInWishlist: StateFlow<Boolean> = wishlistUseCase.observeIsProductInWishlist(productId ?: "")
         .stateIn(
             scope = viewModelScope,
@@ -78,7 +80,9 @@ class DetailViewModel @Inject constructor(
     fun addToWishlist() {
         viewModelScope.launch {
             if (productId != null){
-                wishlistUseCase.addToWishlist(productId)
+                wishlistUseCase.addToWishlist(productId).collect { resource ->
+                    _wishlistState.value = resource
+                }
             }
         }
     }

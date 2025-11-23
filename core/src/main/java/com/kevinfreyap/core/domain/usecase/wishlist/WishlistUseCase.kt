@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface WishlistUseCase {
     fun getWishlist(): Flow<Resource<List<Product>>>
     fun observeIsProductInWishlist(productId: String): Flow<Boolean>
-    suspend fun addToWishlist(productId: String)
+    fun addToWishlist(productId: String): Flow<Resource<Unit>>
     suspend fun removeFromWishlist(productId: String)
     suspend fun syncWishlistOnLogin()
     suspend fun clearWishlist()

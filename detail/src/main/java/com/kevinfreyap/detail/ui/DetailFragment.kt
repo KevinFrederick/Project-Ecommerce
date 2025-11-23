@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kevinfreyap.core.data.Resource
@@ -119,6 +120,34 @@ class DetailFragment : Fragment() {
                             binding.btnFavorite.setImageResource(R.drawable.ic_favorite_24)
                         } else {
                             binding.btnFavorite.setImageResource(R.drawable.ic_favorite_border_24)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.wishlistState.collect { resource ->
+                        if (resource is Resource.Error) {
+                            if (resource.message == "ERROR_USER_NOT_FOUND"){
+                                requireContext().showGenericDialog(
+                                    title = getString(R.string.error_login_required),
+                                    message = getString(R.string.error_login_required_desc),
+                                    positiveButtonText = getString(R.string.sign_in),
+                                    negativeButtonText = getString(R.string.cancel),
+                                    isCancelable = true,
+                                    onPositiveClick = {
+                                        val uri = "app://ecommerce/account".toUri()
+
+                                        val navOptions = navOptions {
+                                            popUpTo(findNavController().graph.startDestinationId){
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                        findNavController().navigate(uri, navOptions)
+                                    }
+                                )
+                            }
                         }
                     }
                 }

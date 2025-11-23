@@ -28,8 +28,7 @@ class ProductQuery @Inject constructor() {
             args.add(filter.category)
         }
 
-        Log.d("Query", sb.toString())
-        Log.d("Query", args.toString())
+        sb.append("ORDER BY id ASC")
 
         return SimpleSQLiteQuery(sb.toString(), args.toTypedArray())
     }

@@ -55,8 +55,8 @@ class WishlistInteractor @Inject constructor(
         return wishlistRepository.observeIsProductInWishlist(productId)
     }
 
-    override suspend fun addToWishlist(productId: String) {
-        wishlistRepository.addToWishlist(productId)
+    override fun addToWishlist(productId: String): Flow<Resource<Unit>> {
+        return wishlistRepository.addToWishlist(productId)
     }
 
     override suspend fun removeFromWishlist(productId: String) {

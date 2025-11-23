@@ -52,12 +52,8 @@ class WishlistFragment : Fragment() {
                         binding.progressBar.isVisible = resource is Resource.Loading
 
                         if (resource is Resource.Success) {
-                            if (resource.data.isEmpty()) {
-                                binding.tvNoWishlist.isVisible = true
-                            } else {
-                                binding.tvNoWishlist.isVisible = false
-                                wishlistAdapter.submitList(resource.data)
-                            }
+                            wishlistAdapter.submitList(resource.data)
+                            binding.tvNoWishlist.isVisible = resource.data.isEmpty()
                         }
                     }
                 }
