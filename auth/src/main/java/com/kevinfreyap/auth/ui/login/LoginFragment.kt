@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -29,6 +28,11 @@ import com.kevinfreyap.core.data.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.google.android.material.snackbar.Snackbar
+import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog
+import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.EMAIL_INPUT
+import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_DIALOG
+import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_REQ
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -51,7 +55,15 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeValidationErrors()
         observeLoginState()
+        observeResetPasswordState()
         setupRegisterLink()
+
+        childFragmentManager.setFragmentResultListener(RESET_PASSWORD_REQ, viewLifecycleOwner) { requestKey, result ->
+            val email = result.getString(EMAIL_INPUT)
+            if (!email.isNullOrBlank()){
+                viewModel.onForgotPasswordClicked(email)
+            }
+        }
 
         binding.btnLogin.setOnClickListener {
             val email = binding.emailInputLogin.getText()
@@ -69,6 +81,11 @@ class LoginFragment : Fragment() {
 
         binding.passwordInputLogin.editText.addTextChangedListener {
             viewModel.clearPassError()
+        }
+
+        binding.btnForgetPassword.setOnClickListener {
+            val dialog = ResetPasswordDialog()
+            dialog.show(childFragmentManager, RESET_PASSWORD_DIALOG)
         }
     }
 
@@ -103,7 +120,7 @@ class LoginFragment : Fragment() {
                             }
                             is Resource.Success -> {
                                 binding.progressBar.isVisible = false
-                                Toast.makeText(context, getString(sharedR.string.success_login), Toast.LENGTH_SHORT).show()
+                                Snackbar.make(binding.root, getString(sharedR.string.success_login), Snackbar.LENGTH_SHORT).show()
 
                                 val uri = "app://ecommerce/account".toUri()
                                 val navOptions = NavOptions.Builder()
@@ -133,11 +150,44 @@ class LoginFragment : Fragment() {
                                         getString(sharedR.string.error_unknown)
                                     }
                                 }
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
                             }
                             null -> {
                                 binding.progressBar.isVisible = false
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeResetPasswordState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.resetPasswordState.collect { resource ->
+                        when(resource) {
+                            is Resource.Error -> {
+                                val message = when (resource.message) {
+                                    "ERROR_INVALID_EMAIL" -> getString(sharedR.string.error_enter_valid_email)
+                                    "ERROR_EMAIL_IS_REQUIRED" -> getString(sharedR.string.error_email_is_required)
+                                    "ERROR_FAILED_RESET_PASSWORD" -> getString(sharedR.string.error_failed_reset_password)
+                                    else -> getString(sharedR.string.error_unknown)
+                                }
+
+                                Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+                                viewModel.resetForgotPasswordState()
+                            }
+                            is Resource.Success -> {
+                                Snackbar.make(
+                                    binding.root,
+                                    getString(sharedR.string.success_reset_email_sent),
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                                viewModel.resetForgotPasswordState()
+                            }
+                            is Resource.Loading, null -> {}
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.kevinfreyap.core.domain.usecase.auth
 
+import android.util.Patterns
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.auth.LoginRequest
 import com.kevinfreyap.core.domain.model.auth.RegisterRequest
@@ -77,4 +78,17 @@ class AuthInteractor @Inject constructor (
     }
 
     override fun isUserLoggedIn(): Boolean = authenticationRepository.isUserLoggedIn()
+    override fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>> = flow {
+        if (email.isBlank()) {
+            emit(Resource.Error("ERROR_EMAIL_IS_REQUIRED"))
+            return@flow
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emit(Resource.Error("ERROR_INVALID_EMAIL"))
+            return@flow
+        }
+
+        emitAll(authenticationRepository.sendPasswordResetEmail(email))
+    }
 }

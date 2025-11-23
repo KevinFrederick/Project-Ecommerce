@@ -33,6 +33,7 @@
     <string name="sort_by">Sort By</string>
     <string name="categories">Categories</string>
     <string name="price_range">Price Range</string>
+    <string name="reset_password">Reset Password</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -41,7 +42,7 @@
     <string name="image_card_payment">Card Payment</string>
     <string name="image_voucher">Voucher</string>
     <string name="image_chevron_right">Go to detail</string>
-    <string name="text_unknown_name">Your Name</string>
+    <string name="text_unknown_name">Set Your Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
     <string name="text_seller_username">\@SellerUsername</string>
@@ -107,6 +108,7 @@
     <string name="price_low_high">Price (Low to High)</string>
     <string name="price_high_low">Price (High to Low)</string>
     <string name="clear">Clear</string>
+    <string name="send_link">Send Link</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -122,6 +124,7 @@
     <string name="error_login_required_desc">You need to sign in to access this feature</string>
     <string name="cash_on_delivery">Cash on Delivery</string>
     <string name="debit_credit_card">Debit / Credit Cart</string>
+    <string name="reset_password_desc">Enter your email to receive a reset link</string>
 
     <!-- Error Message -->
     <string name="error_user_not_found">Please Login first</string>
@@ -150,6 +153,7 @@
     <string name="error_country_blank">Country is required</string>
     <string name="error_invalid_zip">Invalid Zip Code</string>
     <string name="error_no_address">Please add a shipping address</string>
+    <string name="error_failed_reset_password">Failed to reset password</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
@@ -159,4 +163,5 @@
     <string name="success_order_placed">Order Placed!</string>
     <string name="success_update_name">Name updated successfully!</string>
     <string name="success_update_address">Address updated successfully!</string>
+    <string name="success_reset_email_sent">Reset link sent! Check your email</string>
 </resources>

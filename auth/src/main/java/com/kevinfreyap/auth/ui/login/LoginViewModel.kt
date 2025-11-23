@@ -25,6 +25,9 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<Resource<Boolean>?>(null)
     val loginState: StateFlow<Resource<Boolean>?> = _loginState
 
+    private val _resetPasswordState = MutableStateFlow<Resource<Unit>?>(null)
+    val resetPasswordState: StateFlow<Resource<Unit>?> = _resetPasswordState
+
     private val _emailError = MutableStateFlow<AuthErrorType?>(null)
     val emailError : StateFlow<AuthErrorType?> = _emailError
 
@@ -63,6 +66,14 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun onForgotPasswordClicked(email: String) {
+        viewModelScope.launch {
+            authUseCase.sendPasswordResetEmail(email).collect { resource ->
+                _resetPasswordState.value = resource
+            }
+        }
+    }
+
     fun clearEmailError() {
         if (_emailError.value != null){
             _emailError.value = null
@@ -73,5 +84,9 @@ class LoginViewModel @Inject constructor(
         if (_passError.value != null) {
             _passError.value = null
         }
+    }
+
+    fun resetForgotPasswordState() {
+        _resetPasswordState.value = null
     }
 }

@@ -16,4 +16,5 @@ interface AuthUseCase {
     fun updateUserName(newName: String): Flow<Resource<Unit>>
     fun updateAddress(newAddress: UserAddress): Flow<Resource<Unit>>
     fun isUserLoggedIn(): Boolean
+    fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>>
 }

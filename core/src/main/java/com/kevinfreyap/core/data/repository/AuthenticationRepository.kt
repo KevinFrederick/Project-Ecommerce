@@ -237,6 +237,17 @@ class AuthenticationRepository @Inject constructor(
         return firebaseAuth.currentUser != null
     }
 
+    override fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            firebaseAuth.sendPasswordResetEmail(email).await()
+
+            emit(Resource.Success(Unit))
+        } catch (_: Exception) {
+            emit(Resource.Error("ERROR_FAILED_RESET_PASSWORD"))
+        }
+    }.flowOn(Dispatchers.IO)
+
     private suspend fun saveUserInfo(userId: String, email: String?) {
         val userData = mapOf(
             FIELD_ID to userId,
