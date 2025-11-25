@@ -9,6 +9,7 @@ import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.repository.ICartRepository
 import com.kevinfreyap.core.domain.repository.IOrderRepository
 import com.kevinfreyap.core.domain.repository.ITransactionRepository
+import com.kevinfreyap.core.domain.repository.IVoucherRepository
 import com.kevinfreyap.core.utils.PaymentMethod
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class OrderInteractor @Inject constructor(
     private val orderRepository: IOrderRepository,
     private val cartRepository: ICartRepository,
+    private val voucherRepository: IVoucherRepository,
     private val transactionRepository: ITransactionRepository,
     private val connectivityManager: ConnectivityManager,
     private val firebaseAuth: FirebaseAuth
@@ -54,11 +56,30 @@ class OrderInteractor @Inject constructor(
                 transactionRepository.saveOrder(receipt)
                 cartRepository.clearCart()
                 cartRepository.clearFirestoreCart()
+
+                if (!voucher.isNullOrBlank()) {
+                    markVoucherAsUsed(voucher)
+                }
+
                 return result
             }
             is Resource.Error -> {
                 return result
             }
+        }
+    }
+
+    private suspend fun markVoucherAsUsed(code: String) {
+        val resource = voucherRepository.getVoucherByCode(code)
+
+        if (resource is Resource.Success) {
+            val voucher = resource.data
+
+            val usedVoucher = voucher.copy(
+                isUsed = true,
+                isNew = false
+            )
+            voucherRepository.markVoucherAsUsed(usedVoucher)
         }
     }
 

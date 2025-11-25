@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":transaction"))
     implementation(project(":wishlist"))
     implementation(project(":search"))
+    implementation(project(":voucher"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

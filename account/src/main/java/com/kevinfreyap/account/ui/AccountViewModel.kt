@@ -7,8 +7,7 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
-import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
-import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
+import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,8 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val authUseCase: AuthUseCase,
-    private val cartUseCase: CartUseCase,
-    private val transactionUseCase: TransactionUseCase
+    private val voucherUseCase: VoucherUseCase
 ) : ViewModel() {
 
     val userProfile: StateFlow<Resource<UserProfile>> = authUseCase.getUserProfile()
@@ -34,6 +32,13 @@ class AccountViewModel @Inject constructor(
 
     private val _updateState = MutableStateFlow<Resource<Unit>?>(null)
     val updateState: StateFlow<Resource<Unit>?> = _updateState
+
+    val newVoucherCount: StateFlow<Int> = voucherUseCase.getNewVoucherCount()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
 
     init {
         refreshProfileData()
@@ -96,8 +101,6 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authUseCase.logout()
-                cartUseCase.clearCart()
-                transactionUseCase.clearOrderHistory()
             } catch (e: IOException) {
                 Log.e("AccountViewModel", "Failed to clear auth token", e)
             } catch (e: Exception) {

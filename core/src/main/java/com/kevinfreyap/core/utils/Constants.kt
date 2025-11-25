@@ -2,6 +2,7 @@ package com.kevinfreyap.core.utils
 
 object Constants {
     const val USER_COLLECTION = "users"
+    const val VOUCHER_COLLECTION = "vouchers"
     const val CART_SUB_COLLECTION = "cart"
     const val TRANSACTION_SUB_COLLECTION = "transactions"
     const val WISHLIST_SUB_COLLECTION = "wishlist"

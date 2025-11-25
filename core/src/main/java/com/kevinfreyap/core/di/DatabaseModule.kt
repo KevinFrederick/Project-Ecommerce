@@ -8,6 +8,7 @@ import com.kevinfreyap.core.data.source.local.room.CategoryDao
 import com.kevinfreyap.core.data.source.local.room.ProductDao
 import com.kevinfreyap.core.data.source.local.room.ProductDatabase
 import com.kevinfreyap.core.data.source.local.room.TransactionDao
+import com.kevinfreyap.core.data.source.local.room.VoucherDao
 import com.kevinfreyap.core.data.source.local.room.WishlistDao
 import com.kevinfreyap.core.data.source.remote.network.ApiService
 import dagger.Module
@@ -43,6 +44,9 @@ class DatabaseModule {
 
     @Provides
     fun provideCategoryDao(database: ProductDatabase): CategoryDao = database.categoryDao()
+
+    @Provides
+    fun provideVoucherDao(database: ProductDatabase): VoucherDao = database.voucherDao()
 
     @Provides
     @Singleton

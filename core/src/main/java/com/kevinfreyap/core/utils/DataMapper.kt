@@ -6,6 +6,7 @@ import com.kevinfreyap.core.data.source.local.entity.CartEntity
 import com.kevinfreyap.core.data.source.local.entity.CategoryEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.core.data.source.local.entity.VoucherEntity
 import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 import com.kevinfreyap.core.data.source.remote.response.CategoryResponse
 import com.kevinfreyap.core.data.source.remote.response.ProductsResponseItem
@@ -14,6 +15,7 @@ import com.kevinfreyap.core.domain.model.order.OrderReceipt
 import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.product.ProductCategory
 import com.kevinfreyap.core.domain.model.user.UserAddress
+import com.kevinfreyap.core.domain.model.voucher.Voucher
 import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
 
 object DataMapper {
@@ -179,6 +181,39 @@ object DataMapper {
             image = response.image,
             creationAt = DateHelper.parseIsoStringToLong(response.creationAt),
             updateAt = DateHelper.parseIsoStringToLong(response.updatedAt)
+        )
+    }
+
+    // Voucher
+    fun mapVoucherEntityToDomain(entity: VoucherEntity): Voucher {
+        return Voucher(
+            id = entity.id,
+            code = entity.code,
+            title = entity.title,
+            description = entity.description,
+            discountAmount = entity.discountAmount,
+            isPercentage = entity.isPercentage,
+            minSpend = entity.minSpend,
+            expiryDate = entity.expiryDate,
+            type = entity.type,
+            isUsed = entity.isUsed,
+            isNew = entity.isNew
+        )
+    }
+
+    fun mapVoucherDomainToVoucherEntity(domain: Voucher): VoucherEntity {
+        return VoucherEntity(
+            id = domain.id,
+            code = domain.code,
+            title = domain.title,
+            description = domain.description,
+            discountAmount = domain.discountAmount,
+            isPercentage = domain.isPercentage,
+            minSpend = domain.minSpend,
+            expiryDate = domain.expiryDate,
+            type = domain.type,
+            isUsed = domain.isUsed,
+            isNew = domain.isNew
         )
     }
 }

@@ -13,6 +13,7 @@ interface AuthUseCase {
     fun login(request: LoginRequest): Flow<Resource<Boolean>>
     suspend fun logout()
     fun getUserProfile(): Flow<Resource<UserProfile>>
+    suspend fun syncUserData()
     suspend fun refreshUserProfile()
     fun updateUserName(newName: String): Flow<Resource<Unit>>
     fun updateAddress(newAddress: UserAddress): Flow<Resource<Unit>>

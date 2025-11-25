@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
+import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val connectivityManager: ConnectivityManager,
+    voucherUseCase: VoucherUseCase,
     cartUseCase: CartUseCase,
 ): ViewModel() {
 
@@ -46,6 +48,8 @@ class MainViewModel @Inject constructor(
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+
+        voucherUseCase.listenToPublicVouchers()
     }
 
     override fun onCleared() {

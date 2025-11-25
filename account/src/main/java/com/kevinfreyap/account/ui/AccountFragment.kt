@@ -69,6 +69,11 @@ class AccountFragment : Fragment() {
             findNavController().navigate(uri)
         }
 
+        binding.btnVoucher.setOnClickListener {
+            val uri = "app://ecommerce/voucher".toUri()
+            findNavController().navigate(uri)
+        }
+
         binding.btnEditAccount.setOnClickListener {
             val editAccountBottomSheetFragment = EditProfileBottomSheetFragment()
             val profileBundle = bundleOf(
@@ -152,6 +157,12 @@ class AccountFragment : Fragment() {
                             }
                         }
 
+                    }
+                }
+
+                launch {
+                    viewModel.newVoucherCount.collect { value ->
+                        binding.newVoucherBadge.isVisible = value > 0
                     }
                 }
             }

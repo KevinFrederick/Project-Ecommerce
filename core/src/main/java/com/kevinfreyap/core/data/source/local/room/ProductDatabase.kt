@@ -11,6 +11,7 @@ import com.kevinfreyap.core.data.source.local.entity.CategoryEntity
 import com.kevinfreyap.core.data.source.local.entity.ProductEntity
 import com.kevinfreyap.core.data.source.local.entity.RemoteKeyEntity
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.core.data.source.local.entity.VoucherEntity
 import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 
 @Database(
@@ -20,7 +21,8 @@ import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
         RemoteKeyEntity::class,
         TransactionEntity::class,
         WishlistEntity::class,
-        CategoryEntity::class
+        CategoryEntity::class,
+        VoucherEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -36,4 +38,5 @@ abstract class ProductDatabase: RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun wishlistDao(): WishlistDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun voucherDao(): VoucherDao
 }

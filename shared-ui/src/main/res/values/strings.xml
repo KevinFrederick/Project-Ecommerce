@@ -34,6 +34,7 @@
     <string name="categories">Categories</string>
     <string name="price_range">Price Range</string>
     <string name="reset_password">Reset Password</string>
+    <string name="new_item">New</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -47,6 +48,7 @@
     <string name="text_seller_display_name">Seller Name</string>
     <string name="text_seller_username">\@SellerUsername</string>
     <string name="text_default_email">Example@email.com</string>
+    <string name="percentage">Percentage</string>
 
     <!-- String Format -->
     <string name="currency_dollar">$%1$d</string>
@@ -59,6 +61,8 @@
     <string name="items">(%1$s items)</string>
     <string name="order_success_desc">Your order #%1$s has been successfully placed</string>
     <string name="price_range_value">($%1$d to $%2$d)</string>
+    <string name="exp_date">Exp: %1$s</string>
+    <string name="voucher_min_amount_not_enough">Add %1$d more to use this voucher</string>
 
     <!-- Hint -->
     <string name="email_hint">Email</string>
@@ -109,6 +113,8 @@
     <string name="price_high_low">Price (High to Low)</string>
     <string name="clear">Clear</string>
     <string name="send_link">Send Link</string>
+    <string name="vouchers">Vouchers</string>
+    <string name="my_vouchers">My Vouchers</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -118,7 +124,9 @@
     <string name="empty_cart">Your cart is empty</string>
     <string name="empty_transactions">No transactions yet</string>
     <string name="empty_wishlist">No item in wishlist</string>
+    <string name="empty_voucher">No voucher</string>
     <string name="empty_search_result">No item found</string>
+    <string name="voucher_used">Voucher already used</string>
     <string name="start_searching">Find your favorite products</string>
     <string name="error_no_product_desc">This product has been removed by the seller</string>
     <string name="error_login_required_desc">You need to sign in to access this feature</string>
@@ -156,6 +164,10 @@
     <string name="error_failed_reset_password">Failed to reset password</string>
     <string name="error_google_login">Google sign in cancelled or failed</string>
     <string name="error_google_register">Google sign up cancelled or failed</string>
+    <string name="error_voucher_cart_still_loading">Cannot apply voucher while cart is loading</string>
+    <string name="error_blank_code">Please enter a voucher code</string>
+    <string name="error_voucher_not_found">Voucher code not found</string>
+    <string name="error_voucher_used_or_expired">This voucher already used or expired</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
@@ -166,4 +178,6 @@
     <string name="success_update_name">Name updated successfully!</string>
     <string name="success_update_address">Address updated successfully!</string>
     <string name="success_reset_email_sent">Reset link sent! Check your email</string>
+    <string name="success_copy_clipboard">Copied to clipboard</string>
+    <string name="success_voucher_applied">Voucher Successfully Applied</string>
 </resources>

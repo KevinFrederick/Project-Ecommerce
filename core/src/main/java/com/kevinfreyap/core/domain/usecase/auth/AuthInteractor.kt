@@ -7,23 +7,81 @@ import com.kevinfreyap.core.domain.model.auth.RegisterRequest
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
+import com.kevinfreyap.core.domain.repository.ICartRepository
+import com.kevinfreyap.core.domain.repository.ITransactionRepository
+import com.kevinfreyap.core.domain.repository.IVoucherRepository
+import com.kevinfreyap.core.domain.repository.IWishlistRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthInteractor @Inject constructor (
-    private val authenticationRepository: IAuthenticationRepository
+    private val authenticationRepository: IAuthenticationRepository,
+    private val cartRepository: ICartRepository,
+    private val wishlistRepository: IWishlistRepository,
+    private val transactionRepository: ITransactionRepository,
+    private val voucherRepository: IVoucherRepository
 ): AuthUseCase {
-    override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = authenticationRepository.loginWithGoogle(idToken)
+    override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
+        authenticationRepository.loginWithGoogle(idToken).collect { resource ->
+            if (resource is Resource.Success) {
+                syncUserData()
+            }
+
+            emit(resource)
+        }
+    }
 
     override fun register(request: RegisterRequest): Flow<Resource<Boolean>> = authenticationRepository.register(request)
 
-    override fun login(request: LoginRequest): Flow<Resource<Boolean>> = authenticationRepository.login(request)
+    override fun login(request: LoginRequest): Flow<Resource<Boolean>> = flow {
+        authenticationRepository.login(request).collect{ resource ->
+            if (resource is Resource.Success) {
+                syncUserData()
+            }
 
-    override suspend fun logout() = authenticationRepository.logout()
+            emit(resource)
+        }
+    }
+
+    override suspend fun logout() {
+        coroutineScope {
+            val jobs = listOf(
+                async { runCatching { cartRepository.clearCart() } },
+                async { runCatching { wishlistRepository.clearWishlist() } },
+                async { runCatching { transactionRepository.clearOrderHistory() } },
+                async { runCatching { voucherRepository.clearVouchers() } }
+            )
+
+            jobs.awaitAll()
+
+            authenticationRepository.logout()
+        }
+    }
 
     override fun getUserProfile(): Flow<Resource<UserProfile>> = authenticationRepository.getUserProfile()
+
+    override suspend fun syncUserData() {
+        coroutineScope {
+            voucherRepository.listenToPublicVouchers()
+
+            val jobs = listOf(
+                launch { cartRepository.syncCartOnLogin() },
+                launch { voucherRepository.syncVouchers() },
+                launch { transactionRepository.syncTransactionHistoryOnLogin() },
+                launch { wishlistRepository.syncWishlistOnLogin() },
+                launch { authenticationRepository.refreshUserProfile() }
+            )
+
+            jobs.joinAll()
+        }
+    }
 
     override suspend fun refreshUserProfile() = authenticationRepository.refreshUserProfile()
 

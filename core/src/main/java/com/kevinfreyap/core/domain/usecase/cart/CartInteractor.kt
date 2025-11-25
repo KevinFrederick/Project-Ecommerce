@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CartInteractor @Inject constructor (
-    private val cartRepository: ICartRepository
+    private val cartRepository: ICartRepository,
+    private val calculateSummaryService: CalculateSummaryService
 ): CartUseCase {
     override fun getCartItems(): Flow<Resource<List<Cart>>> = cartRepository.getCartItems()
     override fun addToCart(
@@ -29,17 +30,7 @@ class CartInteractor @Inject constructor (
                     cart.isAvailable
                 }
 
-                val subtotal = items.sumOf { it.product.price.toDouble() * it.quantity }
-                val shippingFee = if (0 < subtotal && subtotal < 100) 20.0 else 0.0
-                val voucherDisc = 0
-                val total = (subtotal + shippingFee - voucherDisc).coerceAtLeast(0.0)
-
-                CartSummary(
-                    subtotal = subtotal.toInt(),
-                    shippingFee = shippingFee.toInt(),
-                    voucherDiscount = voucherDisc,
-                    total = total.toInt()
-                )
+                calculateSummaryService(items, null)
             } else {
                 CartSummary(
                     subtotal = 0,

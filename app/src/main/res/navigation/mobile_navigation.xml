@@ -33,6 +33,10 @@
         android:id="@+id/nav_search"
         app:graph="@navigation/nav_search" />
 
+    <include
+        android:id="@+id/nav_voucher"
+        app:graph="@navigation/nav_voucher"/>
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"

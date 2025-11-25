@@ -69,7 +69,7 @@ class CheckoutFragment : Fragment() {
             val voucherCode = binding.etVoucherInput.text.toString()
 
             if (voucherCode.isNotEmpty()) {
-                // TODO (Apply Voucher Functionality)
+                viewModel.applyVoucher(voucherCode)
             } else {
                 binding.etVoucherInput.error = getString(R.string.error_no_voucher)
             }
@@ -90,6 +90,23 @@ class CheckoutFragment : Fragment() {
                 launch {
                     viewModel.selectedMethod.collect { method ->
                         updateSelectionUI(method)
+                    }
+                }
+
+                launch {
+                    viewModel.voucherMessage.collect { text ->
+                        if (!text.isNullOrBlank()){
+                            val message = when(text) {
+                                "SUCCESS_APPLIED_VOUCHER" -> getString(R.string.success_voucher_applied)
+                                "ERROR_CART_STILL_LOADING" -> getString(R.string.error_voucher_cart_still_loading)
+                                "ERROR_NO_CODE" -> getString(R.string.error_blank_code)
+                                "ERROR_VOUCHER_NOT_FOUND" -> getString(R.string.error_voucher_not_found)
+                                "ERROR_VOUCHER_EXPIRED_OR_USED" -> getString(R.string.error_voucher_used_or_expired)
+                                else -> text
+                            }
+
+                            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+                        }
                     }
                 }
 

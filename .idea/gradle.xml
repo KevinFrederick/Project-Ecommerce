@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/search" />
             <option value="$PROJECT_DIR$/shared-ui" />
             <option value="$PROJECT_DIR$/transaction" />
+            <option value="$PROJECT_DIR$/voucher" />
             <option value="$PROJECT_DIR$/wishlist" />
           </set>
         </option>
