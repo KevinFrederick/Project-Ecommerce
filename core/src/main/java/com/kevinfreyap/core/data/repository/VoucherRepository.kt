@@ -33,7 +33,8 @@ class VoucherRepository @Inject constructor(
     private var listenerRegistration: ListenerRegistration? = null
 
     override fun getUserVouchers(): Flow<Resource<List<Voucher>>> {
-        return voucherDao.getAllVouchers()
+        val currentTime = System.currentTimeMillis()
+        return voucherDao.getAllVouchers(currentTime)
             .map <List<VoucherEntity>, Resource<List<Voucher>>> { entities ->
                 val domainList = entities.map { DataMapper.mapVoucherEntityToDomain(it) }
                 Resource.Success(domainList)

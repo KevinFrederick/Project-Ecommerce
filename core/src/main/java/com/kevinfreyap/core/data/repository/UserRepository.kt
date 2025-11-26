@@ -12,6 +12,7 @@ import com.kevinfreyap.core.domain.repository.IUserRepository
 import com.kevinfreyap.core.utils.Constants.FIELD_ADDRESS
 import com.kevinfreyap.core.utils.Constants.FIELD_NAME
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
+import com.kevinfreyap.core.utils.isGoogleAccount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -32,16 +33,20 @@ class UserRepository @Inject constructor(
     override fun getUserProfile(): Flow<Resource<UserProfile>> {
         return userPreferences.getUserProfile()
             .map { profile ->
+                val user = firebaseAuth.currentUser
                 if (profile.uid.isNotEmpty()) {
                     Resource.Success(profile)
-                } else if (firebaseAuth.currentUser != null) {
+                } else if (user != null) {
+                    val isGoogle = user.isGoogleAccount()
+
                     Resource.Success(
                         UserProfile(
                             uid = firebaseAuth.currentUser?.uid ?: "",
                             email = firebaseAuth.currentUser?.email,
                             displayName = firebaseAuth.currentUser?.displayName,
                             photoUrl = firebaseAuth.currentUser?.photoUrl.toString(),
-                            address = null
+                            address = null,
+                            isGoogleAccount = isGoogle
                         )
                     )
                 } else {

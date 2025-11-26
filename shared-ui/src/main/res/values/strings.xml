@@ -123,6 +123,7 @@
     <string name="theme">Theme</string>
     <string name="change_password">Change Password</string>
     <string name="delete_account">Delete Account</string>
+    <string name="update">Update</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>
@@ -176,6 +177,12 @@
     <string name="error_blank_code">Please enter a voucher code</string>
     <string name="error_voucher_not_found">Voucher code not found</string>
     <string name="error_voucher_used_or_expired">This voucher already used or expired</string>
+    <string name="error_current_pass_is_required">Please enter your current password</string>
+    <string name="error_new_pass_is_required">Please enter a new password</string>
+    <string name="error_conf_pass_is_required">Please confirm your new password</string>
+    <string name="error_new_pass_not_match">New passwords do not match</string>
+    <string name="error_new_pass_same">New password cannot be the same as the old one</string>
+    <string name="error_current_password_wrong">Current password wrong. Try again</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>
@@ -188,6 +195,7 @@
     <string name="success_reset_email_sent">Reset link sent! Check your email</string>
     <string name="success_copy_clipboard">Copied to clipboard</string>
     <string name="success_voucher_applied">Voucher Successfully Applied</string>
+    <string name="success_update_password">Password Updated Successfully</string>
 
     <!-- Theme Mode -->
     <string name="theme_choose_theme">Choose Theme</string>

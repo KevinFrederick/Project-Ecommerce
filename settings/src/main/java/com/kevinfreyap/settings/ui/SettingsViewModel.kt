@@ -4,10 +4,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.user.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -22,6 +25,13 @@ class SettingsViewModel @Inject constructor(
     private val userUseCase: UserUseCase
 ): ViewModel(){
 
+    val currentUser: StateFlow<Resource<UserProfile>> = userUseCase.getUserProfile()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Resource.Loading()
+        )
+
     val currentTheme: StateFlow<Int> = userUseCase.getTheme()
         .stateIn(
             scope = viewModelScope,
@@ -32,11 +42,32 @@ class SettingsViewModel @Inject constructor(
     private val _navEvent = Channel<Boolean>()
     val navEvent = _navEvent.receiveAsFlow()
 
+    private val _updateState = MutableStateFlow<Resource<Unit>?>(null)
+    val updateState: StateFlow<Resource<Unit>?> = _updateState
+
     fun setTheme(mode: Int) {
         viewModelScope.launch {
             userUseCase.saveTheme(mode)
             AppCompatDelegate.setDefaultNightMode(mode)
         }
+    }
+
+    fun onChangePassword(currentPass: String, newPass: String, confirmPass: String) {
+        viewModelScope.launch {
+            _updateState.value = Resource.Loading()
+
+            val result = authUseCase.updatePassword(
+                currentPass = currentPass,
+                newPass = newPass,
+                confirmPass = confirmPass
+            )
+
+            _updateState.value = result
+        }
+    }
+
+    fun resetUpdateState() {
+        _updateState.value = null
     }
 
     fun logout() {

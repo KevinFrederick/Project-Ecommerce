@@ -11,6 +11,7 @@ interface AuthUseCase {
     fun login(request: LoginRequest): Flow<Resource<Boolean>>
     fun isUserLoggedIn(): Boolean
     fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>>
+    suspend fun updatePassword(currentPass: String, newPass: String, confirmPass: String): Resource<Unit>
     suspend fun syncUserData()
     suspend fun logout()
 }

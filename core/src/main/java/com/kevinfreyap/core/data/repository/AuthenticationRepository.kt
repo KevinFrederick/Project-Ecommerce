@@ -1,6 +1,7 @@
 package com.kevinfreyap.core.data.repository
 
 import android.util.Log
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -16,6 +17,7 @@ import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.utils.Constants.FIELD_EMAIL
 import com.kevinfreyap.core.utils.Constants.FIELD_ID
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
+import com.kevinfreyap.core.utils.isGoogleAccount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -44,12 +46,15 @@ class AuthenticationRepository @Inject constructor(
                 val token = user.getIdToken(true).await().token ?: ""
                 userPreferences.saveAuthToken(token)
 
+                val isGoogleAccount = user.isGoogleAccount()
+
                 val profile = UserProfile(
                     uid = user.uid,
                     email = user.email,
                     displayName = user.displayName,
                     photoUrl = user.photoUrl?.toString(),
-                    address = null
+                    address = null,
+                    isGoogleAccount = isGoogleAccount
                 )
                 userPreferences.saveUserProfile(profile)
 
@@ -117,12 +122,15 @@ class AuthenticationRepository @Inject constructor(
                 val token = user.getIdToken(true).await().token ?: ""
                 userPreferences.saveAuthToken(token)
 
+                val isGoogleAccount = user.isGoogleAccount()
+
                 val profile = UserProfile(
                     uid = user.uid,
                     email = user.email,
                     displayName = user.displayName,
                     photoUrl = user.photoUrl.toString(),
-                    address = null
+                    address = null,
+                    isGoogleAccount = isGoogleAccount
                 )
                 userPreferences.saveUserProfile(profile)
 
@@ -192,6 +200,26 @@ class AuthenticationRepository @Inject constructor(
             emit(Resource.Error("ERROR_FAILED_RESET_PASSWORD"))
         }
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun changePassword(
+        currentPass: String,
+        newPass: String
+    ): Resource<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: return Resource.Error("ERROR_USER_NOT_FOUND")
+            val email = user.email ?: return Resource.Error("ERROR_EMAIL_NOT_FOUND")
+
+            val credential = EmailAuthProvider.getCredential(email, currentPass)
+
+            user.reauthenticate(credential).await()
+
+            user.updatePassword(newPass).await()
+
+            Resource.Success(Unit)
+        } catch (_: Exception) {
+            Resource.Error("ERROR_WRONG_PASSWORD")
+        }
+    }
 
     private suspend fun saveUserInfo(userId: String, email: String?) {
         val userData = mapOf(

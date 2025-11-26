@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.gson.Gson
@@ -49,7 +50,8 @@ class UserPreferences @Inject constructor(
                 email = preferences[EMAIL_KEY],
                 displayName = preferences[USERNAME_KEY],
                 photoUrl = preferences[PHOTO_URL_KEY],
-                address = addressObj
+                address = addressObj,
+                isGoogleAccount = preferences[IS_GOOGLE_KEY] ?: false
             )
         }
     }
@@ -66,6 +68,7 @@ class UserPreferences @Inject constructor(
             preferences[USERNAME_KEY] = profile.displayName ?: ""
             preferences[EMAIL_KEY] = profile.email ?: ""
             preferences[PHOTO_URL_KEY] = profile.photoUrl ?: ""
+            preferences[IS_GOOGLE_KEY] = profile.isGoogleAccount
 
             if (profile.address != null){
                 preferences[ADDRESS_KEY] = Gson().toJson(profile.address)
@@ -92,6 +95,7 @@ class UserPreferences @Inject constructor(
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val ADDRESS_KEY = stringPreferencesKey("address")
+        private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
         private val THEME_KEY = intPreferencesKey("theme_mode")
     }
 }

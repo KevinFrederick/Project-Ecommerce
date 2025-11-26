@@ -13,5 +13,6 @@ interface IAuthenticationRepository {
     fun login(loginRequest: LoginRequest): Flow<Resource<Boolean>>
     fun isUserLoggedIn(): Boolean
     fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>>
+    suspend fun changePassword(currentPass: String, newPass: String): Resource<Unit>
     suspend fun logout()
 }

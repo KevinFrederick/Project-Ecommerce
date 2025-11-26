@@ -13,4 +13,5 @@ object Constants {
     const val FIELD_PHOTO_URL = "photoUrl"
     const val FIELD_ADDRESS = "address"
     const val FIELD_QUANTITY = "quantity"
+    const val FIELD_IS_GOOGLE_ACCOUNT = "isGoogleAccount"
 }
