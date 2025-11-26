@@ -188,4 +188,10 @@
     <string name="success_reset_email_sent">Reset link sent! Check your email</string>
     <string name="success_copy_clipboard">Copied to clipboard</string>
     <string name="success_voucher_applied">Voucher Successfully Applied</string>
+
+    <!-- Theme Mode -->
+    <string name="theme_choose_theme">Choose Theme</string>
+    <string name="theme_dark_mode">Dark Mode</string>
+    <string name="theme_light_mode">Light Mode</string>
+    <string name="theme_follow_system">Follow System</string>
 </resources>

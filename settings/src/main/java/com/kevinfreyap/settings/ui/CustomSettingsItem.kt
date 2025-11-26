@@ -60,6 +60,7 @@ class CustomSettingsItem @JvmOverloads constructor(
     }
 
     fun setDescriptionText(text: String) {
+        binding.tvSettingsDesc.isVisible = true
         binding.tvSettingsDesc.text = text
     }
 

@@ -1,11 +1,13 @@
 package com.kevinfreyap.core.data.source.local
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.gson.Gson
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
@@ -13,7 +15,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserPreferences @Inject constructor(private val dataStore: DataStore<Preferences>) {
+class UserPreferences @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) {
+
+    val themeMode: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[THEME_KEY] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    }
+
+    suspend fun saveTheme(mode: Int) {
+        dataStore.edit { preferences ->
+            preferences[THEME_KEY] = mode
+        }
+    }
 
     fun getAuthToken(): Flow<String?> {
         return dataStore.data.map { preferences ->
@@ -61,7 +75,13 @@ class UserPreferences @Inject constructor(private val dataStore: DataStore<Prefe
 
     suspend fun clearSession() {
         dataStore.edit { preferences ->
+            val currentTheme = preferences[THEME_KEY]
+
             preferences.clear()
+
+            if (currentTheme != null) {
+                preferences[THEME_KEY] = currentTheme
+            }
         }
     }
 
@@ -72,5 +92,6 @@ class UserPreferences @Inject constructor(private val dataStore: DataStore<Prefe
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val ADDRESS_KEY = stringPreferencesKey("address")
+        private val THEME_KEY = intPreferencesKey("theme_mode")
     }
 }

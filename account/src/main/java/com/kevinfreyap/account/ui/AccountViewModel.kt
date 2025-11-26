@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
+import com.kevinfreyap.core.domain.usecase.user.UserUseCase
 import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +18,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     voucherUseCase: VoucherUseCase,
-    private val authUseCase: AuthUseCase
+    private val userUseCase: UserUseCase
 ) : ViewModel() {
 
-    val userProfile: StateFlow<Resource<UserProfile>> = authUseCase.getUserProfile()
+    val userProfile: StateFlow<Resource<UserProfile>> = userUseCase.getUserProfile()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -44,7 +44,7 @@ class AccountViewModel @Inject constructor(
 
     fun  refreshProfileData() {
         viewModelScope.launch {
-            authUseCase.refreshUserProfile()
+            userUseCase.refreshUserProfile()
         }
     }
 
@@ -55,7 +55,7 @@ class AccountViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            authUseCase.updateUserName(newName).collect { result ->
+            userUseCase.updateUserName(newName).collect { result ->
                 _updateState.value = result
             }
         }
@@ -85,7 +85,7 @@ class AccountViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            authUseCase.updateAddress(newAddress).collect { result ->
+            userUseCase.updateAddress(newAddress).collect { result ->
                 _updateState.value = result
             }
         }

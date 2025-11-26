@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+    api(libs.androidx.appcompat)
 
     implementation(libs.kotlinx.coroutines.playServices)
     implementation(libs.firebase.auth)

@@ -9,10 +9,10 @@ import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.cart.CartSummary
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.voucher.Voucher
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.cart.CalculateSummaryService
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
 import com.kevinfreyap.core.domain.usecase.order.OrderUseCase
+import com.kevinfreyap.core.domain.usecase.user.UserUseCase
 import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-    authUseCase: AuthUseCase,
+    userUseCase: UserUseCase,
     private val cartUseCase: CartUseCase,
     private val calculateSummaryService: CalculateSummaryService,
     private val orderUseCase: OrderUseCase,
@@ -36,7 +36,7 @@ class CheckoutViewModel @Inject constructor(
     private val _orderState = MutableStateFlow<OrderState>(OrderState.Idle)
     val orderState: StateFlow<OrderState> = _orderState
 
-    val userAddress: StateFlow<UserAddress?> = authUseCase.getUserProfile()
+    val userAddress: StateFlow<UserAddress?> = userUseCase.getUserProfile()
         .map { resource ->
             if (resource is Resource.Success) {
                 resource.data.address
