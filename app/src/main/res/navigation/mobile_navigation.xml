@@ -37,6 +37,10 @@
         android:id="@+id/nav_voucher"
         app:graph="@navigation/nav_voucher"/>
 
+    <include
+        android:id="@+id/nav_settings"
+        app:graph="@navigation/nav_settings"/>
+
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.kevinfreyap.ecommerce.ui.home.HomeFragment"

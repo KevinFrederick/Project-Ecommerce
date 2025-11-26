@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingVertical="32dp"
+    tools:context=".ui.SettingsFragment">
+
+    <TextView
+        android:id="@+id/tv_general_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/general_settings"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.kevinfreyap.settings.ui.CustomSettingsItem
+        android:id="@+id/settings_theme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:settingTitle="@string/theme"
+        app:settingIcon="@drawable/ic_light_mode_24"
+        app:layout_constraintTop_toBottomOf="@id/tv_general_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:descriptionText="Light Mode"/>
+
+    <com.kevinfreyap.settings.ui.CustomSettingsItem
+        android:id="@+id/settings_notification"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:chevronVisible="true"
+        app:settingTitle="@string/notification"
+        app:settingIcon="@drawable/ic_notifications_24"
+        app:layout_constraintTop_toBottomOf="@id/settings_theme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_account_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/account_settings"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+        app:layout_constraintTop_toBottomOf="@id/settings_notification"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.kevinfreyap.settings.ui.CustomSettingsItem
+        android:id="@+id/settings_change_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:chevronVisible="true"
+        app:settingIcon="@drawable/ic_password_24"
+        app:settingTitle="@string/change_password"
+        app:layout_constraintTop_toBottomOf="@id/tv_account_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.kevinfreyap.settings.ui.CustomSettingsItem
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:chevronVisible="true"
+        app:settingIcon="@drawable/ic_delete_24"
+        app:settingTitle="@string/delete_account"
+        app:layout_constraintTop_toBottomOf="@id/settings_change_password"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_logout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="32dp"
+        android:paddingVertical="14dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+        android:text="@string/sign_out"
+        app:layout_constraintVertical_weight="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

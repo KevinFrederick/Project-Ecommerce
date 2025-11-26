@@ -1,25 +1,21 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hiltAndroid)
-    alias(libs.plugins.google.gms.google.services)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
-    namespace = "com.kevinfreyap.ecommerce"
+    namespace = "com.kevinfreyap.settings"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kevinfreyap.ecommerce"
         minSdk = 25
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -34,12 +30,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
     }
-
     buildFeatures {
         viewBinding = true
-        buildConfig = true
     }
 }
 
@@ -52,21 +45,9 @@ kotlin {
 dependencies {
     implementation(project(":core"))
     implementation(project(":shared-ui"))
-    implementation(project(":auth"))
-    implementation(project(":account"))
-    implementation(project(":detail"))
-    implementation(project(":cart"))
-    implementation(project(":checkout"))
-    implementation(project(":transaction"))
-    implementation(project(":wishlist"))
-    implementation(project(":search"))
-    implementation(project(":voucher"))
-    implementation(project(":settings"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

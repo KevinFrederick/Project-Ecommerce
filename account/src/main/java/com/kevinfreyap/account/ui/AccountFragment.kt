@@ -31,7 +31,6 @@ import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.IS_PR
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
-import com.kevinfreyap.core.utils.GoogleAuthHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -47,8 +46,6 @@ class AccountFragment : Fragment() {
     private var userName: String? = null
     private var userAddress: UserAddress? = null
 
-    private lateinit var googleAuthHelper: GoogleAuthHelper
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +59,6 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeUserProfile()
-        googleAuthHelper = GoogleAuthHelper(requireActivity())
 
         binding.btnWishlist.setOnClickListener {
             val uri = "app://ecommerce/wishlist".toUri()
@@ -71,6 +67,11 @@ class AccountFragment : Fragment() {
 
         binding.btnVoucher.setOnClickListener {
             val uri = "app://ecommerce/voucher".toUri()
+            findNavController().navigate(uri)
+        }
+
+        binding.btnSettings.setOnClickListener {
+            val uri = "app://ecommerce/settings".toUri()
             findNavController().navigate(uri)
         }
 
@@ -106,13 +107,6 @@ class AccountFragment : Fragment() {
             val isSuccess = result.getBoolean(IS_ADDRESS_UPDATE_SUCCESS)
             if (isSuccess) {
                 showSnackBar(getString(sharedR.string.success_update_address))
-            }
-        }
-
-        binding.btnLogout.setOnClickListener {
-            viewModel.logout()
-            viewLifecycleOwner.lifecycleScope.launch {
-                googleAuthHelper.signOut()
             }
         }
     }

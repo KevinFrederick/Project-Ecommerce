@@ -35,6 +35,8 @@
     <string name="price_range">Price Range</string>
     <string name="reset_password">Reset Password</string>
     <string name="new_item">New</string>
+    <string name="general_settings">General</string>
+    <string name="account_settings">Account</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -42,13 +44,16 @@
     <string name="image_cod_payment">Cash On Delivery Payment</string>
     <string name="image_card_payment">Card Payment</string>
     <string name="image_voucher">Voucher</string>
-    <string name="image_chevron_right">Go to detail</string>
     <string name="text_unknown_name">Add Name</string>
     <string name="text_no_address">No Shipping Address Saved</string>
     <string name="text_seller_display_name">Seller Name</string>
     <string name="text_seller_username">\@SellerUsername</string>
     <string name="text_default_email">Example@email.com</string>
+
+    <!-- Content Description -->
+    <string name="image_chevron_right">Go to detail</string>
     <string name="percentage">Percentage</string>
+    <string name="setting_icon">Settings Icon</string>
 
     <!-- String Format -->
     <string name="currency_dollar">$%1$d</string>
@@ -115,6 +120,9 @@
     <string name="send_link">Send Link</string>
     <string name="vouchers">Vouchers</string>
     <string name="my_vouchers">My Vouchers</string>
+    <string name="theme">Theme</string>
+    <string name="change_password">Change Password</string>
+    <string name="delete_account">Delete Account</string>
 
     <!-- Description -->
     <string name="login_description">Please enter your details.</string>

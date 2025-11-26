@@ -1,6 +1,5 @@
 package com.kevinfreyap.account.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
@@ -14,13 +13,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase,
-    private val voucherUseCase: VoucherUseCase
+    voucherUseCase: VoucherUseCase,
+    private val authUseCase: AuthUseCase
 ) : ViewModel() {
 
     val userProfile: StateFlow<Resource<UserProfile>> = authUseCase.getUserProfile()
@@ -95,17 +93,5 @@ class AccountViewModel @Inject constructor(
 
     fun resetUpdateState() {
         _updateState.value = null
-    }
-
-    fun logout() {
-        viewModelScope.launch {
-            try {
-                authUseCase.logout()
-            } catch (e: IOException) {
-                Log.e("AccountViewModel", "Failed to clear auth token", e)
-            } catch (e: Exception) {
-                Log.e("AccountViewModel", "Logout Failed", e)
-            }
-        }
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomSettingsItem">
+        <attr name="settingTitle" format="string" />
+        <attr name="settingIcon" format="reference" />
+        <attr name="chevronVisible" format="boolean" />
+        <attr name="descriptionText" format="string" />
+    </declare-styleable>
+</resources>
