@@ -48,36 +48,6 @@ class AuthInteractor @Inject constructor (
         }
     }
 
-    override suspend fun logout() {
-        coroutineScope {
-            val jobs = listOf(
-                async { runCatching { cartRepository.clearCart() } },
-                async { runCatching { wishlistRepository.clearWishlist() } },
-                async { runCatching { transactionRepository.clearOrderHistory() } },
-                async { runCatching { voucherRepository.clearVouchers() } }
-            )
-            jobs.awaitAll()
-
-            authenticationRepository.logout()
-        }
-    }
-
-    override suspend fun syncUserData() {
-        coroutineScope {
-            voucherRepository.listenToPublicVouchers()
-
-            val jobs = listOf(
-                launch { cartRepository.syncCartOnLogin() },
-                launch { voucherRepository.syncVouchers() },
-                launch { transactionRepository.syncTransactionHistoryOnLogin() },
-                launch { wishlistRepository.syncWishlistOnLogin() },
-                launch { userRepository.refreshUserProfile() }
-            )
-
-            jobs.joinAll()
-        }
-    }
-
     override fun isUserLoggedIn(): Boolean = authenticationRepository.isUserLoggedIn()
 
     override fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>> = flow {
@@ -120,5 +90,47 @@ class AuthInteractor @Inject constructor (
         }
 
         return authenticationRepository.changePassword(currentPass, newPass)
+    }
+
+    override suspend fun syncUserData() {
+        coroutineScope {
+            voucherRepository.listenToPublicVouchers()
+
+            val jobs = listOf(
+                launch { cartRepository.syncCartOnLogin() },
+                launch { voucherRepository.syncVouchers() },
+                launch { transactionRepository.syncTransactionHistoryOnLogin() },
+                launch { wishlistRepository.syncWishlistOnLogin() },
+                launch { userRepository.refreshUserProfile() }
+            )
+
+            jobs.joinAll()
+        }
+    }
+
+    override suspend fun logout() {
+        coroutineScope {
+            val jobs = listOf(
+                async { runCatching { cartRepository.clearCart() } },
+                async { runCatching { wishlistRepository.clearWishlist() } },
+                async { runCatching { transactionRepository.clearOrderHistory() } },
+                async { runCatching { voucherRepository.clearVouchers() } }
+            )
+            jobs.awaitAll()
+
+            authenticationRepository.logout()
+        }
+    }
+
+    override suspend fun reAuthAndDeleteWithPassword(password: String): Resource<Unit> {
+        val result = authenticationRepository.reAuthAndDeleteWithPassword(password)
+        if (result is Resource.Success) logout()
+        return result
+    }
+
+    override suspend fun reAuthAndDeleteWithGoogle(idToken: String): Resource<Unit> {
+        val result = authenticationRepository.reAuthAndDeleteWithGoogle(idToken)
+        if (result is Resource.Success) logout()
+        return result
     }
 }

@@ -45,6 +45,9 @@ class SettingsViewModel @Inject constructor(
     private val _updateState = MutableStateFlow<Resource<Unit>?>(null)
     val updateState: StateFlow<Resource<Unit>?> = _updateState
 
+    private val _deleteState = MutableStateFlow<Resource<Unit>?>(null)
+    val deleteState: StateFlow<Resource<Unit>?> = _deleteState
+
     fun setTheme(mode: Int) {
         viewModelScope.launch {
             userUseCase.saveTheme(mode)
@@ -81,6 +84,28 @@ class SettingsViewModel @Inject constructor(
                 Log.e("AccountViewModel", "Failed to clear auth token", e)
             } catch (e: Exception) {
                 Log.e("AccountViewModel", "Logout Failed", e)
+            }
+        }
+    }
+
+    fun onDeleteAccountWithPassword(password: String) {
+        viewModelScope.launch {
+            _deleteState.value = Resource.Loading()
+            val result = authUseCase.reAuthAndDeleteWithPassword(password)
+            _deleteState.value = result
+            if (result is Resource.Success) {
+                _navEvent.send(true)
+            }
+        }
+    }
+
+    fun onDeleteAccountWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _deleteState.value = Resource.Loading()
+            val result = authUseCase.reAuthAndDeleteWithGoogle(idToken)
+            _deleteState.value = result
+            if (result is Resource.Success) {
+                _navEvent.send(true)
             }
         }
     }

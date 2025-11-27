@@ -15,4 +15,6 @@ interface IAuthenticationRepository {
     fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>>
     suspend fun changePassword(currentPass: String, newPass: String): Resource<Unit>
     suspend fun logout()
+    suspend fun reAuthAndDeleteWithPassword(password: String): Resource<Unit>
+    suspend fun reAuthAndDeleteWithGoogle(idToken: String): Resource<Unit>
 }

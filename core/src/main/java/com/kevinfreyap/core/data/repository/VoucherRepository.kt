@@ -82,7 +82,8 @@ class VoucherRepository @Inject constructor(
     }
 
     override fun getNewVoucherCount(): Flow<Int> {
-        return voucherDao.getNewVoucherCount().flowOn(Dispatchers.IO)
+        val currentTime = System.currentTimeMillis()
+        return voucherDao.getNewVoucherCount(currentTime).flowOn(Dispatchers.IO)
     }
 
     override fun listenToPublicVouchers() {

@@ -1,11 +1,13 @@
 package com.kevinfreyap.core.data.repository
 
 import android.util.Log
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.core.data.Resource
@@ -181,15 +183,6 @@ class AuthenticationRepository @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun logout() {
-        firebaseAuth.signOut()
-        userPreferences.clearSession()
-    }
-
-    override fun isUserLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
-    }
-
     override fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
         try {
@@ -221,6 +214,40 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
+    override suspend fun logout() {
+        firebaseAuth.signOut()
+        userPreferences.clearSession()
+    }
+
+    override suspend fun reAuthAndDeleteWithPassword(password: String): Resource<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: return Resource.Error("ERROR_USER_NOT_FOUND")
+            val email = user.email ?: return Resource.Error("ERROR_EMAIL_NOT_FOUND")
+
+            val credential = EmailAuthProvider.getCredential(email, password)
+
+            performDelete(user, credential)
+        } catch (e: kotlin.Exception) {
+            Resource.Error(e.message ?: "Failed to delete")
+        }
+    }
+
+    override suspend fun reAuthAndDeleteWithGoogle(idToken: String): Resource<Unit> {
+        return try {
+            val user = firebaseAuth.currentUser ?: return Resource.Error("ERROR_USER_NOT_FOUND")
+
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+            performDelete(user, credential)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Failed to delete")
+        }
+    }
+
+    override fun isUserLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
+    }
+
     private suspend fun saveUserInfo(userId: String, email: String?) {
         val userData = mapOf(
             FIELD_ID to userId,
@@ -230,5 +257,19 @@ class AuthenticationRepository @Inject constructor(
             .document(userId)
             .set(userData)
             .await()
+    }
+
+    private suspend fun performDelete(user: FirebaseUser, credential: AuthCredential): Resource<Unit> {
+        val uid = user.uid
+
+        user.reauthenticate(credential).await()
+
+        firebaseFirestore.collection(USER_COLLECTION)
+            .document(uid)
+            .delete()
+            .await()
+
+        user.delete().await()
+        return Resource.Success(Unit)
     }
 }

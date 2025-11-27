@@ -1,7 +1,6 @@
 package com.kevinfreyap.settings.dialog
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import androidx.fragment.app.setFragmentResult
 import com.kevinfreyap.settings.R
 import com.kevinfreyap.settings.databinding.DialogThemeBinding
 import androidx.core.graphics.drawable.toDrawable
+import com.kevinfreyap.settings.ui.SettingsFragment.Companion.THEME_REQ
 
 class ThemeDialog : DialogFragment() {
     private var _binding: DialogThemeBinding? = null
@@ -67,7 +67,6 @@ class ThemeDialog : DialogFragment() {
 
     companion object {
         const val THEME_DIALOG_TAG = "theme_dialog"
-        const val THEME_REQ = "theme_req"
         const val THEME_KEY = "theme_mode_key"
     }
 }

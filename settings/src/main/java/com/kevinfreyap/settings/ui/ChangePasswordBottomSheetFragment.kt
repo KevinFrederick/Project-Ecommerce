@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.settings.databinding.BottomSheetFragmentChangePasswordBinding
+import com.kevinfreyap.settings.ui.SettingsFragment.Companion.CHANGE_PASSWORD_REQ
 import com.kevinfreyap.shared_ui.R
 import kotlinx.coroutines.launch
 
@@ -89,7 +90,6 @@ class ChangePasswordBottomSheetFragment : BottomSheetDialogFragment() {
 
     companion object {
         const val CHANGE_PASSWORD_BOTTOM_SHEET = "change_password_bottom_sheet"
-        const val CHANGE_PASSWORD_REQ = "change_password_req"
         const val IS_SUCCESS = "is_success"
     }
 }

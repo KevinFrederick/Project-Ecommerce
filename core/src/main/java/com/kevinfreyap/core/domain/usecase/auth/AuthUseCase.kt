@@ -14,4 +14,6 @@ interface AuthUseCase {
     suspend fun updatePassword(currentPass: String, newPass: String, confirmPass: String): Resource<Unit>
     suspend fun syncUserData()
     suspend fun logout()
+    suspend fun reAuthAndDeleteWithPassword(password: String): Resource<Unit>
+    suspend fun reAuthAndDeleteWithGoogle(idToken: String): Resource<Unit>
 }

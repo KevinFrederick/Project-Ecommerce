@@ -4,13 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingVertical="32dp"
+    android:paddingBottom="32dp"
     tools:context=".ui.SettingsFragment">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:indeterminate="true"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_general_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:layout_marginHorizontal="16dp"
         android:text="@string/general_settings"
         android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
@@ -64,6 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.kevinfreyap.settings.ui.CustomSettingsItem
+        android:id="@+id/settings_delete_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:chevronVisible="true"
