@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.user.UserUseCase
@@ -39,6 +40,13 @@ class SettingsViewModel @Inject constructor(
             initialValue = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         )
 
+    val notificationSettings = userUseCase.getNotificationSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NotificationPreferences()
+        )
+
     private val _navEvent = Channel<Boolean>()
     val navEvent = _navEvent.receiveAsFlow()
 
@@ -52,6 +60,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userUseCase.saveTheme(mode)
             AppCompatDelegate.setDefaultNightMode(mode)
+        }
+    }
+
+    fun updateNotificationPreferences(isSystem: Boolean, isEnabled: Boolean) {
+        viewModelScope.launch {
+            userUseCase.updateNotificationSetting(isSystem, isEnabled)
         }
     }
 

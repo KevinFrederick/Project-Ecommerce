@@ -24,6 +24,9 @@ interface WishlistDao {
     @Query("UPDATE watchlist SET isAvailable = :available WHERE productId = :id")
     suspend fun updateAvailability(id: String, available: Boolean)
 
+    @Query("UPDATE watchlist SET isNotified = :isNotified WHERE productId = :id")
+    suspend fun updateNotificationStatus(id: String, isNotified: Boolean)
+
     @Query("SELECT * FROM watchlist")
     suspend fun getAllSync(): List<WishlistEntity>
 

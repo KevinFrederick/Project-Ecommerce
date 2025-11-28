@@ -1,6 +1,7 @@
 package com.kevinfreyap.core.domain.usecase.user
 
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IUserRepository
@@ -68,7 +69,16 @@ class UserInteractor @Inject constructor(
 
     override fun getTheme(): Flow<Int> = userRepository.getTheme()
 
+    override fun getNotificationSettings(): Flow<NotificationPreferences> = userRepository.getNotificationSettings()
+
     override suspend fun refreshUserProfile() = userRepository.refreshUserProfile()
 
     override suspend fun saveTheme(mode: Int) = userRepository.saveTheme(mode)
+
+    override suspend fun updateNotificationSetting(
+        isSystem: Boolean,
+        isEnabled: Boolean
+    ) {
+        return userRepository.updateNotificationSetting(isSystem, isEnabled)
+    }
 }

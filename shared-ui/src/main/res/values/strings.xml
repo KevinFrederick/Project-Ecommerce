@@ -37,6 +37,9 @@
     <string name="new_item">New</string>
     <string name="general_settings">General</string>
     <string name="account_settings">Account</string>
+    <string name="notification_preferences">Notification Preferences</string>
+    <string name="system_notification">System Notification</string>
+    <string name="promotion_notification">Promotion Notification</string>
 
     <!-- Placeholder -->
     <string name="image_product">Product Image</string>
@@ -147,6 +150,7 @@
     <string name="sign_out_description">Are you sure you want to sign out of the app?</string>
     <string name="delete_account_description">This action is permanent. Data cannot be recovered.</string>
     <string name="re_auth_password">Enter your password to authenticate</string>
+    <string name="notification_preferences_description">Choose which notification you want to get</string>
 
     <!-- Error Message -->
     <string name="error_user_not_found">Please Login first</string>
@@ -189,6 +193,7 @@
     <string name="error_new_pass_same">New password cannot be the same as the old one</string>
     <string name="error_current_password_wrong">Current password wrong. Try again</string>
     <string name="error_verification_failed">Verification Failed</string>
+    <string name="error_notification_permission_denied">"Notifications blocked. Please enable in Settings."</string>
 
     <!-- Success Message -->
     <string name="success_register">Registration Successful!</string>

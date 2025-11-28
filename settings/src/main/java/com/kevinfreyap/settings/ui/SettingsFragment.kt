@@ -20,6 +20,8 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.utils.GoogleAuthHelper
 import com.kevinfreyap.core.utils.isDarkThemeOn
 import com.kevinfreyap.settings.databinding.FragmentSettingsBinding
+import com.kevinfreyap.settings.dialog.NotificationDialog
+import com.kevinfreyap.settings.dialog.NotificationDialog.Companion.NOTIFICATION_DIALOG_TAG
 import com.kevinfreyap.settings.dialog.ReAuthDialog
 import com.kevinfreyap.settings.dialog.ReAuthDialog.Companion.KEY_PASSWORD
 import com.kevinfreyap.settings.dialog.ReAuthDialog.Companion.RE_AUTH_REQ
@@ -100,6 +102,11 @@ class SettingsFragment : Fragment() {
 
             themeDialog.arguments = currentMode
             themeDialog.show(childFragmentManager, THEME_DIALOG_TAG)
+        }
+
+        binding.settingsNotification.setOnClickListener {
+            val notificationDialog = NotificationDialog()
+            notificationDialog.show(childFragmentManager, NOTIFICATION_DIALOG_TAG)
         }
 
         binding.settingsChangePassword.setOnClickListener {

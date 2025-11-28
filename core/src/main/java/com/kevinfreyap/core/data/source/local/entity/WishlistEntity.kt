@@ -12,5 +12,6 @@ data class WishlistEntity(
     val productName: String,
     val productPrice: Int,
     val productImage: String,
-    val isAvailable: Boolean = true
+    val isAvailable: Boolean = true,
+    val isNotified: Boolean = false
 )

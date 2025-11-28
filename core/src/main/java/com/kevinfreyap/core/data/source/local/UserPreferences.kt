@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.gson.Gson
+import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import javax.inject.Inject
@@ -56,6 +57,15 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    fun getNotificationSettings(): Flow<NotificationPreferences> {
+        return dataStore.data.map { preferences ->
+            NotificationPreferences(
+                system = preferences[NOTIF_SYSTEM_KEY] ?: true,
+                promotions = preferences[NOTIF_PROMOTION_KEY] ?: true
+            )
+        }
+    }
+
     suspend fun saveAuthToken(token: String) {
         dataStore.edit { preferences ->
             preferences[AUTH_TOKEN_KEY] = token
@@ -73,6 +83,13 @@ class UserPreferences @Inject constructor(
             if (profile.address != null){
                 preferences[ADDRESS_KEY] = Gson().toJson(profile.address)
             }
+        }
+    }
+
+    suspend fun saveNotificationSettings(isSystem: Boolean, isEnabled: Boolean) {
+        val key = if (isSystem) NOTIF_SYSTEM_KEY else NOTIF_PROMOTION_KEY
+        dataStore.edit { preferences ->
+            preferences[key] = isEnabled
         }
     }
 
@@ -97,5 +114,7 @@ class UserPreferences @Inject constructor(
         private val ADDRESS_KEY = stringPreferencesKey("address")
         private val IS_GOOGLE_KEY = booleanPreferencesKey("is_google")
         private val THEME_KEY = intPreferencesKey("theme_mode")
+        private val NOTIF_SYSTEM_KEY = booleanPreferencesKey("notif_system")
+        private val NOTIF_PROMOTION_KEY = booleanPreferencesKey("notif_promo")
     }
 }

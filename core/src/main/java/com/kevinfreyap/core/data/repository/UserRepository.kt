@@ -6,6 +6,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
+import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.repository.IUserRepository
@@ -110,6 +111,10 @@ class UserRepository @Inject constructor(
 
     override fun getTheme(): Flow<Int> = userPreferences.themeMode
 
+    override fun getNotificationSettings(): Flow<NotificationPreferences> {
+        return userPreferences.getNotificationSettings()
+    }
+
     override suspend fun refreshUserProfile() {
         val uid = firebaseAuth.currentUser?.uid ?: return
 
@@ -131,5 +136,24 @@ class UserRepository @Inject constructor(
 
     override suspend fun saveTheme(mode: Int) {
         userPreferences.saveTheme(mode)
+    }
+
+    override suspend fun updateNotificationSetting(
+        isSystem: Boolean,
+        isEnabled: Boolean
+    ) {
+        userPreferences.saveNotificationSettings(isSystem = isSystem, isEnabled = isEnabled)
+
+        val field = if (isSystem) "settings.notification.system" else "settings.notification.promotion"
+        val uid = firebaseAuth.currentUser?.uid ?: return
+
+        try {
+            firebaseFirestore.collection(USER_COLLECTION)
+                .document(uid)
+                .update(field, isEnabled)
+                .await()
+        } catch (e: kotlin.Exception) {
+            Log.e("UserRepo", "Failed to sync notification setting", e)
+        }
     }
 }

@@ -5,17 +5,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
 import com.kevinfreyap.core.data.source.local.room.TransactionDao
 import com.kevinfreyap.core.domain.model.order.OrderReceipt
 import com.kevinfreyap.core.domain.model.order.OrderStatus
 import com.kevinfreyap.core.domain.repository.ITransactionRepository
+import com.kevinfreyap.core.domain.services.INotificationService
 import com.kevinfreyap.core.utils.Constants.TRANSACTION_SUB_COLLECTION
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import com.kevinfreyap.core.utils.DataMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -27,7 +30,9 @@ import javax.inject.Singleton
 class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao,
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val notificationService: INotificationService,
+    private val userPreferences: UserPreferences
 ): ITransactionRepository {
     override suspend fun saveOrder(receipt: OrderReceipt) {
         val entity = DataMapper.mapOrderDomainToEntity(receipt)
@@ -115,19 +120,33 @@ class TransactionRepository @Inject constructor(
         val currentTime = System.currentTimeMillis()
         val updates = ArrayList<TransactionEntity>()
 
+        val settings = userPreferences.getNotificationSettings().first()
+        val areSystemNotificationEnabled = settings.system
+
         val processingOrders = transactionDao.getOrdersByStatus(OrderStatus.PROCESSING)
 
         processingOrders.forEach { order ->
             val timeDiff = currentTime - order.datePlaced
 
             if (timeDiff >= DELIVERY_TIME_MS) {
-                val updateOrderStatus = order.copy(orderStatus = OrderStatus.DELIVERED)
+                val newStatus = OrderStatus.DELIVERED
+                val updateOrderStatus = order.copy(orderStatus = newStatus)
                 updates.add(updateOrderStatus)
-                updateFirestoreStatus(order.transactionId, OrderStatus.DELIVERED)
+                updateFirestoreStatus(order.transactionId, newStatus)
+
+                if (areSystemNotificationEnabled) {
+                    triggerStatusNotification(order.transactionId, newStatus)
+                }
             } else if (timeDiff >= SHIPPED_TIME_MS) {
-                val updateOrderStatus = order.copy(orderStatus = OrderStatus.SHIPPED)
+                val newStatus = OrderStatus.SHIPPED
+
+                val updateOrderStatus = order.copy(orderStatus = newStatus)
                 updates.add(updateOrderStatus)
-                updateFirestoreStatus(order.transactionId, OrderStatus.SHIPPED)
+                updateFirestoreStatus(order.transactionId, newStatus)
+
+                if (areSystemNotificationEnabled) {
+                    triggerStatusNotification(order.transactionId, newStatus)
+                }
             }
         }
 
@@ -135,11 +154,13 @@ class TransactionRepository @Inject constructor(
 
         shippedOrders.forEach { order ->
             val timeDiff = currentTime - order.datePlaced
+            val newStatus = OrderStatus.DELIVERED
 
             if (timeDiff >= DELIVERY_TIME_MS) {
-                val updateOrderStatus = order.copy(orderStatus = OrderStatus.DELIVERED)
+                val updateOrderStatus = order.copy(orderStatus = newStatus)
                 updates.add(updateOrderStatus)
-                updateFirestoreStatus(order.transactionId, OrderStatus.DELIVERED)
+                updateFirestoreStatus(order.transactionId, newStatus)
+                triggerStatusNotification(order.transactionId, newStatus)
             }
         }
 
@@ -162,8 +183,15 @@ class TransactionRepository @Inject constructor(
         }
     }
 
+    private fun triggerStatusNotification(orderId: String, newStatus: OrderStatus) {
+        val title = "Status Updated"
+        val message = "Order #$orderId is now ${newStatus.displayName}!"
+        val type = "TRANSACTION"
+        notificationService.showNotification(title, message, type)
+    }
+
     companion object {
-        private const val SHIPPED_TIME_MS = 1 * 24 * 60 * 60 * 1000L
-        private const val DELIVERY_TIME_MS = 2 * 24 * 60 * 60 * 1000L
+        private const val SHIPPED_TIME_MS = 1 * 12 * 60 * 60 * 1000L
+        private const val DELIVERY_TIME_MS = 2 * 7 * 60 * 60 * 1000L
     }
 }
