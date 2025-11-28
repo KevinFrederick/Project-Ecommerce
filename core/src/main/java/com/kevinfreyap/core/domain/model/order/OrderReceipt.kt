@@ -10,7 +10,7 @@ data class OrderReceipt(
     val subtotal: Int = 0,
     val shippingFee: Int = 0,
     val discountAmount: Int = 0,
-    val orderStatus: String = "",
+    val orderStatus: OrderStatus = OrderStatus.PROCESSING,
     val shippingAddress: UserAddress = UserAddress(),
     val itemsPurchased: List<OrderItem> = emptyList(),
     val paymentMethod: PaymentMethod = PaymentMethod.CASH

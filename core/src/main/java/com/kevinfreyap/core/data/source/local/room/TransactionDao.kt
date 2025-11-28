@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.kevinfreyap.core.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.core.domain.model.order.OrderStatus
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,6 +18,9 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transaction_history WHERE transactionId = :id LIMIT 1")
     fun getTransactionById(id: String): Flow<TransactionEntity>
+
+    @Query("SELECT * FROM transaction_history WHERE orderStatus = :status")
+    suspend fun getOrdersByStatus(status: OrderStatus): List<TransactionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(orders: List<TransactionEntity>)

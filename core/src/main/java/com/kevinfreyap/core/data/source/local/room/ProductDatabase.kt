@@ -3,6 +3,7 @@ package com.kevinfreyap.core.data.source.local.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.kevinfreyap.core.data.source.local.converters.OrderTypeConverters
 import com.kevinfreyap.core.data.source.local.converters.PaymentMethodConverters
 import com.kevinfreyap.core.data.source.local.converters.ProductConverters
 import com.kevinfreyap.core.data.source.local.converters.TransactionTypeConverters
@@ -30,7 +31,8 @@ import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 @TypeConverters(
     ProductConverters::class,
     TransactionTypeConverters::class,
-    PaymentMethodConverters::class
+    PaymentMethodConverters::class,
+    OrderTypeConverters::class
 )
 abstract class ProductDatabase: RoomDatabase() {
     abstract fun productDao(): ProductDao

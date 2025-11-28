@@ -4,6 +4,7 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.cart.Cart
 import com.kevinfreyap.core.domain.model.order.OrderItem
 import com.kevinfreyap.core.domain.model.order.OrderReceipt
+import com.kevinfreyap.core.domain.model.order.OrderStatus
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.voucher.Voucher
 import com.kevinfreyap.core.domain.repository.IOrderRepository
@@ -62,7 +63,7 @@ class OrderRepository @Inject constructor(
             subtotal = summary.subtotal,
             shippingFee = summary.shippingFee,
             discountAmount = summary.voucherDiscount,
-            orderStatus = "Processing",
+            orderStatus = OrderStatus.PROCESSING,
             shippingAddress = address,
             itemsPurchased = itemsPurchased,
             paymentMethod = payment
