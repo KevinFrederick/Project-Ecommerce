@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
 import com.kevinfreyap.wishlist.databinding.ItemWishlistBinding
 import com.kevinfreyap.wishlist.viewholder.WishlistViewHolder
 
 class WishlistAdapter(
     private val onItemClick: (productId: String) -> Unit,
     private val onWishlistClick: (productId: String) -> Unit
-): ListAdapter<Product, WishlistViewHolder>(WISHLIST_DIFF_CALLBACK) {
+): ListAdapter<WishlistItem, WishlistViewHolder>(WISHLIST_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -24,24 +24,24 @@ class WishlistAdapter(
         holder: WishlistViewHolder,
         position: Int
     ) {
-        val product = getItem(position)
-        if (product != null) {
-            holder.bind(product, onItemClick, onWishlistClick)
+        val wishlistItem = getItem(position)
+        if (wishlistItem != null) {
+            holder.bind(wishlistItem, onItemClick, onWishlistClick)
         }
     }
 
     companion object {
-        val WISHLIST_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Product>() {
+        val WISHLIST_DIFF_CALLBACK = object : DiffUtil.ItemCallback<WishlistItem>() {
             override fun areItemsTheSame(
-                oldItem: Product,
-                newItem: Product
+                oldItem: WishlistItem,
+                newItem: WishlistItem
             ): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.productId == newItem.productId
             }
 
             override fun areContentsTheSame(
-                oldItem: Product,
-                newItem: Product
+                oldItem: WishlistItem,
+                newItem: WishlistItem
             ): Boolean {
                 return oldItem == newItem
             }

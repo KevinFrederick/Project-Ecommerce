@@ -16,6 +16,7 @@ import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.product.ProductCategory
 import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.core.domain.model.voucher.Voucher
+import com.kevinfreyap.core.domain.model.wishlist.FirestoreWishlistItem
 import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
 
 object DataMapper {
@@ -142,7 +143,12 @@ object DataMapper {
     fun mapWishlistEntityToDomain(entity: WishlistEntity): WishlistItem {
         return WishlistItem(
             productId = entity.productId,
-            dateAdded = entity.dateAdded
+            dateAdded = entity.dateAdded,
+            productCategory = entity.productCategory,
+            productName = entity.productName,
+            productPrice = entity.productPrice,
+            productImage = entity.productImage,
+            isAvailable = entity.isAvailable,
         )
     }
 
@@ -152,15 +158,20 @@ object DataMapper {
         }
     }
 
-    fun mapWishlistDomainToEntity(domain: WishlistItem): WishlistEntity {
+    fun mapFirestoreWishlistToEntity(firestore: FirestoreWishlistItem): WishlistEntity {
         return WishlistEntity(
-            productId = domain.productId,
-            dateAdded = domain.dateAdded
+            productId = firestore.productId,
+            dateAdded = firestore.dateAdded,
+            productName = firestore.productName,
+            productPrice = firestore.productPrice,
+            productImage = firestore.productImage,
+            productCategory = firestore.productCategory,
+            isAvailable = true,
         )
     }
 
-    fun mapWishlistsDomainToEntity(domains: List<WishlistItem>): List<WishlistEntity> {
-        return domains.map { mapWishlistDomainToEntity(it) }
+    fun mapFirestoreWishlistsToEntity(domains: List<FirestoreWishlistItem>): List<WishlistEntity> {
+        return domains.map { mapFirestoreWishlistToEntity(it) }
     }
 
 

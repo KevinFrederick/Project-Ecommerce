@@ -1,11 +1,10 @@
 package com.kevinfreyap.core.domain.model.wishlist
 
-data class WishlistItem(
+data class FirestoreWishlistItem(
     val productId: String = "",
     val dateAdded: Long = 0,
-    val productCategory: String = "",
     val productName: String = "",
     val productPrice: Int = 0,
     val productImage: String = "",
-    val isAvailable: Boolean = true
+    val productCategory: String = ""
 )

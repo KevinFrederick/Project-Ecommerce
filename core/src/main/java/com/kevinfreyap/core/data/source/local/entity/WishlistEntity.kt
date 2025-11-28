@@ -7,5 +7,10 @@ import androidx.room.PrimaryKey
 data class WishlistEntity(
     @PrimaryKey
     val productId: String,
-    val dateAdded: Long
+    val dateAdded: Long,
+    val productCategory: String,
+    val productName: String,
+    val productPrice: Int,
+    val productImage: String,
+    val isAvailable: Boolean = true
 )

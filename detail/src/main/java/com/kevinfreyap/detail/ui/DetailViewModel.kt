@@ -79,9 +79,12 @@ class DetailViewModel @Inject constructor(
 
     fun addToWishlist() {
         viewModelScope.launch {
-            if (productId != null){
-                wishlistUseCase.addToWishlist(productId).collect { resource ->
-                    _wishlistState.value = resource
+            if (_productState.value is Resource.Success){
+                val product = _productState.value.data
+                if (product != null){
+                    wishlistUseCase.addToWishlist(product).collect { resource ->
+                        _wishlistState.value = resource
+                    }
                 }
             }
         }

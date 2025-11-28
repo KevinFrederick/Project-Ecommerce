@@ -21,6 +21,12 @@ interface WishlistDao {
     @Query("SELECT EXISTS(SELECT 1 FROM watchlist WHERE productId = :id LIMIT 1)")
     fun isProductInWatchlist(id: String): Flow<Boolean>
 
+    @Query("UPDATE watchlist SET isAvailable = :available WHERE productId = :id")
+    suspend fun updateAvailability(id: String, available: Boolean)
+
+    @Query("SELECT * FROM watchlist")
+    suspend fun getAllSync(): List<WishlistEntity>
+
     @Query("DELETE FROM watchlist WHERE productId = :id")
     suspend fun deleteWatchlistById(id: String)
 

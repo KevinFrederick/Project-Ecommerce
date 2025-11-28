@@ -14,7 +14,7 @@ interface VoucherDao {
     @Query("SELECT * FROM voucher ORDER BY isUsed ASC, (expiryDate < :now) ASC, expiryDate ASC")
     fun getAllVouchers(now: Long): Flow<List<VoucherEntity>>
 
-    @Query("SELECT COUNT(*) FROM voucher WHERE isNew = 1 AND isUsed = 0 AND expiryDate < :now")
+    @Query("SELECT COUNT(*) FROM voucher WHERE isNew = 1 AND isUsed = 0 AND expiryDate > :now")
     fun getNewVoucherCount(now: Long): Flow<Int>
 
     // Used to check existence during sync
