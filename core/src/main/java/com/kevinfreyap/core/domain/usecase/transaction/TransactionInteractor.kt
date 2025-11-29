@@ -13,6 +13,8 @@ class TransactionInteractor @Inject constructor(
 
     override fun getTransactionById(transactionId: String): Flow<Resource<OrderReceipt>> = transactionRepository.getTransactionById(transactionId)
 
+    override fun listenToTransactionsUpdate() = transactionRepository.listenToTransactionUpdates()
+
     override suspend fun syncTransactionHistoryOnLogin() = transactionRepository.syncTransactionHistoryOnLogin()
 
     override suspend fun clearOrderHistory() = transactionRepository.clearOrderHistory()

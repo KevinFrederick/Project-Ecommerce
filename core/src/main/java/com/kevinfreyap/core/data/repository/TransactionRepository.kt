@@ -2,7 +2,9 @@ package com.kevinfreyap.core.data.repository
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
@@ -15,6 +17,7 @@ import com.kevinfreyap.core.domain.services.INotificationService
 import com.kevinfreyap.core.utils.Constants.TRANSACTION_SUB_COLLECTION
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import com.kevinfreyap.core.utils.DataMapper
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,6 +38,9 @@ class TransactionRepository @Inject constructor(
     private val notificationService: INotificationService,
     private val userPreferences: UserPreferences
 ): ITransactionRepository {
+
+    private var transactionListener: ListenerRegistration? = null
+
     override suspend fun saveOrder(receipt: OrderReceipt) {
         val entity = DataMapper.mapOrderDomainToEntity(receipt)
 
@@ -84,6 +91,49 @@ class TransactionRepository @Inject constructor(
             }
     }
 
+    override fun listenToTransactionUpdates() {
+        if (transactionListener != null) return
+        val uid = firebaseAuth.currentUser?.uid ?: return
+
+        transactionListener = firestore.collection(USER_COLLECTION)
+            .document(uid)
+            .collection(TRANSACTION_SUB_COLLECTION)
+            .addSnapshotListener { snapshots, error ->
+                if (error != null){
+                    Log.w("TransactionRepository", "Listen failed", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshots != null){
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val settings = userPreferences.getNotificationSettings().first()
+                        val areSystemNotificationEnabled = settings.system
+                        val updates = ArrayList<TransactionEntity>()
+
+                        for (change in snapshots.documentChanges) {
+                            val doc = change.document
+                            val order = doc.toObject(OrderReceipt::class.java)
+                            val entity = DataMapper.mapOrderDomainToEntity(order)
+
+                            updates.add(entity)
+
+                            if (change.type == DocumentChange.Type.MODIFIED) {
+                                Log.d("TransactionRepository", "Modified: ${order.orderStatus}")
+                                if (areSystemNotificationEnabled){
+                                    triggerStatusNotification(order.orderId, order.orderStatus)
+                                }
+                            }
+                        }
+
+                        if (updates.isNotEmpty()) {
+                            transactionDao.insertAll(updates)
+                        }
+                    }
+                }
+            }
+    }
+
     override suspend fun syncTransactionHistoryOnLogin() {
         val currentUserUid = firebaseAuth.currentUser?.uid ?: return
 
@@ -110,6 +160,9 @@ class TransactionRepository @Inject constructor(
 
     override suspend fun clearOrderHistory() {
         try {
+            transactionListener?.remove()
+            transactionListener = null
+
             transactionDao.clearAll()
         } catch (e: Exception) {
             Log.e("TransactionRepository", "Failed to clear history", e)
@@ -118,11 +171,6 @@ class TransactionRepository @Inject constructor(
 
     private suspend fun simulateOrderStatusUpdates() {
         val currentTime = System.currentTimeMillis()
-        val updates = ArrayList<TransactionEntity>()
-
-        val settings = userPreferences.getNotificationSettings().first()
-        val areSystemNotificationEnabled = settings.system
-
         val processingOrders = transactionDao.getOrdersByStatus(OrderStatus.PROCESSING)
 
         processingOrders.forEach { order ->
@@ -130,23 +178,10 @@ class TransactionRepository @Inject constructor(
 
             if (timeDiff >= DELIVERY_TIME_MS) {
                 val newStatus = OrderStatus.DELIVERED
-                val updateOrderStatus = order.copy(orderStatus = newStatus)
-                updates.add(updateOrderStatus)
                 updateFirestoreStatus(order.transactionId, newStatus)
-
-                if (areSystemNotificationEnabled) {
-                    triggerStatusNotification(order.transactionId, newStatus)
-                }
             } else if (timeDiff >= SHIPPED_TIME_MS) {
                 val newStatus = OrderStatus.SHIPPED
-
-                val updateOrderStatus = order.copy(orderStatus = newStatus)
-                updates.add(updateOrderStatus)
                 updateFirestoreStatus(order.transactionId, newStatus)
-
-                if (areSystemNotificationEnabled) {
-                    triggerStatusNotification(order.transactionId, newStatus)
-                }
             }
         }
 
@@ -157,15 +192,8 @@ class TransactionRepository @Inject constructor(
             val newStatus = OrderStatus.DELIVERED
 
             if (timeDiff >= DELIVERY_TIME_MS) {
-                val updateOrderStatus = order.copy(orderStatus = newStatus)
-                updates.add(updateOrderStatus)
                 updateFirestoreStatus(order.transactionId, newStatus)
-                triggerStatusNotification(order.transactionId, newStatus)
             }
-        }
-
-        if (updates.isNotEmpty()) {
-            transactionDao.insertAll(updates)
         }
     }
 
@@ -192,6 +220,6 @@ class TransactionRepository @Inject constructor(
 
     companion object {
         private const val SHIPPED_TIME_MS = 1 * 12 * 60 * 60 * 1000L
-        private const val DELIVERY_TIME_MS = 2 * 7 * 60 * 60 * 1000L
+        private const val DELIVERY_TIME_MS = 2 * 7  * 60 * 1000L
     }
 }

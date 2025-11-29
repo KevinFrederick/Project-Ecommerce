@@ -8,6 +8,7 @@ interface ITransactionRepository {
     suspend fun saveOrder(receipt: OrderReceipt)
     fun getTransactionHistory(): Flow<Resource<List<OrderReceipt>>>
     fun getTransactionById(transactionId: String): Flow<Resource<OrderReceipt>>
+    fun listenToTransactionUpdates()
     suspend fun syncTransactionHistoryOnLogin()
     suspend fun clearOrderHistory()
 }

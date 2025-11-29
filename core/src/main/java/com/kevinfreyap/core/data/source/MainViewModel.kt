@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
+import com.kevinfreyap.core.domain.usecase.transaction.TransactionUseCase
 import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ class MainViewModel @Inject constructor(
     private val connectivityManager: ConnectivityManager,
     voucherUseCase: VoucherUseCase,
     cartUseCase: CartUseCase,
+    transactionUseCase: TransactionUseCase
 ): ViewModel() {
 
     val cartItemCount: StateFlow<Int> = cartUseCase.getCartItemCount()
@@ -50,6 +52,7 @@ class MainViewModel @Inject constructor(
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
 
         voucherUseCase.listenToPublicVouchers()
+        transactionUseCase.listenToTransactionsUpdate()
     }
 
     override fun onCleared() {

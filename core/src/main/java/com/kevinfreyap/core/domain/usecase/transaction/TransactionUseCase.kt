@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionUseCase {
     fun getTransactionHistory(): Flow<Resource<List<OrderReceipt>>>
     fun getTransactionById(transactionId: String): Flow<Resource<OrderReceipt>>
+    fun listenToTransactionsUpdate()
     suspend fun syncTransactionHistoryOnLogin()
     suspend fun clearOrderHistory()
 }
