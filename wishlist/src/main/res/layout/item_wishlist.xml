@@ -20,7 +20,7 @@
             android:text="@string/error_unavailable_product"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
             android:gravity="center"
-            android:background="@color/grey_300"
+            android:background="?attr/colorCustomTextInputLayout"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -1,5 +1,6 @@
 package com.kevinfreyap.shared_ui.ui
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -12,10 +13,16 @@ import com.kevinfreyap.shared_ui.databinding.DialogCustomBinding
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class CustomDialog : DialogFragment() {
     private var _binding: DialogCustomBinding? = null
     private val binding get() = _binding!!
+
+    private var requestKey: String = ""
+    private var isAutoDismiss: Boolean = false
 
     override fun onStart() {
         super.onStart()
@@ -39,7 +46,15 @@ class CustomDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val args = requireArguments()
-        val requestKey = args.getString(ARG_REQ_KEY)!!
+        requestKey = args.getString(ARG_REQ_KEY)!!
+
+        isAutoDismiss = args.getBoolean(ARG_AUTO_DISMISS)
+        if (isAutoDismiss) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(3000)
+                dismiss()
+            }
+        }
 
         binding.tvDialogTitle.text = args.getString(ARG_TITLE)
         binding.tvDialogMessage.text = args.getString(ARG_MESSAGE)
@@ -54,8 +69,10 @@ class CustomDialog : DialogFragment() {
         }
         binding.btnNegative.isVisible = !negativeBtnText.isNullOrBlank()
 
+        val positiveBtnColor = args.getInt(ARG_POS_COLOR)
         val positiveBtn = args.getString(ARG_POS_BTN)
         if (!positiveBtn.isNullOrBlank()) {
+            binding.btnPositive.setBackgroundColor(positiveBtnColor)
             binding.btnPositive.text = positiveBtn
             binding.btnPositive.setOnClickListener {
                 setFragmentResult(requestKey, bundleOf(RESULT_CONFIRMED to true))
@@ -81,13 +98,24 @@ class CustomDialog : DialogFragment() {
         _binding = null
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (isAutoDismiss) {
+            if (requestKey.isNotBlank()){
+                setFragmentResult(requestKey, bundleOf(RESULT_CONFIRMED to true))
+            }
+        }
+    }
+
     companion object {
         const val CUSTOM_DIALOG_TAG = "ConfirmationDialog"
 
+        private const val ARG_AUTO_DISMISS = "auto_dismiss_dialog"
         private const val ARG_TITLE = "title"
         private const val ARG_MESSAGE = "message"
         private const val ARG_POS_BTN = "positive_btn"
         private const val ARG_NEG_BTN = "negative_btn"
+        private const val ARG_POS_COLOR = "pos_btn_color"
         private const val ARG_ICON = "icon"
         private const val ARG_ICON_COLOR = "icon_color"
         private const val ARG_REQ_KEY = "req_key"
@@ -99,19 +127,25 @@ class CustomDialog : DialogFragment() {
             requestKey: String,
             title: String,
             message: String,
+            autoDismissDialog: Boolean = false,
             positiveText: String? = null,
             negativeText: String? = null,
+            positiveBtnColor: Int? = null,
             icon: Int? = null,
             iconColor: Int? = null
         ): CustomDialog {
             return CustomDialog().apply {
                arguments = bundleOf(
                    ARG_REQ_KEY to requestKey,
+                   ARG_AUTO_DISMISS to autoDismissDialog,
                    ARG_TITLE to title,
                    ARG_MESSAGE to message,
                    ARG_POS_BTN to positiveText,
                    ARG_NEG_BTN to negativeText,
                ).apply {
+                   if (positiveBtnColor != null) {
+                       putInt(ARG_POS_COLOR, positiveBtnColor)
+                   }
                    if (icon != null) {
                        putInt(ARG_ICON, icon)
                    }

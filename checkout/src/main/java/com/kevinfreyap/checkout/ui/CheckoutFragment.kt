@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -18,7 +19,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.checkout.databinding.FragmentCheckoutBinding
 import com.kevinfreyap.checkout.utils.OrderState
@@ -26,11 +26,13 @@ import com.kevinfreyap.core.utils.PaymentMethod
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.adapter.CartAdapter
+import com.kevinfreyap.shared_ui.ui.CustomDialog
+import com.kevinfreyap.shared_ui.ui.CustomDialog.Companion.CUSTOM_DIALOG_TAG
+import com.kevinfreyap.shared_ui.ui.CustomDialog.Companion.RESULT_CONFIRMED
 import com.yanzhenjie.recyclerview.SwipeMenuCreator
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import com.yanzhenjie.recyclerview.SwipeRecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -192,6 +194,13 @@ class CheckoutFragment : Fragment() {
         binding.btnOrder.setOnClickListener {
             viewModel.onOrderClicked()
         }
+
+        childFragmentManager.setFragmentResultListener(REQ_ORDER_SUCCESS, viewLifecycleOwner) { _, result ->
+            val isDismiss = result.getBoolean(RESULT_CONFIRMED)
+            if (isDismiss) {
+                navigateToHome()
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -246,26 +255,17 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun showOrderSuccessDialog(orderId: String) {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.success_order_placed))
-            .setMessage(getString(R.string.order_success_desc, orderId))
-            .setCancelable(true) // Allow outside click and back press
-            .create()
+        val iconColor = ContextCompat.getColor(requireContext(), R.color.green_500)
+        val dialog = CustomDialog.newInstance(
+            requestKey = REQ_ORDER_SUCCESS,
+            title = getString(R.string.success_order_placed),
+            message = getString(R.string.order_success_desc, orderId),
+            autoDismissDialog = true,
+            icon = R.drawable.ic_check_circle_outline_24,
+            iconColor = iconColor
+        )
 
-        val job = viewLifecycleOwner.lifecycleScope.launch {
-            delay(2000)
-
-            if (dialog.isShowing) {
-                dialog.dismiss()
-            }
-        }
-
-        dialog.setOnDismissListener {
-            job.cancel()
-            navigateToHome()
-        }
-
-        dialog.show()
+        dialog.show(childFragmentManager, CUSTOM_DIALOG_TAG)
     }
 
     private fun navigateToHome() {
@@ -284,5 +284,9 @@ class CheckoutFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val REQ_ORDER_SUCCESS = "req_order_success"
     }
 }

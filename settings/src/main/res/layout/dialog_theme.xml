@@ -39,7 +39,9 @@
                 android:layoutDirection="rtl"
                 android:textAlignment="textStart"
                 android:text="@string/theme_dark_mode"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"/>
+                android:textColor="?attr/colorOnBackground"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                app:buttonTint="?attr/colorOnBackground"/>
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rb_light_mode"
@@ -50,7 +52,9 @@
                 android:layoutDirection="rtl"
                 android:textAlignment="textStart"
                 android:text="@string/theme_light_mode"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"/>
+                android:textColor="?attr/colorOnBackground"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                app:buttonTint="?attr/colorOnBackground"/>
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rb_system_mode"
@@ -61,7 +65,9 @@
                 android:layoutDirection="rtl"
                 android:textAlignment="textStart"
                 android:text="@string/theme_follow_system"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"/>
+                android:textColor="?attr/colorOnBackground"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                app:buttonTint="?attr/colorOnBackground"/>
 
         </RadioGroup>
 

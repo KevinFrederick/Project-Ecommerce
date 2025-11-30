@@ -27,7 +27,7 @@
                 android:contentDescription="@string/close"
                 android:background="@android:color/transparent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progress_bar"
@@ -119,6 +119,7 @@
                     android:layout_height="match_parent"
                     android:paddingHorizontal="16dp"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium.Emphasized"
                     tools:text="1"/>
 
@@ -141,6 +142,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/add_to_cart"
+        android:textColor="?attr/colorOnPrimary"
+        android:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

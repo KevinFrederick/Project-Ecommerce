@@ -115,29 +115,33 @@ class SettingsFragment : Fragment() {
         }
 
         binding.btnLogout.setOnClickListener {
-            val color = ContextCompat.getColor(requireContext(), R.color.orange_700)
+            val btnColor = ContextCompat.getColor(requireContext(), R.color.red_500)
+            val iconColor = ContextCompat.getColor(requireContext(), R.color.orange_700)
             val signOutDialog = CustomDialog.newInstance(
                 requestKey = SIGN_OUT_REQ,
                 title = getString(R.string.sign_out),
                 message = getString(R.string.sign_out_description),
                 positiveText = getString(R.string.confirm),
                 negativeText = getString(R.string.cancel),
+                positiveBtnColor = btnColor,
                 icon = R.drawable.ic_error_outline_24,
-                iconColor = color
+                iconColor = iconColor
             )
             signOutDialog.show(childFragmentManager, CUSTOM_DIALOG_TAG)
         }
 
         binding.settingsDeleteAccount.setOnClickListener {
-            val color = ContextCompat.getColor(requireContext(), R.color.red_500)
+            val iconColor = ContextCompat.getColor(requireContext(), R.color.red_500)
+            val btnColor = ContextCompat.getColor(requireContext(), R.color.red_500)
             val deleteAccountDialog = CustomDialog.newInstance(
                 requestKey = DELETE_ACCOUNT_WARNING_REQ,
                 title = getString(R.string.delete_account),
                 message = getString(R.string.delete_account_description),
                 positiveText = getString(R.string.delete),
                 negativeText = getString(R.string.cancel),
+                positiveBtnColor = btnColor,
                 icon = R.drawable.ic_error_outline_24,
-                iconColor = color
+                iconColor = iconColor
             )
             deleteAccountDialog.show(childFragmentManager, CUSTOM_DIALOG_TAG)
         }

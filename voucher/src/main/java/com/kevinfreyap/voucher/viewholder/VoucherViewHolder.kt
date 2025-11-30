@@ -48,8 +48,8 @@ class VoucherViewHolder(
                 Toast.makeText(context, context.getString(R.string.success_copy_clipboard), Toast.LENGTH_SHORT).show()
             }
         } else {
-            binding.percentageContainer.alpha = 0.3f
-            binding.voucherDescription.alpha = 0.3f
+            binding.percentageContainer.alpha = 0.5f
+            binding.voucherDescription.alpha = 0.5f
             binding.tvNewVoucher.isVisible = false
         }
     }

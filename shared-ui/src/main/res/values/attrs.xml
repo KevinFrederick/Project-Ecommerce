@@ -15,4 +15,11 @@
             <enum name="custom" value="-1"/>
         </attr>
     </declare-styleable>
+
+    <!-- Theme -->
+    <attr name="colorCustomTextInputLayout" format="color|reference"/>
+    <attr name="profileIconColor" format="color|reference" />
+    <attr name="iconColor" format="color|reference"/>
+    <attr name="chipColor" format="color|reference"/>
+    <attr name="secondTextView" format="color|reference"/>
 </resources>

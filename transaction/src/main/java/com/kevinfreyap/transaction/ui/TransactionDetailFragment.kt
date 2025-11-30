@@ -54,6 +54,7 @@ class TransactionDetailFragment : Fragment() {
                             val transaction = resource.data
                             binding.tvTransactionId.text = getString(R.string.transaction_id, transaction.orderId)
                             binding.tvOrderDate.text = TimeUtils.formatTransactionTime(transaction.datePlaced)
+                            binding.tvShippingAddress.text = transaction.shippingAddress.toString()
                             binding.tvPaymentMethod.text = when(transaction.paymentMethod) {
                                 PaymentMethod.CASH -> getString(R.string.cash_on_delivery)
                                 PaymentMethod.CARD -> getString(R.string.debit_credit_card)

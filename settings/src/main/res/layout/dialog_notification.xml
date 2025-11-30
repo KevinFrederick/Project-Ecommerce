@@ -50,7 +50,11 @@
             android:layout_marginTop="16dp"
             android:paddingHorizontal="16dp"
             android:text="@string/system_notification"
+            android:textColor="?attr/colorOnBackground"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+            app:trackDecoration="@android:color/transparent"
+            app:trackDecorationTint="?attr/colorOnBackground"
+            app:thumbTint="@color/selector_switch_thumb"
             app:layout_constraintTop_toBottomOf="@id/tv_subtitle"/>
 
         <com.google.android.material.materialswitch.MaterialSwitch
@@ -60,7 +64,11 @@
             android:layout_marginTop="8dp"
             android:paddingHorizontal="16dp"
             android:text="@string/promotion_notification"
+            android:textColor="?attr/colorOnBackground"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+            app:trackDecoration="@android:color/transparent"
+            app:trackDecorationTint="?attr/colorOnBackground"
+            app:thumbTint="@color/selector_switch_thumb"
             app:layout_constraintTop_toBottomOf="@id/system_notification"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

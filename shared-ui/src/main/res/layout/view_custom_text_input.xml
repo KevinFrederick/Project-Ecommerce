@@ -7,7 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="5dp"
-    app:boxBackgroundColor="@android:color/white"
+    android:textColorHint="@color/grey_400"
+    app:hintTextColor="@color/grey_400"
+    app:boxBackgroundColor="?attr/colorCustomTextInputLayout"
+    app:endIconTint="@color/grey_400"
     app:boxStrokeWidth="0dp"
     app:boxStrokeWidthFocused="0dp"
     app:boxCornerRadiusTopStart="28dp"
@@ -19,6 +22,8 @@
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/et_custom_text_input_edit_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:textColor="?attr/colorOnBackground"
+        android:textColorHint="@color/grey_400" />
 
 </com.google.android.material.textfield.TextInputLayout>

@@ -17,6 +17,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.product.ProductCategory
+import com.kevinfreyap.core.utils.dpToPx
 import com.kevinfreyap.search.R
 import com.kevinfreyap.shared_ui.R as sharedR
 import com.kevinfreyap.search.databinding.BottomSheetFragmentSearchFilterBinding
@@ -133,15 +134,16 @@ class SearchFilterBottomSheetFragment : BottomSheetDialogFragment() {
             tickInactiveTintList = ColorStateList.valueOf(Color.TRANSPARENT)
             tickActiveTintList = ColorStateList.valueOf(Color.TRANSPARENT)
 
-            val purple = ContextCompat.getColor(context, sharedR.color.purple_500)
             val grey = ContextCompat.getColor(context, sharedR.color.grey_300) // Your #E0E0E0 color
+            val darkGrey = ContextCompat.getColor(context, sharedR.color.grey_600)
 
             // Apply using ColorStateList
-            trackActiveTintList = ColorStateList.valueOf(purple)
-            trackInactiveTintList = ColorStateList.valueOf(grey)
+            trackInactiveTintList = ColorStateList.valueOf(darkGrey)
 
-            // Optional: You usually want the Thumb (the circle) to match the active track
-            thumbTintList = ColorStateList.valueOf(purple)
+            thumbRadius = 12.dpToPx
+            haloRadius = 24.dpToPx
+            thumbElevation = 4f.dpToPx
+            thumbTintList = ColorStateList.valueOf(grey)
         }
 
         binding.priceSlider.setLabelFormatter { value ->

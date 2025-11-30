@@ -48,6 +48,9 @@ class CustomTextInput @JvmOverloads constructor(
 
             val enabled = getBoolean(R.styleable.CustomTextInput_android_enabled, true)
             binding.etCustomTextInputEditText.isEnabled = enabled
+            if (!enabled){
+                binding.tilCustomTextInputLayout.alpha = 0.6f
+            }
 
             val imeOptions = getInt(R.styleable.CustomTextInput_android_imeOptions, EditorInfo.IME_NULL)
             if (imeOptions != EditorInfo.IME_NULL) {
