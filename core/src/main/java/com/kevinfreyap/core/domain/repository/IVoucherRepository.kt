@@ -9,6 +9,7 @@ interface IVoucherRepository {
     suspend fun getVoucherByCode(code: String): Resource<Voucher>
     fun getNewVoucherCount(): Flow<Int>
     fun listenToPublicVouchers()
+    suspend fun checkNewVoucherInBackground()
     suspend fun markVoucherAsUsed(voucher: Voucher)
     suspend fun syncVouchers()
     suspend fun markAllAsSeen()

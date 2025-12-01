@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.toObjects
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.data.source.local.entity.VoucherEntity
@@ -117,6 +118,40 @@ class VoucherRepository @Inject constructor(
                     }
                 }
             }
+    }
+
+    override suspend fun checkNewVoucherInBackground() {
+        try {
+            val settings = userPreferences.getNotificationSettings().first()
+            val arePromotionEnabled = settings.promotions
+
+            val localIds = voucherDao.getAllIds().toSet()
+
+            val snapshot = firestore.collection(VOUCHER_COLLECTION)
+                .whereEqualTo("type", "PUBLIC")
+                .get()
+                .await()
+
+            val remoteList = snapshot.toObjects(Voucher::class.java)
+
+            remoteList.forEach { voucher ->
+                if (!localIds.contains(voucher.id)){
+                    if (arePromotionEnabled) {
+                        val discountText = if (voucher.isPercentage) "${voucher.discountAmount.toInt()}%" else "$${voucher.discountAmount}"
+
+                        val title = "New Voucher! \uD83C\uDF81"
+                        val message = "Get $discountText off with code: ${voucher.code}"
+                        val type = "VOUCHER"
+                        notificationService.showNotification(title, message, type)
+                    }
+
+                    val entity = DataMapper.mapVoucherDomainToVoucherEntity(voucher)
+                    voucherDao.insertAll(listOf(entity))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("VoucherRepository: Worker", "Voucher check failed", e)
+        }
     }
 
     override suspend fun markVoucherAsUsed(voucher: Voucher) = withContext(Dispatchers.IO) {

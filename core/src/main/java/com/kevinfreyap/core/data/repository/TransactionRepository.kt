@@ -2,7 +2,6 @@ package com.kevinfreyap.core.data.repository
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -107,8 +106,6 @@ class TransactionRepository @Inject constructor(
                 if (snapshots != null){
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        val settings = userPreferences.getNotificationSettings().first()
-                        val areSystemNotificationEnabled = settings.system
                         val updates = ArrayList<TransactionEntity>()
 
                         for (change in snapshots.documentChanges) {
@@ -117,13 +114,6 @@ class TransactionRepository @Inject constructor(
                             val entity = DataMapper.mapOrderDomainToEntity(order)
 
                             updates.add(entity)
-
-                            if (change.type == DocumentChange.Type.MODIFIED) {
-                                Log.d("TransactionRepository", "Modified: ${order.orderStatus}")
-                                if (areSystemNotificationEnabled){
-                                    triggerStatusNotification(order.orderId, order.orderStatus)
-                                }
-                            }
                         }
 
                         if (updates.isNotEmpty()) {
@@ -169,9 +159,14 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    private suspend fun simulateOrderStatusUpdates() {
+    override suspend fun simulateOrderStatusUpdates() {
         val currentTime = System.currentTimeMillis()
         val processingOrders = transactionDao.getOrdersByStatus(OrderStatus.PROCESSING)
+
+        val settings = userPreferences.getNotificationSettings().first()
+        val areSystemNotificationEnabled = settings.system
+
+        val updates = ArrayList<TransactionEntity>()
 
         processingOrders.forEach { order ->
             val timeDiff = currentTime - order.datePlaced
@@ -179,9 +174,19 @@ class TransactionRepository @Inject constructor(
             if (timeDiff >= DELIVERY_TIME_MS) {
                 val newStatus = OrderStatus.DELIVERED
                 updateFirestoreStatus(order.transactionId, newStatus)
+                updates.add(order.copy(orderStatus = newStatus))
+
+                if (areSystemNotificationEnabled) {
+                    triggerStatusNotification(order.transactionId, newStatus)
+                }
             } else if (timeDiff >= SHIPPED_TIME_MS) {
                 val newStatus = OrderStatus.SHIPPED
                 updateFirestoreStatus(order.transactionId, newStatus)
+                updates.add(order.copy(orderStatus = newStatus))
+
+                if (areSystemNotificationEnabled) {
+                    triggerStatusNotification(order.transactionId, newStatus)
+                }
             }
         }
 
@@ -189,11 +194,20 @@ class TransactionRepository @Inject constructor(
 
         shippedOrders.forEach { order ->
             val timeDiff = currentTime - order.datePlaced
-            val newStatus = OrderStatus.DELIVERED
 
             if (timeDiff >= DELIVERY_TIME_MS) {
+                val newStatus = OrderStatus.DELIVERED
                 updateFirestoreStatus(order.transactionId, newStatus)
+                updates.add(order.copy(orderStatus = newStatus))
+
+                if (areSystemNotificationEnabled) {
+                    triggerStatusNotification(order.transactionId, newStatus)
+                }
             }
+        }
+
+        if (updates.isNotEmpty()){
+            transactionDao.insertAll(updates)
         }
     }
 
@@ -220,6 +234,6 @@ class TransactionRepository @Inject constructor(
 
     companion object {
         private const val SHIPPED_TIME_MS = 1 * 12 * 60 * 60 * 1000L
-        private const val DELIVERY_TIME_MS = 2 * 7  * 60 * 1000L
+        private const val DELIVERY_TIME_MS = 2 * 7 * 60 * 60 * 1000L
     }
 }

@@ -2,7 +2,7 @@ package com.kevinfreyap.ecommerce.di
 
 import android.content.Context
 import com.kevinfreyap.core.domain.services.INotificationService
-import com.kevinfreyap.shared_ui.notification.NotificationHelper
+import com.kevinfreyap.ecommerce.notification.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

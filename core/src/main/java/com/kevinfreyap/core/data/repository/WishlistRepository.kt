@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.core.data.Resource
+import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.data.source.local.entity.WishlistEntity
 import com.kevinfreyap.core.data.source.local.room.WishlistDao
 import com.kevinfreyap.core.data.source.remote.network.ApiService
@@ -11,6 +12,7 @@ import com.kevinfreyap.core.domain.model.product.Product
 import com.kevinfreyap.core.domain.model.wishlist.FirestoreWishlistItem
 import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
 import com.kevinfreyap.core.domain.repository.IWishlistRepository
+import com.kevinfreyap.core.domain.services.INotificationService
 import com.kevinfreyap.core.utils.Constants.USER_COLLECTION
 import com.kevinfreyap.core.utils.Constants.WISHLIST_SUB_COLLECTION
 import com.kevinfreyap.core.utils.DataMapper
@@ -19,6 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -33,7 +36,9 @@ class WishlistRepository @Inject constructor(
     private val wishlistDao: WishlistDao,
     private val firestore: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val notificationService: INotificationService,
+    private val userPreferences: UserPreferences
 ): IWishlistRepository {
     override fun getWishlist(): Flow<Resource<List<WishlistItem>>> {
         return wishlistDao.getAllWatchlist()
@@ -152,6 +157,9 @@ class WishlistRepository @Inject constructor(
         val localItems = wishlistDao.getAllSync()
         if (localItems.isEmpty()) return@withContext
 
+        val settings = userPreferences.getNotificationSettings().first()
+        val areSystemNotificationEnabled = settings.system
+
         localItems.map { item ->
             async {
                 try {
@@ -159,6 +167,12 @@ class WishlistRepository @Inject constructor(
                     if (!item.isAvailable && !item.isNotified) {
                         wishlistDao.updateAvailability(item.productId, true)
                         wishlistDao.updateNotificationStatus(item.productId, true)
+                        if (areSystemNotificationEnabled) {
+                            val title = "Back in Stock!"
+                            val message = "${item.productName} is available now!"
+                            val type = "WISHLIST"
+                            notificationService.showNotification(title, message, type)
+                        }
                     }
                 } catch (e: HttpException) {
                     if (e.code() == 404 || e.code() == 400) {

@@ -1,4 +1,4 @@
-package com.kevinfreyap.shared_ui.notification
+package com.kevinfreyap.ecommerce.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
+import com.kevinfreyap.ecommerce.ui.MainActivity
 import com.kevinfreyap.shared_ui.R
 
 object NotificationHelper {
@@ -24,9 +25,10 @@ object NotificationHelper {
             else -> "app://ecommerce/home".toUri()
         }
 
-        val intent = Intent(Intent.ACTION_VIEW, deeplinkUri).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            setPackage(context.packageName)
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = deeplinkUri
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
         val pendingIntent = PendingIntent.getActivity(

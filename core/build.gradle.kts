@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
-    api(libs.androidx.appcompat)
+    implementation(libs.androidx.appcompat)
 
     implementation(libs.kotlinx.coroutines.playServices)
     implementation(libs.firebase.auth)
@@ -76,6 +76,10 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    api(libs.androidx.work.runtime.ktx)
+    api(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preference)
