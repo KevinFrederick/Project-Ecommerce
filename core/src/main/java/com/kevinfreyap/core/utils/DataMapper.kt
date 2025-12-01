@@ -34,7 +34,7 @@ object DataMapper {
 
     fun mapProductResponseToEntity(response: ProductsResponseItem): ProductEntity {
         return ProductEntity(
-            id = response.id.toString(),
+            id = response.id,
             title = response.title,
             description = response.description,
             price = response.price,
@@ -59,7 +59,7 @@ object DataMapper {
         )
 
         return Product(
-            id = entity.id,
+            id = entity.id.toString(),
             title = entity.title,
             category = categoryObject,
             description = entity.description,

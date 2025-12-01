@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "remote_keys")
 data class RemoteKeyEntity(
     @PrimaryKey
-    val productId: String,
+    val productId: Int,
     val nextOffset: Int?
 )

@@ -1,6 +1,5 @@
 package com.kevinfreyap.core.utils
 
-import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.kevinfreyap.core.domain.model.filter.SearchFilter
 import javax.inject.Inject

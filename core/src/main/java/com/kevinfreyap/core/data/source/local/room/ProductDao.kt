@@ -32,7 +32,7 @@ interface ProductDao {
     suspend fun deleteProductById(id: String)
 
     @Query("SELECT * FROM remote_keys WHERE productId = :id")
-    suspend fun getRemoteKeysById(id: String): RemoteKeyEntity?
+    suspend fun getRemoteKeysById(id: Int): RemoteKeyEntity?
 
     @Query("SELECT * FROM remote_keys ORDER BY productId DESC LIMIT 1")
     suspend fun getLastRemoteKey(): RemoteKeyEntity?
