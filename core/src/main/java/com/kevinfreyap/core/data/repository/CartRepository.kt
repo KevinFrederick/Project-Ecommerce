@@ -78,6 +78,13 @@ class CartRepository @Inject constructor(
             return@flow
         }
 
+        val productExist = cartDao.getCartItemById(product.id)
+        val insertQuantity = if (productExist != null) {
+            productExist.quantity + quantity
+        } else {
+            quantity
+        }
+
         val timestamp = System.currentTimeMillis()
 
         val cartEntity = CartEntity(
@@ -85,7 +92,7 @@ class CartRepository @Inject constructor(
             name = product.title,
             price = product.price,
             imageUrl = product.images.firstOrNull() ?: "",
-            quantity = quantity,
+            quantity = insertQuantity,
             isAvailable = true,
             dateAdded = timestamp
         )

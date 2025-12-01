@@ -57,37 +57,49 @@
 
             <TextView
                 android:id="@+id/tv_voucher_title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 tools:text="50% Off"/>
 
             <TextView
                 android:id="@+id/tv_voucher_desc"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="@color/grey_500"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:layout_constraintTop_toBottomOf="@id/tv_voucher_title"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Min. spend $20" />
 
             <TextView
                 android:id="@+id/tv_voucher_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginTop="8dp"
                 android:paddingVertical="4dp"
                 android:paddingHorizontal="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="@drawable/bg_pill_outline"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium.Emphasized"
                 android:drawablePadding="8dp"
                 app:drawableStartCompat="@drawable/ic_content_copy_24"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintTop_toBottomOf="@id/tv_voucher_desc"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:text="DISC50" />

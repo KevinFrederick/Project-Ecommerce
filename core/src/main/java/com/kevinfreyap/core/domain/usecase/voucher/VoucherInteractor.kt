@@ -18,7 +18,7 @@ class VoucherInteractor @Inject constructor(
     override suspend fun applyVoucher(voucherCode: String, cartTotal: Double): Resource<Voucher> {
         if (voucherCode.isBlank()) return Resource.Error("ERROR_NO_CODE")
 
-        val result = voucherRepository.getVoucherByCode(code = voucherCode)
+        val result = voucherRepository.getVoucherByCode(code = voucherCode.uppercase())
         if (result is Resource.Error) {
             return Resource.Error("ERROR_VOUCHER_NOT_FOUND")
         }
