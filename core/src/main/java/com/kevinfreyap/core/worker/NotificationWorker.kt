@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.google.firebase.auth.FirebaseAuth
 import com.kevinfreyap.core.domain.repository.ITransactionRepository
 import com.kevinfreyap.core.domain.repository.IVoucherRepository
 import com.kevinfreyap.core.domain.repository.IWishlistRepository
@@ -19,10 +20,16 @@ class NotificationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val transactionRepository: ITransactionRepository,
     private val wishlistRepository: IWishlistRepository,
-    private val voucherRepository: IVoucherRepository
+    private val voucherRepository: IVoucherRepository,
+    private val firebaseAuth: FirebaseAuth
 ): CoroutineWorker(context, params) {
     override suspend fun doWork(): Result = coroutineScope {
         try {
+            if (firebaseAuth.currentUser == null) {
+                Log.d("NotificationWorker", "User logged out. Stop background work.")
+                return@coroutineScope Result.success()
+            }
+
             val jobs = listOf(
                 async { transactionRepository.simulateOrderStatusUpdates() },
                 async { wishlistRepository.validateWishlistAvailability() },

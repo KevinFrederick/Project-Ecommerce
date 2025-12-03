@@ -10,6 +10,7 @@ import com.kevinfreyap.core.domain.repository.ITransactionRepository
 import com.kevinfreyap.core.domain.repository.IUserRepository
 import com.kevinfreyap.core.domain.repository.IVoucherRepository
 import com.kevinfreyap.core.domain.repository.IWishlistRepository
+import com.kevinfreyap.core.domain.services.INotificationService
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -26,7 +27,8 @@ class AuthInteractor @Inject constructor (
     private val wishlistRepository: IWishlistRepository,
     private val transactionRepository: ITransactionRepository,
     private val voucherRepository: IVoucherRepository,
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val notificationService: INotificationService
 ): AuthUseCase {
     override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
         authenticationRepository.loginWithGoogle(idToken).collect { resource ->
@@ -94,6 +96,7 @@ class AuthInteractor @Inject constructor (
 
     override suspend fun syncUserData() {
         coroutineScope {
+            notificationService.startBackgroundSync()
             voucherRepository.listenToPublicVouchers()
 
             val jobs = listOf(
@@ -110,6 +113,8 @@ class AuthInteractor @Inject constructor (
 
     override suspend fun logout() {
         coroutineScope {
+            notificationService.stopBackgroundSync()
+
             val jobs = listOf(
                 async { runCatching { cartRepository.clearCart() } },
                 async { runCatching { wishlistRepository.clearWishlist() } },
