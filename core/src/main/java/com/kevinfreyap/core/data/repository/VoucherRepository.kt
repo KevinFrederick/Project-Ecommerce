@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.toObjects
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.data.source.local.UserPreferences
 import com.kevinfreyap.core.data.source.local.entity.VoucherEntity
@@ -197,10 +196,19 @@ class VoucherRepository @Inject constructor(
             val publicList = publicDeferred.await()
             val personalList = personalDeferred.await()
 
+            val validPublicIds = publicList.map { it.id }.toSet()
+            val validPersonalList = personalList.filter {
+                if (it.type == "PRIVATE"){
+                    true
+                } else {
+                    validPublicIds.contains(it.id)
+                }
+            }
+
             // Merge (Personal Overwrites Public)
             val voucherMap = HashMap<String, Voucher>()
             publicList.forEach { voucherMap[it.id] = it }
-            personalList.forEach { voucherMap[it.id] = it }
+            validPersonalList.forEach { voucherMap[it.id] = it }
             val combinedList = voucherMap.values.toList()
 
             val localStateMap = voucherDao.getLocalState().associateBy { it.id }
