@@ -14,7 +14,9 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
         <!-- Customize your theme here. -->
+        <item name="android:colorBackground">@color/grey_900</item>
         <item name="android:textViewStyle">@style/CustomTextView</item>
+        <item name="cardBackgroundColor">@color/grey_900</item>
         <item name="colorCustomTextInputLayout">@color/grey_700</item>
         <item name="profileIconColor">@color/grey_400</item>
         <item name="iconColor">@color/grey_400</item>
