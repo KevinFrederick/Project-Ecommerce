@@ -51,6 +51,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-events"))
     implementation(project(":shared-auth"))
     implementation(project(":shared-ui"))
     implementation(project(":auth"))

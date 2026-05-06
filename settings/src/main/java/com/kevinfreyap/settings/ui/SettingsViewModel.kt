@@ -8,7 +8,10 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.domain.usecase.user.UserUseCase
-import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.DeleteWithGoogleUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.DeleteWithPassUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.LogoutUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.UpdatePasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +25,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase,
+    private val deleteWithPassUseCase: DeleteWithPassUseCase,
+    private val deleteWithGoogleUseCase: DeleteWithGoogleUseCase,
+    private val updatePasswordUseCase: UpdatePasswordUseCase,
+    private val logoutUseCase: LogoutUseCase,
     private val userUseCase: UserUseCase
 ): ViewModel(){
 
@@ -73,7 +79,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _updateState.value = Resource.Loading()
 
-            val result = authUseCase.updatePassword(
+            val result = updatePasswordUseCase(
                 currentPass = currentPass,
                 newPass = newPass,
                 confirmPass = confirmPass
@@ -90,7 +96,7 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                authUseCase.logout()
+                logoutUseCase()
 
                 // Will execute only after authUseCase.logout Finished
                 _navEvent.send(true)
@@ -105,7 +111,7 @@ class SettingsViewModel @Inject constructor(
     fun onDeleteAccountWithPassword(password: String) {
         viewModelScope.launch {
             _deleteState.value = Resource.Loading()
-            val result = authUseCase.reAuthAndDeleteWithPassword(password)
+            val result = deleteWithPassUseCase(password)
             _deleteState.value = result
             if (result is Resource.Success) {
                 _navEvent.send(true)
@@ -116,7 +122,7 @@ class SettingsViewModel @Inject constructor(
     fun onDeleteAccountWithGoogle(idToken: String) {
         viewModelScope.launch {
             _deleteState.value = Resource.Loading()
-            val result = authUseCase.reAuthAndDeleteWithGoogle(idToken)
+            val result = deleteWithGoogleUseCase(idToken)
             _deleteState.value = result
             if (result is Resource.Success) {
                 _navEvent.send(true)

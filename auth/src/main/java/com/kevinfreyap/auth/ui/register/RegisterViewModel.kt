@@ -5,10 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.shared_auth.domain.model.AuthRequest
 import com.kevinfreyap.auth.ui.nav.AuthNav
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
+import com.kevinfreyap.shared_auth.domain.usecase.LoginWithGoogleUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase,
+    private val registerUseCase: RegisterUseCase,
+    private val loginWithGoogleUseCase: LoginWithGoogleUseCase
 ): ViewModel() {
     private val _registerState = MutableStateFlow<Resource<Boolean>?>(null)
     val registerState: StateFlow<Resource<Boolean>?> = _registerState
@@ -64,24 +66,20 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _registerState.value = Resource.Loading()
             val request = AuthRequest(email, pass)
-            authUseCase.register(request).collect { value ->
-                _registerState.value = value
-                if (value is Resource.Success){
-                    _navEvent.send(AuthNav.ToLogin)
-                }
+
+            val result = registerUseCase(request)
+            _registerState.value = result
+            if (result is Resource.Success){
+                _navEvent.send(AuthNav.ToLogin)
             }
         }
     }
 
     fun onGoogleIdTokenReceived(idToken: String) {
         viewModelScope.launch {
-            authUseCase.loginWithGoogle(idToken).collect { resource ->
-                _registerState.value = resource
-
-                if (resource is Resource.Success) {
-                    _navEvent.send(AuthNav.ToAccount)
-                }
-            }
+            _registerState.value = Resource.Loading()
+            val result = loginWithGoogleUseCase(idToken)
+            _registerState.value = result
         }
     }
 

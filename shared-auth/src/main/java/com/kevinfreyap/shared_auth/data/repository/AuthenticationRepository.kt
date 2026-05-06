@@ -17,10 +17,8 @@ import com.kevinfreyap.core.utils.Constants
 import com.kevinfreyap.core.utils.isGoogleAccount
 import com.kevinfreyap.shared_auth.domain.model.AuthRequest
 import com.kevinfreyap.shared_auth.domain.repository.IAuthenticationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import com.kevinfreyap.shared_events.AppEvent
+import com.kevinfreyap.shared_events.AppEventBus
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import javax.inject.Inject
@@ -32,9 +30,8 @@ class AuthenticationRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val userPreferences: UserPreferences
 ): IAuthenticationRepository {
-    override fun loginWithGoogle(idToken: String): Flow<Resource<Boolean>> = flow {
-        emit(Resource.Loading())
-        try {
+    override suspend fun loginWithGoogle(idToken: String): Resource<Boolean> {
+        return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
 
             val authResult = firebaseAuth.signInWithCredential(credential).await()
@@ -70,18 +67,18 @@ class AuthenticationRepository @Inject constructor(
                     Log.e("AuthRepository", "Firestore sync failed", e)
                 }
 
-                emit(Resource.Success(true))
+                AppEventBus.emit(AppEvent.UserLoggedIn)
+                Resource.Success(true)
             } else {
-                emit(Resource.Error("ERROR_GOOGLE_SIGN_IN_FAILED"))
+                Resource.Error("ERROR_GOOGLE_SIGN_IN_FAILED")
             }
         } catch (e: java.lang.Exception) {
-            emit(Resource.Error(e.message ?: "Login Failed"))
+            Resource.Error(e.message ?: "Login Failed")
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
-    override fun register(registerRequest: AuthRequest): Flow<Resource<Boolean>> = flow {
-        emit(Resource.Loading())
-        try {
+    override suspend fun register(registerRequest: AuthRequest): Resource<Boolean> {
+        return try {
             val response = firebaseAuth.createUserWithEmailAndPassword(
                 registerRequest.email,
                 registerRequest.password
@@ -90,26 +87,25 @@ class AuthenticationRepository @Inject constructor(
             val user = response.user
             if (user != null) {
                 saveUserInfo(user.uid, user.email)
-                emit(Resource.Success(true))
+                Resource.Success(true)
             } else {
-                emit(Resource.Error("REGISTRATION_FAILED"))
+                Resource.Error("REGISTRATION_FAILED")
             }
         } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
+            Resource.Error("ERROR_NO_CONNECTION")
         } catch (e: FirebaseAuthException) {
-            emit(Resource.Error(e.message ?: "REGISTRATION_FAILED"))
+            Resource.Error(e.message ?: "REGISTRATION_FAILED")
         } catch (e: java.lang.Exception) {
             if (e.message?.contains("network", ignoreCase = true) == true) {
-                emit(Resource.Error("ERROR_NO_CONNECTION"))
+                Resource.Error("ERROR_NO_CONNECTION")
             } else {
-                emit(Resource.Error(e.message ?: "REGISTRATION_FAILED"))
+                Resource.Error(e.message ?: "REGISTRATION_FAILED")
             }
         }
     }
 
-    override fun login(loginRequest: AuthRequest): Flow<Resource<Boolean>> = flow {
-        emit(Resource.Loading())
-        try {
+    override suspend fun login(loginRequest: AuthRequest): Resource<Boolean> {
+        return try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(
                 loginRequest.email,
                 loginRequest.password
@@ -147,51 +143,51 @@ class AuthenticationRepository @Inject constructor(
                     Log.e("AuthRepository", "Failed to sync full profile on login", e)
                 }
 
-                emit(Resource.Success(true))
+                AppEventBus.emit(AppEvent.UserLoggedIn)
+                Resource.Success(true)
             } else {
-                emit(Resource.Error("UNKNOWN_ERROR"))
+                Resource.Error("UNKNOWN_ERROR")
             }
         } catch (_: IOException) {
-            emit(Resource.Error("ERROR_NO_CONNECTION"))
+            Resource.Error("ERROR_NO_CONNECTION")
         } catch (e: java.lang.Exception) {
             when (e) {
                 is FirebaseAuthInvalidUserException -> {
-                    emit(Resource.Error("ERROR_EMAIL_NOT_REGISTERED"))
+                    Resource.Error("ERROR_EMAIL_NOT_REGISTERED")
                 }
 
                 is FirebaseAuthInvalidCredentialsException -> {
-                    emit(Resource.Error("ERROR_WRONG_PASSWORD"))
+                    Resource.Error("ERROR_WRONG_PASSWORD")
                 }
 
                 is FirebaseAuthException -> {
                     if (e.errorCode == "ERROR_NETWORK_REQUEST_FAILED") {
-                        emit(Resource.Error("ERROR_NO_CONNECTION"))
+                        Resource.Error("ERROR_NO_CONNECTION")
                     } else {
-                        emit(Resource.Error(e.message ?: "Login Failed"))
+                        Resource.Error(e.message ?: "Login Failed")
                     }
                 }
 
                 else -> {
                     if (e.message?.contains("network", ignoreCase = true) == true) {
-                        emit(Resource.Error("ERROR_NO_CONNECTION"))
+                        Resource.Error("ERROR_NO_CONNECTION")
                     } else {
-                        emit(Resource.Error(e.message ?: "Login Failed"))
+                        Resource.Error(e.message ?: "Login Failed")
                     }
                 }
             }
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
-    override fun sendPasswordResetEmail(email: String): Flow<Resource<Unit>> = flow {
-        emit(Resource.Loading())
-        try {
+    override suspend fun sendPasswordResetEmail(email: String): Resource<Unit> {
+        return try {
             firebaseAuth.sendPasswordResetEmail(email).await()
 
-            emit(Resource.Success(Unit))
+            Resource.Success(Unit)
         } catch (_: java.lang.Exception) {
-            emit(Resource.Error("ERROR_FAILED_RESET_PASSWORD"))
+            Resource.Error("ERROR_FAILED_RESET_PASSWORD")
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
     override suspend fun changePassword(
         currentPass: String,
@@ -269,6 +265,7 @@ class AuthenticationRepository @Inject constructor(
             .await()
 
         user.delete().await()
+        AppEventBus.emit(AppEvent.UserLoggedOut)
         return Resource.Success(Unit)
     }
 }

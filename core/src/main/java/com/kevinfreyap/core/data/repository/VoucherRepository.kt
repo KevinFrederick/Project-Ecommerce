@@ -97,7 +97,7 @@ class VoucherRepository @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    override fun listenToPublicVouchers() {
+    override fun listenToPublicVouchers(scope: CoroutineScope) {
         if (listenerRegistration != null) {
             return
         }
@@ -112,7 +112,7 @@ class VoucherRepository @Inject constructor(
 
                 if (snapshots != null && !snapshots.isEmpty) {
                     val newVouchers = snapshots.toObjects(Voucher::class.java)
-                    CoroutineScope(Dispatchers.IO).launch {
+                    scope.launch(Dispatchers.IO) {
                         processAndSaveVouchers(newVouchers)
                     }
                 }

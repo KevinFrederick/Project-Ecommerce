@@ -3,11 +3,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.kevinfreyap.shared_auth"
+    namespace = "com.kevinfreyap.shared_events"
     compileSdk = 36
 
     defaultConfig {
@@ -29,20 +28,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":shared-events"))
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore.ktx)
-
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.androidx.credentials)
-    implementation(libs.googleid)
-
-    implementation(libs.kotlinx.coroutines.playServices)
+    implementation(libs.androidx.core.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

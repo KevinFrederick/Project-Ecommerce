@@ -8,6 +8,10 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 open class MyApplication: Application(), Configuration.Provider {
+
+    @Inject
+    lateinit var migrationEventObserver: MigrationEventObserver
+
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
@@ -15,4 +19,9 @@ open class MyApplication: Application(), Configuration.Provider {
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+
+    override fun onCreate() {
+        super.onCreate()
+        migrationEventObserver.startListening()
+    }
 }

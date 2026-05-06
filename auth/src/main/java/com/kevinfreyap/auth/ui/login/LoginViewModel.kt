@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.shared_auth.domain.model.AuthRequest
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
+import com.kevinfreyap.shared_auth.domain.usecase.LoginUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.LoginWithGoogleUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.SendResetPassEmailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase
+    private val loginUseCase: LoginUseCase,
+    private val loginWithGoogleUseCase: LoginWithGoogleUseCase,
+    private val sendResetPassEmailUseCase: SendResetPassEmailUseCase
 ): ViewModel() {
     private val _loginState = MutableStateFlow<Resource<Boolean>?>(null)
     val loginState: StateFlow<Resource<Boolean>?> = _loginState
@@ -52,25 +56,24 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _loginState.value = Resource.Loading()
             val loginRequest = AuthRequest(email, pass)
-            authUseCase.login(loginRequest).collect { value ->
-                _loginState.value = value
-            }
+
+            val result = loginUseCase(loginRequest)
+            _loginState.value = result
         }
     }
 
     fun onGoogleIdTokenReceived(idToken: String) {
         viewModelScope.launch {
-            authUseCase.loginWithGoogle(idToken).collect { resource ->
-                _loginState.value = resource
-            }
+            _loginState.value = Resource.Loading()
+            val result = loginWithGoogleUseCase(idToken)
+            _loginState.value = result
         }
     }
 
     fun onForgotPasswordClicked(email: String) {
         viewModelScope.launch {
-            authUseCase.sendPasswordResetEmail(email).collect { resource ->
-                _resetPasswordState.value = resource
-            }
+            val result = sendResetPassEmailUseCase(email)
+            _resetPasswordState.value = result
         }
     }
 
