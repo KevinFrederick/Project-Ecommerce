@@ -2,9 +2,9 @@ package com.kevinfreyap.auth.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.shared_auth.domain.model.AuthRequest
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.auth.LoginRequest
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
@@ -51,7 +51,7 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             _loginState.value = Resource.Loading()
-            val loginRequest = LoginRequest(email, pass)
+            val loginRequest = AuthRequest(email, pass)
             authUseCase.login(loginRequest).collect { value ->
                 _loginState.value = value
             }

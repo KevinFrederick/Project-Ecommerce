@@ -2,10 +2,10 @@ package com.kevinfreyap.auth.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.shared_auth.domain.model.AuthRequest
 import com.kevinfreyap.auth.ui.nav.AuthNav
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.auth.RegisterRequest
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
@@ -63,7 +63,7 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch {
             _registerState.value = Resource.Loading()
-            val request = RegisterRequest(email, pass)
+            val request = AuthRequest(email, pass)
             authUseCase.register(request).collect { value ->
                 _registerState.value = value
                 if (value is Resource.Success){

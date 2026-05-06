@@ -29,7 +29,7 @@ import com.kevinfreyap.auth.ui.nav.AuthNav
 import com.kevinfreyap.auth.ui.util.getErrorMessage
 import com.kevinfreyap.core.BuildConfig
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.utils.GoogleAuthHelper
+import com.kevinfreyap.shared_auth.data.helper.GoogleAuthHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -46,7 +46,7 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root

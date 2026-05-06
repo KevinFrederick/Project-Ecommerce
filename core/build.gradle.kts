@@ -67,12 +67,8 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.appcompat)
 
-    implementation(libs.kotlinx.coroutines.playServices)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore.ktx)
-    implementation(libs.googleid)
-    api(libs.androidx.credentials.play.services.auth)
-    api(libs.androidx.credentials)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

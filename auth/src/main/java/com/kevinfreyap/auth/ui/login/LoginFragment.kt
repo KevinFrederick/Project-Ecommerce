@@ -34,7 +34,7 @@ import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.EMAI
 import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_DIALOG
 import com.kevinfreyap.auth.ui.reset_password.ResetPasswordDialog.Companion.RESET_PASSWORD_REQ
 import com.kevinfreyap.core.BuildConfig
-import com.kevinfreyap.core.utils.GoogleAuthHelper
+import com.kevinfreyap.shared_auth.data.helper.GoogleAuthHelper
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -49,7 +49,7 @@ class LoginFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
@@ -64,7 +64,7 @@ class LoginFragment : Fragment() {
         observeResetPasswordState()
         setupRegisterLink()
 
-        childFragmentManager.setFragmentResultListener(RESET_PASSWORD_REQ, viewLifecycleOwner) { requestKey, result ->
+        childFragmentManager.setFragmentResultListener(RESET_PASSWORD_REQ, viewLifecycleOwner) { _, result ->
             val email = result.getString(EMAIL_INPUT)
             if (!email.isNullOrBlank()){
                 viewModel.onForgotPasswordClicked(email)

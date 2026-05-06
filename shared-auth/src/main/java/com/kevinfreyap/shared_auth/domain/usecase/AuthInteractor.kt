@@ -1,10 +1,9 @@
-package com.kevinfreyap.core.domain.usecase.auth
+package com.kevinfreyap.shared_auth.domain.usecase
 
 import android.util.Patterns
+import com.kevinfreyap.shared_auth.domain.model.AuthRequest
+import com.kevinfreyap.shared_auth.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.auth.LoginRequest
-import com.kevinfreyap.core.domain.model.auth.RegisterRequest
-import com.kevinfreyap.core.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.core.domain.repository.ICartRepository
 import com.kevinfreyap.core.domain.repository.ITransactionRepository
 import com.kevinfreyap.core.domain.repository.IUserRepository
@@ -39,9 +38,9 @@ class AuthInteractor @Inject constructor (
         }
     }
 
-    override fun register(request: RegisterRequest): Flow<Resource<Boolean>> = authenticationRepository.register(request)
+    override fun register(request: AuthRequest): Flow<Resource<Boolean>> = authenticationRepository.register(request)
 
-    override fun login(request: LoginRequest): Flow<Resource<Boolean>> = flow {
+    override fun login(request: AuthRequest): Flow<Resource<Boolean>> = flow {
         authenticationRepository.login(request).collect{ resource ->
             if (resource is Resource.Success) {
                 syncUserData()

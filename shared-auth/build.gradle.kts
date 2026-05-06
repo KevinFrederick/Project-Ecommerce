@@ -4,35 +4,21 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hiltAndroid)
 }
 
 android {
-    namespace = "com.kevinfreyap.settings"
+    namespace = "com.kevinfreyap.shared_auth"
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 25
+        minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        viewBinding = true
     }
 }
 
@@ -44,13 +30,20 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":shared-auth"))
-    implementation(project(":shared-ui"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore.ktx)
+
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+
+    implementation(libs.kotlinx.coroutines.playServices)
+
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
 }

@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.ecommerce.R
+import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

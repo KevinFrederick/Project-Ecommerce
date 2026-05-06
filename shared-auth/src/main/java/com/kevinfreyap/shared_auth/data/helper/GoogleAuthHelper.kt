@@ -1,8 +1,8 @@
-package com.kevinfreyap.core.utils
+package com.kevinfreyap.shared_auth.data.helper
 
-import androidx.credentials.CredentialManager
 import android.content.Context
 import android.util.Log
+import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException

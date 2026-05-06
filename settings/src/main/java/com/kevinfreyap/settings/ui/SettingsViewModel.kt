@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
 import com.kevinfreyap.core.domain.model.user.UserProfile
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.core.domain.usecase.user.UserUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

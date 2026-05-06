@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.core.BuildConfig
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.utils.GoogleAuthHelper
 import com.kevinfreyap.core.utils.isDarkThemeOn
 import com.kevinfreyap.settings.databinding.FragmentSettingsBinding
 import com.kevinfreyap.settings.dialog.NotificationDialog
@@ -31,6 +30,7 @@ import com.kevinfreyap.settings.dialog.ThemeDialog.Companion.THEME_DIALOG_TAG
 import com.kevinfreyap.settings.dialog.ThemeDialog.Companion.THEME_KEY
 import com.kevinfreyap.settings.ui.ChangePasswordBottomSheetFragment.Companion.CHANGE_PASSWORD_BOTTOM_SHEET
 import com.kevinfreyap.settings.ui.ChangePasswordBottomSheetFragment.Companion.IS_SUCCESS
+import com.kevinfreyap.shared_auth.data.helper.GoogleAuthHelper
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.ui.CustomDialog
 import com.kevinfreyap.shared_ui.ui.CustomDialog.Companion.CUSTOM_DIALOG_TAG
