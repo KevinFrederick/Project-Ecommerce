@@ -6,9 +6,9 @@ import android.content.Context
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.kevinfreyap.core.domain.model.voucher.Voucher
 import com.kevinfreyap.core.utils.DateHelper
 import com.kevinfreyap.shared_ui.R
+import com.kevinfreyap.shared_voucher.domain.model.Voucher
 import com.kevinfreyap.voucher.databinding.ItemVoucherBinding
 
 class VoucherViewHolder(

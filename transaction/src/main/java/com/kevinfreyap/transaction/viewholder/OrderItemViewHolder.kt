@@ -5,14 +5,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.kevinfreyap.core.domain.model.order.OrderItem
+import com.kevinfreyap.shared_transaction.domain.model.TransactionItem
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.databinding.ItemCartBinding
 
 class OrderItemViewHolder(
     private val binding: ItemCartBinding
 ): RecyclerView.ViewHolder(binding.root) {
-    fun bind(orderItem: OrderItem){
+    fun bind(orderItem: TransactionItem){
         val context = itemView.context
 
         val shimmer = Shimmer.AlphaHighlightBuilder()

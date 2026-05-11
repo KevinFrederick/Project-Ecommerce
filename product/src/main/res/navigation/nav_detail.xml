@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_detail"
+    app:startDestination="@id/detailFragment">
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.kevinfreyap.product.ui.detail.DetailFragment"
+        android:label="@string/title_product_detail"
+        tools:layout="@layout/fragment_detail" >
+
+        <argument
+            android:name="productId"
+            app:argType="string" />
+
+        <deepLink
+            android:id="@+id/deep_link_detail"
+            app:uri="app://ecommerce/product/{productId}"/>
+
+    </fragment>
+</navigation>

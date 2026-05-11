@@ -1,0 +1,33 @@
+package com.kevinfreyap.shared_transaction.data.source.local.room
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.kevinfreyap.shared_transaction.data.source.local.entity.TransactionEntity
+import com.kevinfreyap.shared_transaction.domain.model.TransactionStatus
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface TransactionDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(order: TransactionEntity)
+
+    @Query("SELECT * FROM transaction_history ORDER BY datePlaced DESC")
+    fun getAllTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transaction_history WHERE transactionId = :id LIMIT 1")
+    fun getTransactionById(id: String): Flow<TransactionEntity>
+
+    @Query("SELECT * FROM transaction_history WHERE transactionStatus = :status")
+    suspend fun getOrdersByStatus(status: TransactionStatus): List<TransactionEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(orders: List<TransactionEntity>)
+
+    @Query("DELETE FROM transaction_history WHERE transactionId = :id")
+    suspend fun deleteTransactionById(id: String)
+
+    @Query("DELETE FROM transaction_history")
+    suspend fun clearAll()
+}

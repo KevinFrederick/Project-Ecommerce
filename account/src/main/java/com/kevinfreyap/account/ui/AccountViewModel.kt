@@ -2,11 +2,15 @@ package com.kevinfreyap.account.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kevinfreyap.account.model.UserAddressUi
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.user.UserAddress
-import com.kevinfreyap.core.domain.model.user.UserProfile
-import com.kevinfreyap.core.domain.usecase.user.UserUseCase
-import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
+import com.kevinfreyap.shared_user.domain.model.UserAddress
+import com.kevinfreyap.shared_user.domain.model.UserProfile
+import com.kevinfreyap.shared_user.domain.usecase.GetUserProfileUseCase
+import com.kevinfreyap.shared_user.domain.usecase.RefreshUserProfileUseCase
+import com.kevinfreyap.shared_user.domain.usecase.UpdateAddressUseCase
+import com.kevinfreyap.shared_user.domain.usecase.UpdateUserNameUseCase
+import com.kevinfreyap.shared_voucher.domain.usecase.GetNewVoucherCountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,11 +21,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    voucherUseCase: VoucherUseCase,
-    private val userUseCase: UserUseCase
+    getNewVoucherCount: GetNewVoucherCountUseCase,
+    getUserProfile: GetUserProfileUseCase,
+    private val updateUserName: UpdateUserNameUseCase,
+    private val updateUserAddress: UpdateAddressUseCase,
+    private val refreshUserProfile: RefreshUserProfileUseCase,
 ) : ViewModel() {
 
-    val userProfile: StateFlow<Resource<UserProfile>> = userUseCase.getUserProfile()
+    val userProfile: StateFlow<Resource<UserProfile>> = getUserProfile()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -31,7 +38,7 @@ class AccountViewModel @Inject constructor(
     private val _updateState = MutableStateFlow<Resource<Unit>?>(null)
     val updateState: StateFlow<Resource<Unit>?> = _updateState
 
-    val newVoucherCount: StateFlow<Int> = voucherUseCase.getNewVoucherCount()
+    val newVoucherCount: StateFlow<Int> = getNewVoucherCount()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -44,7 +51,7 @@ class AccountViewModel @Inject constructor(
 
     fun  refreshProfileData() {
         viewModelScope.launch {
-            userUseCase.refreshUserProfile()
+            refreshUserProfile()
         }
     }
 
@@ -55,14 +62,14 @@ class AccountViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            userUseCase.updateUserName(newName).collect { result ->
+            updateUserName(newName).collect { result ->
                 _updateState.value = result
             }
         }
     }
 
     fun updateAddress(
-        currentAddress: UserAddress?,
+        currentAddress: UserAddressUi?,
         newStreet: String,
         newCity: String,
         newState: String,
@@ -85,7 +92,13 @@ class AccountViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            userUseCase.updateAddress(newAddress).collect { result ->
+            updateUserAddress(
+                newStreet = newStreet,
+                newCity = newCity,
+                newState = newState,
+                newZip = newZip,
+                newCountry = newCountry
+            ).collect { result ->
                 _updateState.value = result
             }
         }

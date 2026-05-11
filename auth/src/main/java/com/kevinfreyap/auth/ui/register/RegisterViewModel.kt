@@ -8,7 +8,7 @@ import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.core.domain.validation.AuthErrorType
 import com.kevinfreyap.core.domain.validation.AuthValidator
 import com.kevinfreyap.core.domain.validation.ValidationResult
-import com.kevinfreyap.shared_auth.domain.usecase.LoginWithGoogleUseCase
+import com.kevinfreyap.auth.domain.usecase.LoginWithGoogleUseCase
 import com.kevinfreyap.shared_auth.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

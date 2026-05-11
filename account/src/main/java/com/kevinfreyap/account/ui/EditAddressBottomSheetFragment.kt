@@ -15,8 +15,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.account.databinding.BottomSheetFragmentEditAddressBinding
+import com.kevinfreyap.account.model.UserAddressUi
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.user.UserAddress
 import com.kevinfreyap.shared_ui.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -28,11 +28,12 @@ class EditAddressBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetFragmentEditAddressBinding? = null
     private val binding get() = _binding!!
 
-    private var userAddress: UserAddress? = null
+    private var userAddress: UserAddressUi? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = BottomSheetFragmentEditAddressBinding.inflate(inflater, container, false)
         return binding.root
@@ -42,7 +43,7 @@ class EditAddressBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         userAddress = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable(ACCOUNT_ADDRESS, UserAddress::class.java)
+            arguments?.getParcelable(ACCOUNT_ADDRESS, UserAddressUi::class.java)
         } else {
             @Suppress("DEPRECATION")
             arguments?.getParcelable(ACCOUNT_ADDRESS)

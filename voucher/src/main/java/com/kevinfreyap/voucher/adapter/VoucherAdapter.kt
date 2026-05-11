@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kevinfreyap.core.domain.model.voucher.Voucher
+import com.kevinfreyap.shared_voucher.domain.model.Voucher
 import com.kevinfreyap.voucher.databinding.ItemVoucherBinding
 import com.kevinfreyap.voucher.viewholder.VoucherViewHolder
 

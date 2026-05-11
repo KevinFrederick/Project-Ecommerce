@@ -19,6 +19,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.account.databinding.FragmentAccountBinding
 import com.kevinfreyap.shared_ui.R as sharedR
 import com.kevinfreyap.account.R
+import com.kevinfreyap.account.mapper.toUiModel
+import com.kevinfreyap.account.model.UserAddressUi
 import com.kevinfreyap.account.ui.EditAddressBottomSheetFragment.Companion.ACCOUNT_ADDRESS
 import com.kevinfreyap.account.ui.EditAddressBottomSheetFragment.Companion.EDIT_ADDRESS_BOTTOM_SHEET
 import com.kevinfreyap.account.ui.EditAddressBottomSheetFragment.Companion.EDIT_ADDRESS_REQ
@@ -29,8 +31,7 @@ import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.EDIT_
 import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.EDIT_PROFILE_REQ
 import com.kevinfreyap.account.ui.EditProfileBottomSheetFragment.Companion.IS_PROFILE_UPDATE_SUCCESS
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.user.UserAddress
-import com.kevinfreyap.core.domain.model.user.UserProfile
+import com.kevinfreyap.shared_user.domain.model.UserProfile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,7 @@ class AccountFragment : Fragment() {
 
     private var userEmail: String? = null
     private var userName: String? = null
-    private var userAddress: UserAddress? = null
+    private var userAddress: UserAddressUi? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,14 +97,14 @@ class AccountFragment : Fragment() {
             editAddressBottomSheetFragment.show(childFragmentManager, EDIT_ADDRESS_BOTTOM_SHEET)
         }
 
-        childFragmentManager.setFragmentResultListener(EDIT_PROFILE_REQ, viewLifecycleOwner) { requestKey, result ->
+        childFragmentManager.setFragmentResultListener(EDIT_PROFILE_REQ, viewLifecycleOwner) { _, result ->
             val isSuccess = result.getBoolean(IS_PROFILE_UPDATE_SUCCESS)
             if (isSuccess) {
                 showSnackBar(getString(sharedR.string.success_update_name))
             }
         }
 
-        childFragmentManager.setFragmentResultListener(EDIT_ADDRESS_REQ, viewLifecycleOwner) { requestKey, result ->
+        childFragmentManager.setFragmentResultListener(EDIT_ADDRESS_REQ, viewLifecycleOwner) { _, result ->
             val isSuccess = result.getBoolean(IS_ADDRESS_UPDATE_SUCCESS)
             if (isSuccess) {
                 showSnackBar(getString(sharedR.string.success_update_address))
@@ -124,7 +125,7 @@ class AccountFragment : Fragment() {
                                 binding.progressBar.isVisible = false
 
                                 val currentUser = userProfile.data
-                                userAddress = currentUser.address
+                                userAddress = currentUser.address?.toUiModel()
                                 if (currentUser.uid.isNotEmpty()) {
                                     setProfile(currentUser)
                                     userEmail = currentUser.email

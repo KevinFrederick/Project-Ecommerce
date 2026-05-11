@@ -3,17 +3,20 @@ package com.kevinfreyap.checkout.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.checkout.utils.OrderState
-import com.kevinfreyap.core.utils.PaymentMethod
+import com.kevinfreyap.shared_transaction.domain.model.PaymentMethod
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.cart.Cart
-import com.kevinfreyap.core.domain.model.cart.CartSummary
-import com.kevinfreyap.core.domain.model.user.UserAddress
-import com.kevinfreyap.core.domain.model.voucher.Voucher
-import com.kevinfreyap.core.domain.usecase.cart.CalculateSummaryService
-import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
-import com.kevinfreyap.core.domain.usecase.order.OrderUseCase
-import com.kevinfreyap.core.domain.usecase.user.UserUseCase
-import com.kevinfreyap.core.domain.usecase.voucher.VoucherUseCase
+import com.kevinfreyap.checkout.domain.usecase.OrderUseCase
+import com.kevinfreyap.shared_cart.domain.model.AppliedDiscount
+import com.kevinfreyap.shared_cart.domain.model.Cart
+import com.kevinfreyap.shared_cart.domain.model.CartSummary
+import com.kevinfreyap.shared_cart.domain.usecase.CalculateSummaryUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.GetCartItemUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.RemoveCartItemUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.UpdateItemQuantityUseCase
+import com.kevinfreyap.shared_user.domain.model.UserAddress
+import com.kevinfreyap.shared_user.domain.usecase.GetUserProfileUseCase
+import com.kevinfreyap.shared_voucher.domain.model.Voucher
+import com.kevinfreyap.shared_voucher.domain.usecase.VoucherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,16 +30,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-    userUseCase: UserUseCase,
-    private val cartUseCase: CartUseCase,
-    private val calculateSummaryService: CalculateSummaryService,
+    getCartItems: GetCartItemUseCase,
+    getUserProfile: GetUserProfileUseCase,
+    private val calculateSummary: CalculateSummaryUseCase,
+    private val updateItemQuantity: UpdateItemQuantityUseCase,
+    private val removeCartItem: RemoveCartItemUseCase,
     private val orderUseCase: OrderUseCase,
     private val voucherUseCase: VoucherUseCase
 ): ViewModel() {
     private val _orderState = MutableStateFlow<OrderState>(OrderState.Idle)
     val orderState: StateFlow<OrderState> = _orderState
 
-    val userAddress: StateFlow<UserAddress?> = userUseCase.getUserProfile()
+    val userAddress: StateFlow<UserAddress?> = getUserProfile()
         .map { resource ->
             if (resource is Resource.Success) {
                 resource.data.address
@@ -58,7 +63,7 @@ class CheckoutViewModel @Inject constructor(
     private val _voucherMessage = MutableStateFlow<String?>(null)
     val voucherMessage = _voucherMessage.asStateFlow()
 
-    val cartList: StateFlow<Resource<List<Cart>>> = cartUseCase.getCartItems()
+    val cartList: StateFlow<Resource<List<Cart>>> = getCartItems()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -73,7 +78,16 @@ class CheckoutViewModel @Inject constructor(
         flow2 = _appliedVoucher
     ) { cartResource, voucher ->
         if (cartResource is Resource.Success) {
-            calculateSummaryService(cartResource.data, voucher)
+            val appliedDiscount = if (voucher != null) {
+                AppliedDiscount(
+                    minSpend = voucher.minSpend,
+                    isPercentage = voucher.isPercentage,
+                    amount = voucher.discountAmount
+                )
+            } else {
+                null
+            }
+            calculateSummary(cartResource.data, appliedDiscount)
         } else {
             CartSummary(0, 0, 0, 0)
         }
@@ -91,7 +105,7 @@ class CheckoutViewModel @Inject constructor(
     fun increaseQuantity(cart: Cart) {
         viewModelScope.launch {
             val newQuantity = cart.quantity + 1
-            cartUseCase.updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
+            updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
                 if (resource is Resource.Error) {
                     _errorState.value = resource.message
                 }
@@ -103,7 +117,7 @@ class CheckoutViewModel @Inject constructor(
         viewModelScope.launch {
             val newQuantity = cart.quantity - 1
             if (newQuantity > 0) {
-                cartUseCase.updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
+                updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
                     if (resource is Resource.Error) {
                         _errorState.value = resource.message
                     }
@@ -116,7 +130,7 @@ class CheckoutViewModel @Inject constructor(
 
     fun removeItemFromCart(cart: Cart) {
         viewModelScope.launch{
-            cartUseCase.removeItemFromCart(cart.product.id).collect { resource ->
+            removeCartItem(cart.product.id).collect { resource ->
                 if (resource is Resource.Error) {
                     _errorState.value = resource.message
                 }
@@ -137,9 +151,7 @@ class CheckoutViewModel @Inject constructor(
             .toDouble()
 
         viewModelScope.launch {
-            val result = voucherUseCase.applyVoucher(code, subtotal)
-
-            when(result) {
+            when(val result = voucherUseCase.applyVoucher(code, subtotal)) {
                 is Resource.Success -> {
                     val voucher = result.data
 

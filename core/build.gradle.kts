@@ -62,9 +62,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
     implementation(libs.androidx.appcompat)
 
     implementation(libs.firebase.auth)
@@ -73,19 +70,16 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
-    api(libs.androidx.work.runtime.ktx)
-    api(libs.androidx.hilt.work)
-    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.converter.gson)
+    implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preference)
 
-    api(libs.androidx.room.ktx)
-    api(libs.androidx.room.runtime)
-    api(libs.androidx.room.paging)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
-
-    api(libs.paging.runtime)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 

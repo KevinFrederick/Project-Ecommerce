@@ -16,11 +16,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.product.ProductCategory
 import com.kevinfreyap.core.utils.dpToPx
 import com.kevinfreyap.search.R
 import com.kevinfreyap.shared_ui.R as sharedR
 import com.kevinfreyap.search.databinding.BottomSheetFragmentSearchFilterBinding
+import com.kevinfreyap.shared_product.domain.model.ProductCategory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.NumberFormat

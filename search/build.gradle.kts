@@ -44,10 +44,13 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-product"))
     implementation(project(":shared-ui"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    implementation(libs.paging.runtime)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

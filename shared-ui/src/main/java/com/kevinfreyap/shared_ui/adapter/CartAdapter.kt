@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kevinfreyap.core.domain.model.cart.Cart
+import com.kevinfreyap.shared_cart.domain.model.Cart
 import com.kevinfreyap.shared_ui.databinding.ItemCartBinding
 import com.kevinfreyap.shared_ui.viewholder.CartViewHolder
 
 class CartAdapter(
-    private val onNavigation: (Cart) -> Unit ,
-    private val onIncrease: (Cart) -> Unit ,
-    private val onDecrease: (Cart) -> Unit ,
+    private val onNavigation: (Cart) -> Unit,
+    private val onIncrease: (Cart) -> Unit,
+    private val onDecrease: (Cart) -> Unit,
 ): ListAdapter<Cart, CartViewHolder>(CART_DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,

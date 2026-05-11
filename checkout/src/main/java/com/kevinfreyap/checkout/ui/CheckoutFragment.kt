@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kevinfreyap.checkout.databinding.FragmentCheckoutBinding
 import com.kevinfreyap.checkout.utils.OrderState
-import com.kevinfreyap.core.utils.PaymentMethod
+import com.kevinfreyap.shared_transaction.domain.model.PaymentMethod
 import com.kevinfreyap.core.data.Resource
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.adapter.CartAdapter
@@ -48,7 +48,7 @@ class CheckoutFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentCheckoutBinding.inflate(inflater, container, false)
         return binding.root

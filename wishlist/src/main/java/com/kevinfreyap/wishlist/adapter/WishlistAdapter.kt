@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.kevinfreyap.core.domain.model.wishlist.WishlistItem
+import com.kevinfreyap.shared_wishlist.domain.model.WishlistItem
 import com.kevinfreyap.wishlist.databinding.ItemWishlistBinding
 import com.kevinfreyap.wishlist.viewholder.WishlistViewHolder
 

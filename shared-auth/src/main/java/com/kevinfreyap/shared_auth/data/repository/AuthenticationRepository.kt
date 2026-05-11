@@ -1,6 +1,5 @@
 package com.kevinfreyap.shared_auth.data.repository
 
-import android.util.Log
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -11,11 +10,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.data.source.local.UserPreferences
-import com.kevinfreyap.core.domain.model.user.UserProfile
 import com.kevinfreyap.core.utils.Constants
 import com.kevinfreyap.core.utils.isGoogleAccount
+import com.kevinfreyap.shared_auth.data.source.local.AuthPreference
 import com.kevinfreyap.shared_auth.domain.model.AuthRequest
+import com.kevinfreyap.shared_auth.domain.model.AuthSessionResult
 import com.kevinfreyap.shared_auth.domain.repository.IAuthenticationRepository
 import com.kevinfreyap.shared_events.AppEvent
 import com.kevinfreyap.shared_events.AppEventBus
@@ -28,9 +27,9 @@ import javax.inject.Singleton
 class AuthenticationRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseFirestore: FirebaseFirestore,
-    private val userPreferences: UserPreferences
+    private val authPreference: AuthPreference
 ): IAuthenticationRepository {
-    override suspend fun loginWithGoogle(idToken: String): Resource<Boolean> {
+    override suspend fun loginWithGoogle(idToken: String): Resource<AuthSessionResult> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
 
@@ -39,36 +38,19 @@ class AuthenticationRepository @Inject constructor(
 
             if (user != null) {
                 val token = user.getIdToken(true).await().token ?: ""
-                userPreferences.saveAuthToken(token)
+                authPreference.saveAuthToken(token)
 
                 val isGoogleAccount = user.isGoogleAccount()
 
-                val profile = UserProfile(
+                val profile = AuthSessionResult(
                     uid = user.uid,
                     email = user.email,
                     displayName = user.displayName,
                     photoUrl = user.photoUrl?.toString(),
-                    address = null,
                     isGoogleAccount = isGoogleAccount
                 )
-                userPreferences.saveUserProfile(profile)
 
-                try {
-                    val snapshot = firebaseFirestore.collection(Constants.USER_COLLECTION)
-                        .document(user.uid)
-                        .get()
-                        .await()
-
-                    val fullProfile = snapshot.toObject(UserProfile::class.java)
-                    if (fullProfile != null) {
-                        userPreferences.saveUserProfile(fullProfile)
-                    }
-                } catch (e: java.lang.Exception) {
-                    Log.e("AuthRepository", "Firestore sync failed", e)
-                }
-
-                AppEventBus.emit(AppEvent.UserLoggedIn)
-                Resource.Success(true)
+                Resource.Success(profile)
             } else {
                 Resource.Error("ERROR_GOOGLE_SIGN_IN_FAILED")
             }
@@ -104,7 +86,7 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    override suspend fun login(loginRequest: AuthRequest): Resource<Boolean> {
+    override suspend fun login(loginRequest: AuthRequest): Resource<AuthSessionResult> {
         return try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(
                 loginRequest.email,
@@ -114,37 +96,19 @@ class AuthenticationRepository @Inject constructor(
             val user = authResult.user
             if (user != null) {
                 val token = user.getIdToken(true).await().token ?: ""
-                userPreferences.saveAuthToken(token)
+                authPreference.saveAuthToken(token)
 
                 val isGoogleAccount = user.isGoogleAccount()
 
-                val profile = UserProfile(
+                val profile = AuthSessionResult(
                     uid = user.uid,
                     email = user.email,
                     displayName = user.displayName,
                     photoUrl = user.photoUrl.toString(),
-                    address = null,
                     isGoogleAccount = isGoogleAccount
                 )
-                userPreferences.saveUserProfile(profile)
 
-                try {
-                    val snapshot = firebaseFirestore.collection(Constants.USER_COLLECTION)
-                        .document(user.uid)
-                        .get()
-                        .await()
-
-                    val fullProfile = snapshot.toObject(UserProfile::class.java)
-
-                    if (fullProfile != null) {
-                        userPreferences.saveUserProfile(fullProfile)
-                    }
-                } catch (e: java.lang.Exception) {
-                    Log.e("AuthRepository", "Failed to sync full profile on login", e)
-                }
-
-                AppEventBus.emit(AppEvent.UserLoggedIn)
-                Resource.Success(true)
+                Resource.Success(profile)
             } else {
                 Resource.Error("UNKNOWN_ERROR")
             }
@@ -211,7 +175,8 @@ class AuthenticationRepository @Inject constructor(
 
     override suspend fun logout() {
         firebaseAuth.signOut()
-        userPreferences.clearSession()
+        authPreference.clearSession()
+        AppEventBus.emit(AppEvent.UserLoggedOut)
     }
 
     override suspend fun reAuthAndDeleteWithPassword(password: String): Resource<Unit> {

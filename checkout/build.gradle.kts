@@ -45,6 +45,11 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-auth"))
+    implementation(project(":shared-cart"))
+    implementation(project(":shared-voucher"))
+    implementation(project(":shared-transaction"))
+    implementation(project(":shared-user"))
     implementation(project(":shared-ui"))
 
     implementation(libs.hilt.android)

@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.shared_product.domain.model.Product
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.shared_ui.databinding.ItemProductBinding
 

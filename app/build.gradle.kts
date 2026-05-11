@@ -51,14 +51,21 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":shared-events"))
+    implementation(project(":background-work"))
     implementation(project(":shared-auth"))
+    implementation(project(":shared-product"))
+    implementation(project(":shared-cart"))
+    implementation(project(":shared-user"))
+    implementation(project(":shared-transaction"))
+    implementation(project(":shared-voucher"))
+    implementation(project(":shared-wishlist"))
+    implementation(project(":shared-events"))
     implementation(project(":shared-ui"))
     implementation(project(":auth"))
     implementation(project(":account"))
-    implementation(project(":detail"))
     implementation(project(":cart"))
     implementation(project(":checkout"))
+    implementation(project(":product"))
     implementation(project(":transaction"))
     implementation(project(":wishlist"))
     implementation(project(":search"))
@@ -67,6 +74,16 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    implementation(libs.converter.gson)
+
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+
+    implementation(libs.androidx.room.paging)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
