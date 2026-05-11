@@ -6,9 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.cart.utils.CheckoutActionState
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.cart.Cart
-import com.kevinfreyap.core.domain.model.cart.CartSummary
-import com.kevinfreyap.core.domain.usecase.cart.CartUseCase
+import com.kevinfreyap.shared_cart.domain.model.Cart
+import com.kevinfreyap.shared_cart.domain.model.CartSummary
+import com.kevinfreyap.shared_cart.domain.usecase.GetCartItemUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.GetCartSummaryUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.RefreshCartAvailabilityUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.RemoveCartItemUseCase
+import com.kevinfreyap.shared_cart.domain.usecase.UpdateItemQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,10 +23,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartUseCase: CartUseCase,
+    getCartItems: GetCartItemUseCase,
+    getCartSummary: GetCartSummaryUseCase,
+    private val refreshCartAvailability: RefreshCartAvailabilityUseCase,
+    private val updateItemQuantity: UpdateItemQuantityUseCase,
+    private val removeCartItem: RemoveCartItemUseCase,
     private val connectivityManager: ConnectivityManager
 ) : ViewModel() {
-    val cartList: StateFlow<Resource<List<Cart>>> = cartUseCase.getCartItems()
+    val cartList: StateFlow<Resource<List<Cart>>> = getCartItems()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -35,7 +43,7 @@ class CartViewModel @Inject constructor(
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> = _errorState
 
-    val cartSummary: StateFlow<CartSummary> = cartUseCase.getCartSummary()
+    val cartSummary: StateFlow<CartSummary> = getCartSummary()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -48,7 +56,7 @@ class CartViewModel @Inject constructor(
 
     fun refreshCart() {
         viewModelScope.launch {
-            cartUseCase.refreshCartAvailability().collect { resource ->
+            refreshCartAvailability().collect { resource ->
                 if (resource is Resource.Error){
                     _errorState.value = resource.message
                 }
@@ -59,7 +67,7 @@ class CartViewModel @Inject constructor(
     fun increaseQuantity(cart: Cart) {
         viewModelScope.launch {
             val newQuantity = cart.quantity + 1
-            cartUseCase.updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
+            updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
                 if (resource is Resource.Error) {
                     _errorState.value = resource.message
                 }
@@ -71,7 +79,7 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch {
             val newQuantity = cart.quantity - 1
             if (newQuantity > 0) {
-                cartUseCase.updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
+                updateItemQuantity(cart.product.id, newQuantity).collect { resource ->
                     if (resource is Resource.Error) {
                         _errorState.value = resource.message
                     }
@@ -84,7 +92,7 @@ class CartViewModel @Inject constructor(
 
     fun removeItemFromCart(cart: Cart) {
         viewModelScope.launch{
-            cartUseCase.removeItemFromCart(cart.product.id).collect { resource ->
+            removeCartItem(cart.product.id).collect { resource ->
                 if (resource is Resource.Error) {
                     _errorState.value = resource.message
                 }
@@ -101,7 +109,7 @@ class CartViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            cartUseCase.refreshCartAvailability().collect { resource ->
+            refreshCartAvailability().collect { resource ->
                 when(resource) {
                     is Resource.Loading -> {
                         _checkoutState.value = CheckoutActionState.Loading

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hiltAndroid)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -45,6 +46,8 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-user"))
+    implementation(project(":shared-voucher"))
     implementation(project(":shared-ui"))
 
     implementation(libs.hilt.android)

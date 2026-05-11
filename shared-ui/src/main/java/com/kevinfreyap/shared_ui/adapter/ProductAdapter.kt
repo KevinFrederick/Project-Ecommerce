@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.kevinfreyap.core.domain.model.product.Product
+import com.kevinfreyap.shared_product.domain.model.Product
 import com.kevinfreyap.shared_ui.databinding.ItemProductBinding
 import com.kevinfreyap.shared_ui.viewholder.ProductViewHolder
 

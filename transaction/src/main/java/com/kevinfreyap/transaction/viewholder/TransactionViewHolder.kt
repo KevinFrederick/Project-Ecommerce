@@ -2,16 +2,16 @@ package com.kevinfreyap.transaction.viewholder
 
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.kevinfreyap.core.domain.model.order.OrderReceipt
-import com.kevinfreyap.core.domain.model.order.OrderStatus
 import com.kevinfreyap.core.utils.TimeUtils
+import com.kevinfreyap.shared_transaction.domain.model.TransactionReceipt
+import com.kevinfreyap.shared_transaction.domain.model.TransactionStatus
 import com.kevinfreyap.shared_ui.R
 import com.kevinfreyap.transaction.databinding.ItemTransactionHistoryBinding
 
 class TransactionViewHolder(
     private val binding: ItemTransactionHistoryBinding
 ): RecyclerView.ViewHolder(binding.root) {
-    fun bind(receipt: OrderReceipt, onItemClick: (OrderReceipt) -> Unit) {
+    fun bind(receipt: TransactionReceipt, onItemClick: (TransactionReceipt) -> Unit) {
         val context = itemView.context
 
         binding.tvOrderId.text = receipt.orderId
@@ -26,13 +26,13 @@ class TransactionViewHolder(
             onItemClick(receipt)
         }
 
-        binding.tvOrderStatus.text = receipt.orderStatus.displayName
+        binding.tvOrderStatus.text = receipt.transactionStatus.displayName
 
-        val color = when(receipt.orderStatus) {
-            OrderStatus.PROCESSING -> ContextCompat.getColor(context, R.color.blue_300)
-            OrderStatus.SHIPPED -> ContextCompat.getColor(context, R.color.blue_700)
-            OrderStatus.DELIVERED -> ContextCompat.getColor(context, R.color.green_500)
-            OrderStatus.CANCELLED -> ContextCompat.getColor(context, R.color.red_500)
+        val color = when(receipt.transactionStatus) {
+            TransactionStatus.PROCESSING -> ContextCompat.getColor(context, R.color.blue_300)
+            TransactionStatus.SHIPPED -> ContextCompat.getColor(context, R.color.blue_700)
+            TransactionStatus.DELIVERED -> ContextCompat.getColor(context, R.color.green_500)
+            TransactionStatus.CANCELLED -> ContextCompat.getColor(context, R.color.red_500)
         }
         binding.tvOrderStatus.setTextColor(color)
     }

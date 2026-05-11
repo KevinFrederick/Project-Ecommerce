@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.data.source.MainViewModel
 import com.kevinfreyap.shared_ui.util.setupCartMenu
 import com.kevinfreyap.transaction.adapter.TransactionAdapter
 import com.kevinfreyap.transaction.databinding.FragmentTransactionBinding
@@ -26,7 +24,6 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class TransactionFragment : Fragment() {
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: TransactionViewModel by viewModels()
 
     private var _binding: FragmentTransactionBinding? = null
@@ -38,7 +35,7 @@ class TransactionFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentTransactionBinding.inflate(inflater, container, false)
         return binding.root
@@ -50,7 +47,7 @@ class TransactionFragment : Fragment() {
         setupRecyclerView()
 
         setupCartMenu(
-            cartItemCount = mainViewModel.cartItemCount
+            cartItemCount = viewModel.cartItemCount
         ) {
             val uri = "app://ecommerce/cart".toUri()
             findNavController().navigate(uri)

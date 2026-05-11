@@ -44,6 +44,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-voucher"))
     implementation(project(":shared-ui"))
 
     implementation(libs.hilt.android)

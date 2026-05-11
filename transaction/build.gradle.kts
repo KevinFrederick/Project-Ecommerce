@@ -46,6 +46,8 @@ kotlin {
 dependencies {
     implementation(project(":core"))
     implementation(project(":shared-ui"))
+    implementation(project(":shared-transaction"))
+    implementation(project(":shared-cart"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

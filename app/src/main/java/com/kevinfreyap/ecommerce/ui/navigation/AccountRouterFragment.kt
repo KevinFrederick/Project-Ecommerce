@@ -4,15 +4,15 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
 import com.kevinfreyap.ecommerce.R
+import com.kevinfreyap.shared_auth.domain.usecase.LoginStatusUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountRouterFragment: Fragment() {
     @Inject
-    lateinit var authUseCase: AuthUseCase
+    lateinit var loginStatus: LoginStatusUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +21,7 @@ class AccountRouterFragment: Fragment() {
             .setPopUpTo(R.id.navigation_account_router, true) // Remove this router from back stack
             .build()
 
-        if (authUseCase.isUserLoggedIn()){
+        if (loginStatus()){
             findNavController().navigate(
                 R.id.action_navigation_account_router_to_accountProfile,
                 null,

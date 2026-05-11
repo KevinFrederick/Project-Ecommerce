@@ -43,6 +43,10 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":shared-cart"))
+    implementation(project(":shared-product"))
+
+    implementation(libs.paging.runtime)
 
     api(libs.androidx.lifecycle.livedata.ktx)
     api(libs.androidx.lifecycle.viewmodel.ktx)

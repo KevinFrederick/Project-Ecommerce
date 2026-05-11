@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.filter.SearchFilter
-import com.kevinfreyap.core.domain.usecase.product.ProductUseCase
+import com.kevinfreyap.shared_product.domain.model.SearchFilter
+import com.kevinfreyap.shared_product.domain.usecase.GetCategoriesUseCase
+import com.kevinfreyap.shared_product.domain.usecase.GetProductUseCase
+import com.kevinfreyap.shared_product.domain.usecase.RefreshCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,12 +25,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val productUseCase: ProductUseCase
+    getCategories: GetCategoriesUseCase,
+    private val getProducts: GetProductUseCase,
+    private val refreshCategories: RefreshCategoriesUseCase
 ): ViewModel(){
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    val categories = productUseCase.getCategories()
+    val categories = getCategories()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -59,7 +63,7 @@ class SearchViewModel @Inject constructor(
             if (isQueryEmpty && !hasFilter) {
                 flowOf(PagingData.empty())
             } else {
-                productUseCase.getProducts(query, filter)
+                getProducts(query, filter)
             }
         }
         .cachedIn(viewModelScope)
@@ -70,7 +74,7 @@ class SearchViewModel @Inject constructor(
 
     fun syncCategory(){
         viewModelScope.launch(Dispatchers.IO) {
-            productUseCase.refreshCategories()
+            refreshCategories()
         }
     }
 

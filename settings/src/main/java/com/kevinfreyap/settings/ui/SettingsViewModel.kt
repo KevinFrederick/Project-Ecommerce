@@ -5,10 +5,17 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevinfreyap.core.data.Resource
-import com.kevinfreyap.core.domain.model.notification.NotificationPreferences
-import com.kevinfreyap.core.domain.model.user.UserProfile
-import com.kevinfreyap.core.domain.usecase.auth.AuthUseCase
-import com.kevinfreyap.core.domain.usecase.user.UserUseCase
+import com.kevinfreyap.core.domain.notification.NotificationPreferences
+import com.kevinfreyap.shared_auth.domain.usecase.DeleteWithGoogleUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.DeleteWithPassUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.LogoutUseCase
+import com.kevinfreyap.shared_auth.domain.usecase.UpdatePasswordUseCase
+import com.kevinfreyap.shared_user.domain.model.UserProfile
+import com.kevinfreyap.shared_user.domain.usecase.GetNotificationSettingUseCase
+import com.kevinfreyap.shared_user.domain.usecase.GetThemeUseCase
+import com.kevinfreyap.shared_user.domain.usecase.GetUserProfileUseCase
+import com.kevinfreyap.shared_user.domain.usecase.SaveThemeUseCase
+import com.kevinfreyap.shared_user.domain.usecase.UpdateNotificationSettingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,25 +29,32 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase,
-    private val userUseCase: UserUseCase
+    getUserProfile: GetUserProfileUseCase,
+    getTheme: GetThemeUseCase,
+    getNotificationSetting: GetNotificationSettingUseCase,
+    private val saveTheme: SaveThemeUseCase,
+    private val updateNotificationSetting: UpdateNotificationSettingUseCase,
+    private val deleteWithPassUseCase: DeleteWithPassUseCase,
+    private val deleteWithGoogleUseCase: DeleteWithGoogleUseCase,
+    private val updatePasswordUseCase: UpdatePasswordUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ): ViewModel(){
 
-    val currentUser: StateFlow<Resource<UserProfile>> = userUseCase.getUserProfile()
+    val currentUser: StateFlow<Resource<UserProfile>> = getUserProfile()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = Resource.Loading()
         )
 
-    val currentTheme: StateFlow<Int> = userUseCase.getTheme()
+    val currentTheme: StateFlow<Int> = getTheme()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         )
 
-    val notificationSettings = userUseCase.getNotificationSettings()
+    val notificationSettings = getNotificationSetting()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -58,14 +72,14 @@ class SettingsViewModel @Inject constructor(
 
     fun setTheme(mode: Int) {
         viewModelScope.launch {
-            userUseCase.saveTheme(mode)
+            saveTheme(mode)
             AppCompatDelegate.setDefaultNightMode(mode)
         }
     }
 
     fun updateNotificationPreferences(isSystem: Boolean, isEnabled: Boolean) {
         viewModelScope.launch {
-            userUseCase.updateNotificationSetting(isSystem, isEnabled)
+            updateNotificationSetting(isSystem, isEnabled)
         }
     }
 
@@ -73,7 +87,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _updateState.value = Resource.Loading()
 
-            val result = authUseCase.updatePassword(
+            val result = updatePasswordUseCase(
                 currentPass = currentPass,
                 newPass = newPass,
                 confirmPass = confirmPass
@@ -90,7 +104,7 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                authUseCase.logout()
+                logoutUseCase()
 
                 // Will execute only after authUseCase.logout Finished
                 _navEvent.send(true)
@@ -105,7 +119,7 @@ class SettingsViewModel @Inject constructor(
     fun onDeleteAccountWithPassword(password: String) {
         viewModelScope.launch {
             _deleteState.value = Resource.Loading()
-            val result = authUseCase.reAuthAndDeleteWithPassword(password)
+            val result = deleteWithPassUseCase(password)
             _deleteState.value = result
             if (result is Resource.Success) {
                 _navEvent.send(true)
@@ -116,7 +130,7 @@ class SettingsViewModel @Inject constructor(
     fun onDeleteAccountWithGoogle(idToken: String) {
         viewModelScope.launch {
             _deleteState.value = Resource.Loading()
-            val result = authUseCase.reAuthAndDeleteWithGoogle(idToken)
+            val result = deleteWithGoogleUseCase(idToken)
             _deleteState.value = result
             if (result is Resource.Success) {
                 _navEvent.send(true)
